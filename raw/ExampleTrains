@@ -1,0 +1,5 @@
+east 1 rectangle long not_double none 3 2 rectangle 2 bucket long not_double arc 3 3 diamond 3 ellipse short not_double flat 2 2 circle 4 hexagon short not_double jagged 2 2 triangle
+east 1 hexagon long not_double flat 2 1 circle 2 rectangle long not_double flat 2 1 diamond 3 rectangle long not_double flat 2 1 rectangle 4 bucket long not_double flat 2 1 diamond
+east 1 hexagon long not_double flat 2 1 circle 2 rectangle long not_double flat 2 1 rectangle 3 rectangle long not_double flat 2 1 circle 4 bucket long not_double flat 2 1 circle
+east 1 rectangle long not_double none 3 2 rectangle 2 bucket long not_double arc 3 3 diamond 3 ellipse short not_double flat 2 2 circle 4 hexagon short not_double jagged 2 2 triangle
+east 1 u_shaped long not_double peaked 2 1 hexagon 2 bucket long not_double flat 2 3 utriangle
