@@ -1,0 +1,21 @@
+.idea
+*/tex/*
+!*/tex/*.tex
+!*/tex/tuda_logo.pdf
+!*.png
+/Master title
+/output/*
+/data/*
+/tmp/
+/dataset/
+/tex/main.aux
+/tex/main.bcf
+/tex/main.log
+/tex/main.out
+/tex/main.run.xml
+/tex/main.synctex.gz
+/tex/main.toc
+/tex/main.xmpdata
+/tex/pdfa.xmpi
+/tex/main.pdf
+/tex/images/
