@@ -27,7 +27,7 @@ def main():
     base_scene = scenes[0]
 
     # generating images
-    generate_trains = False
+    generate_trains = True
 
 
     if generate_trains:
@@ -37,15 +37,15 @@ def main():
         print(f'generating {train_col} images for {base_scene}')
         with_occlusion, black = False, False
         save_blender, high_res, gen_depth = False, False, False
-        replace_existing_img = False
+        replace_existing_img, replace_raw = False, False
         # generate images in range [start_ind:end_ind]
         start_ind = 000
         end_ind = 10000
-        # generate raw trains if they do not exist
-        if not os.path.isfile(f'raw/{train_col}.txt'):
+        # generate raw trains if they do not exist or shall be replaced
+        if not os.path.isfile(f'raw/datasets/{train_col}.txt') or replace_raw:
             gen_raw_trains(train_col)
         # load trains
-        trains = read_trains(f'raw/{train_col}.txt', with_occlusion)
+        trains = read_trains(f'raw/datasets/{train_col}.txt', with_occlusion)
         trains = trains[start_ind:end_ind]
         rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_col[0]}',
                     max_iterations=end_ind - start_ind)

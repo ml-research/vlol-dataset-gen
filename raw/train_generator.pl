@@ -10,38 +10,20 @@
 % The top-level predicates are trains/0 and trains/1.
 % modified for SWI-Prolog by Lukas Helff
 
-loop(0).
 loop(N_trains) :- N_trains>0, trains, C_train is N_trains-1, loop(C_train).
 
 trains :- train1(X), show(X).
 
-
-% trains :- repeat, train1(X), show(X),rep.
-
-% rep :- (get_counter == 5 ->
-%   writeln('all trains generated'),
-%    ! % cut, we won't backtrack to repeat anymore
-% ;
-%   writeln('repeat train generation'),
-%   increment,
-%   repeat % backtrack to repeat
-% ).
-
-
-% rep :- write('More (y/n)? '), read(n),nl,
-% (n == y ->
-%   writeln('You selected yes.'),
-%   repeat % backtrack to repeat
-% ; writeln('You selected no.'),
-%   ! % cut, we won't backtrack to repeat anymore
-% ).
-
 trains([]) :- !.
-trains([H|T]) :- train1(H), trains(T), !.
+trains([H|T]) :- train1(H), randdirection(H), trains(T), !.
 train1(Carriages) :-
   random([0,0.3,0.3,0.4],NCarriages),
   length(Carriages,NCarriages),
-  carriages(Carriages,1), !.
+  carriages(Carriages,1),!.
+
+randdirection(Carriages) :-
+  random(0,2,Elem1),
+  (Elem1 = 0;  eastbound(Carriages)), !.
 
 carriages([],_).
 carriages([C|Cs],N) :-
@@ -111,7 +93,7 @@ load_shape(4,rectangle). load_shape(5,triangle). load_shape(6,utriangle).
 show(Train) :-
   direction(Train),
   show0(Train),
-  open('MichalskiTrains.txt', append, OS),
+  open('raw/tmp/MichalskiTrains.txt', append, OS),
   format(OS, "~n" , []),
   close(OS),
   nl, !.
@@ -119,7 +101,7 @@ show(Train) :-
 show0([]).
 show0([C|Cs]) :-
   C=c(N,Shape,Length,Double,Roof,Wheels,l(Lshape,Lno)),
-  open('MichalskiTrains.txt', append, OS),
+  open('raw/tmp/MichalskiTrains.txt', append, OS),
   format(OS, ' ~w ~w ~w ~w ~w ~w ~w ~w', [N,Shape,Length,Double,Roof,Wheels,Lno,Lshape]),
   writes(['Car ',N,': Shape = ',Shape,
   ', Length = ',Length,', Double = ',Double,nl, tab(8),
@@ -130,7 +112,7 @@ show0([C|Cs]) :-
   show0(Cs), !.
 
 direction(Train) :-
-  open('MichalskiTrains.txt', append, OS),
+  open('raw/tmp/MichalskiTrains.txt', append, OS),
   (eastbound(Train) -> (format(OS, "~w" , [east]), write('Eastbound train:'), nl)
   ;otherwise -> (format(OS, "~w" , [west]), write('Westbound train:'), nl)),
   close(OS).
@@ -148,10 +130,10 @@ mywrite(X) :- write(X), !.
 
 % Theory X
 % There is either a short, closed car, or a car with a circular load somewhere behind a car with a triangular load.
-eastbound([Car|Cars]):-
-(short(Car), closed(Car));
-(has_load0(Car,triangle), has_load1(Cars,circle));
-eastbound(Cars).
+% eastbound([Car|Cars]):-
+% (short(Car), closed(Car));
+% (has_load0(Car,triangle), has_load1(Cars,circle));
+% eastbound(Cars).
 
 
 has_car(T,C) :- member(C,T).
@@ -198,52 +180,3 @@ len1([_|T],N) :- len1(T,N1), N is N1+1, !.
 append([],L,L) :- !.
 append([H|L1],L2,[H|L3]) :-
   append(L1,L2,L3), !.
-
-% Prolog representation of 20 trains.
-
-
-% eastbound([c(1,rectangle,short,not_double,none,2,l(circle,1)),c(2,rectangle,
-%   long,not_double,none,3,l(hexagon,1)),c(3,rectangle,short,
-%   not_double,peaked,2,l(triangle,1)),c(4,rectangle,long,
-%   not_double,none,2,l(rectangle,3))]).
-%
-% eastbound([c(1,rectangle,short,not_double,flat,2,l(circle,2)),c(2,bucket,
-%   short,not_double,none,2,l(rectangle,1)),c(3,u_shaped,
-%   short,not_double,none,2,l(triangle,1))]).
-%
-% eastbound([c(1,rectangle,long,not_double,flat,3,l(utriangle,1)),c(2,hexagon,
-%   short,not_double,flat,2,l(triangle,1)),c(3,rectangle,
-%   short,not_double,none,2,l(circle,1))]).
-%
-% eastbound([c(1,rectangle,short,not_double,none,2,l(rectangle,1)),c(2,ellipse,
-%   short,not_double,arc,2,l(diamond,1)),c(3,rectangle,short,
-%   double,none,2,l(triangle,1)),c(4,bucket,short,not_double,
-%   none,2,l(triangle,1))]).
-%
-% eastbound([c(1,rectangle,short,not_double,flat,2,l(circle,1)),c(2,rectangle,
-%   long,not_double,flat,3,l(rectangle,1)),c(3,rectangle,
-%   short,double,none,2,l(triangle,1))]).
-%
-% eastbound([c(1,rectangle,long,not_double,jagged,3,l(rectangle,1)),c(2,hexagon,
-%   short,not_double,flat,2,l(circle,1)),c(3,rectangle,short,
-%   not_double,none,2,l(triangle,1)),c(4,rectangle,long,not_double,
-%   jagged,2,l(rectangle,0))]).
-%
-% eastbound([c(1,rectangle,long,not_double,none,2,l(hexagon,1)),c(2,rectangle,
-%   short,not_double,none,2,l(rectangle,1)),c(3,rectangle,
-%   short,not_double,flat,2,l(triangle,1))]).
-%
-% eastbound([c(1,rectangle,short,not_double,peaked,2,l(rectangle,1)),c(2,
-%   bucket,short,not_double,none,2,l(rectangle,1)),c(3,rectangle,
-%   long,not_double,flat,2,l(circle,1)),c(4,rectangle,short,
-%   not_double,none,2,l(rectangle,1))]).
-%
-% eastbound([c(1,rectangle,long,not_double,none,2,l(rectangle,3)),c(2,rectangle,
-%   short,not_double,none,2,l(circle,1)),c(3,rectangle,long,
-%   not_double,jagged,3,l(hexagon,1)),c(4,u_shaped,short,
-%   not_double,none,2,l(triangle,1))]).
-%
-% eastbound([c(1,bucket,short,not_double,none,2,l(triangle,1)),c(2,u_shaped,
-%   short,not_double,none,2,l(circle,1)),c(3,rectangle,short,
-%   not_double,none,2,l(triangle,1)),c(4,rectangle,short,
-%   not_double,none,2,l(triangle,1))]).

@@ -16,7 +16,6 @@ from torchvision.transforms import InterpolationMode
 from tqdm.contrib import tenumerate
 
 from blender_image_generator.json_util import merge_json_files
-from models.detectron import setup, predict_instances
 
 
 class MichalskiTrainDataset(Dataset):
@@ -134,6 +133,7 @@ class MichalskiTrainDataset(Dataset):
             self.split_masks()
 
         if 'pred' in self.X_val or 'gt_single_mask' in self.X_val:
+            from models.detectron import setup, predict_instances
             if not os.path.isfile(self.predictions_path):
                 conf_path = "./configs/mask_rcnn_R_101_FPN_3x.yaml"
                 cfg = setup(conf_path, self.base_scene, self.train_col)
