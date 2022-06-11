@@ -8,7 +8,7 @@ class MichalskiTrain(object):
     def __init__(self, m_cars, direction, angle, scale=(0.5, 0.5, 0.5)):
         self.m_cars = m_cars
         self.direction = direction
-        self.angle = angle
+        self.angle = int(angle)
         # blender scale of train
         self.scale = scale
 

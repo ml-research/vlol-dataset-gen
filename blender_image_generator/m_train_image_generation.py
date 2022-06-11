@@ -10,6 +10,18 @@ import time
 
 def generate_image(base_scene, train_col, t_num, train, black=False, save_blender=False, replace_existing_img=True,
                    high_res=False, gen_depth=False):
+    """ assemble and render an image for the provided train
+    Args:
+        base_scene (string): background scene of the train ('base_scene', 'desert_scene', 'sky_scene', 'fisheye_scene')
+        train_col (string): typ of trains which are generated either 'RandomTrains' or 'MichalskiTrains'
+        t_num (int): id of the train
+        train (train obj): train object which is assembled and rendered
+        black (bool): whether to use black or silver metal for the train
+        save_blender (bool): whether the blender scene shall be shaved
+        replace_existing_img (bool): if there exists already an image for the id shall it be replaced?
+        gen_depth (bool): whether to generate the depth information of the individual scenes
+        high_res (bool): whether to render the images in high resolution (1920x1080) or standard resolution (480x270)
+    """
 
     start = time.time()
     output_image = f'output/image_generator/{train_col}/{base_scene}/images/{t_num}_m_train.png'

@@ -2,8 +2,6 @@ import logging
 from rtpt import RTPT
 from util import *
 
-
-
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1"
 
 
@@ -29,23 +27,28 @@ def main():
     # generating images
     generate_trains = True
 
-
     if generate_trains:
         from blender_image_generator.m_train_image_generation import generate_image
-        from raw.read_raw_trains import read_trains
-        from raw.gen_raw_trains import gen_raw_trains
-        print(f'generating {train_col} images for {base_scene}')
+        from raw.gen_raw_trains import gen_raw_trains, read_trains
+
+        # settings
         with_occlusion, black = False, False
         save_blender, high_res, gen_depth = False, False, False
-        replace_existing_img, replace_raw = False, False
+        replace_existing_img, replace_raw = False, True
+
         # generate images in range [start_ind:end_ind]
         start_ind = 000
         end_ind = 10000
+        print(f'generating {train_col} images for {base_scene}')
+
         # generate raw trains if they do not exist or shall be replaced
         if not os.path.isfile(f'raw/datasets/{train_col}.txt') or replace_raw:
-            gen_raw_trains(train_col)
+            gen_raw_trains(train_col, with_occlusion=with_occlusion)
+
         # load trains
-        trains = read_trains(f'raw/datasets/{train_col}.txt', with_occlusion)
+        trains = read_trains(f'raw/datasets/{train_col}.txt')
+
+        # render trains
         trains = trains[start_ind:end_ind]
         rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_col[0]}',
                     max_iterations=end_ind - start_ind)
@@ -54,6 +57,7 @@ def main():
             rtpt.step()
             generate_image(base_scene, train_col, t_num, train, black, save_blender, replace_existing_img,
                            high_res=high_res, gen_depth=True)
+
 
 if __name__ == '__main__':
     main()
