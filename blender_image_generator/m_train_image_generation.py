@@ -10,7 +10,7 @@ import time
 
 def generate_image(base_scene, train_col, t_num, train, black=False, save_blender=False, replace_existing_img=True,
                    high_res=False, gen_depth=False):
-    """ assemble and render an image for the provided train
+    """ assemble and render an image and generate ground truth information for the provided train
     Args:
         base_scene (string): background scene of the train ('base_scene', 'desert_scene', 'sky_scene', 'fisheye_scene')
         train_col (string): typ of trains which are generated either 'RandomTrains' or 'MichalskiTrains'

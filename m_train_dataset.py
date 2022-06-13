@@ -27,7 +27,7 @@ class MichalskiTrainDataset(Dataset):
                 resize: bool if true images are resized to 224x224
                 X_val: X value output for training data returned in __getitem__()
                 ['image', 'predicted_attributes', 'gt_attributes', 'gt_attributes_individual_class', 'predicted_mask', gt_mask]
-                        image: torch image of michalski train
+                        image (torch): image of michalski train
                         gt_attributes: ground truth attributes of michalski train (each attribute uses general classes)
                         predicted_attributes: from attrNet/ResNet predicted attributes (each attribute uses general classes)
                         predicted_attributes_permutation_invariant: from attrNet/ResNet predicted attributes
