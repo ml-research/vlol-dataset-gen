@@ -1,6 +1,9 @@
 import bpy
 from mathutils import Vector
-
+"""
+Copied from StackOverflow
+https://blender.stackexchange.com/questions/7198/save-the-2d-bounding-box-of-an-object-in-rendered-image-to-a-text-file
+    """
 
 class Box:
     dim_x = 1
@@ -40,8 +43,7 @@ class Box:
         return (self.x, self.y, self.width, self.height)
 
 
-# Copied from StackOverflow
-# https://blender.stackexchange.com/questions/7198/save-the-2d-bounding-box-of-an-object-in-rendered-image-to-a-text-file
+
 def camera_view_bounds_2d(scene, cam_ob, me_ob):
     """
     Returns camera space bounding box of mesh object.

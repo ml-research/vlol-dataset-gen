@@ -8,6 +8,9 @@ from blender_image_generator.get_b_box import get_b_box
 
 
 def load_materials():
+    """
+    Loading and adding all materials to the current bpy scene
+    """
     path = 'data/materials/Materials.blend'
     collection_name = 'materials'
 
@@ -25,6 +28,11 @@ def load_materials():
 
 
 def load_base_scene(filepath, collection):
+    """
+    load a new base scene
+    :param:  filepath (string)        : filepath of scene which is loaded
+    :param:  collection (object)      : collection in which all objects are added
+    """
     # append, set to true to keep the link to the original file
     link = False
     files = []
@@ -48,6 +56,13 @@ def load_base_scene(filepath, collection):
 
 
 def load_engine(train_collection, location, alpha, metal_mat=None):
+    """
+    load the train engine to the scene
+    :param:  train_collection (object)      : collection in which the train is added
+    :param:  location (array of int)        : location (x,y,z position) where the engine is added within the scene
+    :param:  alpha (int)                    : angle of the train rotation
+    :param:  metal_mat (string)             : whether to paint the metal of the engin black if 'black_metal'
+    """
     filepath = f'data/shapes/train/engine/engine.blend'
     collection = 'train'
     # append, set to true to keep the link to the original file
@@ -58,6 +73,15 @@ def load_engine(train_collection, location, alpha, metal_mat=None):
 
 
 def load_rails(train_collection, location, alpha, base_scene, scale=(0.5, 0.5, 0.5)):
+    """
+    load the rails to the scene, Load rails into the camera's field of view only and only load and at most to the
+     boundary of the subsoil
+    :param:  train_collection (object)      : collection in which the rails are added
+    :param:  location (array of int)        : location (x,y,z position) where the rails are starting
+    :param:  alpha (int)                    : angle of the train rotation
+    :param:  base_scene (string)            : whether to paint the metal of the engin black if 'black_metal'
+    :param:  scale (array of int)           : scale of the engine in x,y,z direction
+    """
     filepath = f'data/shapes/train/rails/rails.blend'
     collection = 'rails'
     # append, set to true to keep the link to the original file
@@ -84,6 +108,13 @@ def load_rails(train_collection, location, alpha, base_scene, scale=(0.5, 0.5, 0
 
 
 def load_car(car, train_tail, train_collection, alpha):
+    """
+    load a train car to the scene
+    :param:  car (object)                   : car which is added to the scene
+    :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
+    :param:  train_collection (object)      : blender collection in which the car is added
+    :param:  alpha (int)                    : angle of rotation
+    """
     filepath_car = f'data/shapes/train/car/{car.length}_car.blend'
     filepath_wheel = f'data/shapes/train/wheels/{car.length}_car_{car.wheels}_wheels.blend'
     collection_name = 'car' + str(car.n)
@@ -103,6 +134,13 @@ def load_car(car, train_tail, train_collection, alpha):
 
 
 def load_roof(car, car_collection, train_tail, alpha):
+    """
+    if car has a roof load it to the scene
+    :param:  car (object)                   : car which is added to the scene
+    :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
+    :param:  train_collection (object)      : blender collection in which the car is added
+    :param:  alpha (int)                    : angle of rotation
+    """
     roof_type = car.get_blender_roof()
     link = False
 
@@ -118,6 +156,14 @@ def load_roof(car, car_collection, train_tail, alpha):
 
 
 def load_wall(car, car_collection, train_tail, alpha, wall_type):
+    """
+    load the wall of the car to the scene
+    :param:  car (object)                   : car which is added to the scene
+    :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
+    :param:  train_collection (object)      : blender collection in which the car is added
+    :param:  alpha (int)                    : angle of rotation
+    :param:  wall_type (string)             : wall type which is loaded
+    """
     if wall_type is not None:
         filepath = f'data/shapes/train/walls/{car.length}/{wall_type}.blend'
         link = False
@@ -127,6 +173,13 @@ def load_wall(car, car_collection, train_tail, alpha, wall_type):
 
 
 def load_payload(car_collection, train_tail, car, alpha):
+    """
+    load the payload of the car to the scene
+    :param:  car (object)                   : car which is added to the scene
+    :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
+    :param:  train_collection (object)      : blender collection in which the car is added
+    :param:  alpha (int)                    : angle of rotation
+    """
     payload_num = car.get_load_number()
     if payload_num > 0:
         payload = car.get_blender_payload()
@@ -164,6 +217,13 @@ def load_payload(car_collection, train_tail, car, alpha):
 
 
 def create_train(train, train_collection, train_init_cord, alpha):
+    """
+    create and load the train into the blender scene and the given collection
+    :param:  train (object)                 : train which is added to the scene
+    :param:  train_init_cord (array of int) : initial location (x,y,z position) of the train
+    :param:  train_collection (object)      : blender collection in which the train is added
+    :param:  alpha (int)                    : angle of rotation of the train
+    """
     # train is points in x direction -> thus cars need to be added in -x direction
     # the engine is located at 2.9, first car is point at the same coordinates
     train_tail_coord = train_init_cord
@@ -179,6 +239,21 @@ def create_train(train, train_collection, train_init_cord, alpha):
 
 def load_asset(filepath, materials, alpha, location, collection, link, metal_color=None, pass_index=0,
                init_obj_rotation=(math.radians(-.125), 0, math.radians(90)), init_obj_scale=(0.5, 0.5, 0.5)):
+    """
+    load and add an asset to the blender scene
+    :param:  filepath (string)                  : path to the asset which is loaded to the scene
+    :param:  materials (object)                 : the materials to be replaced from the original asset
+    :param:  alpha (int)                        : angle of rotation of the asset
+    :param:  location (array of float)          : coordinates (x,y,z position) where the asset should be loaded
+    :param:  collection (object)                : blender collection in which the asset is added
+    :param:  link (bool)                        : whether the asset shall be linked
+    :param:  metal_color (object)               : color of the assets metal, if None no adjustments are made to the
+    metal
+    :param:  pass_index (int)                   : pass index of the asset, which is used by the compositor to identify
+    the object
+    :param:  init_obj_rotation (array of float) : initial rotation (x,y,z rotation) of the asset
+    :param:  init_obj_scale (array of float)    : initial scale (x,y,z scale) of the asset
+    """
     # append, set to true to keep the link to the original file
     with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
         data_to.objects = data_from.objects[:]
@@ -210,6 +285,12 @@ def load_asset(filepath, materials, alpha, location, collection, link, metal_col
 
 
 def add_position(car, objs, obj_name):
+    """
+    save blender location of object to the train object
+    :param:  car (object)                       : car to which the locations are added
+    :param:  objs (array of blender objects)    : all objects which belong to the name
+    :param:  obj_name (string)                  : name of the descriptor for which we need the location
+    """
     num_obj = len(objs)
     cs = Vector((0, 0, 0))
     for o in objs:

@@ -2,6 +2,16 @@ import bpy
 
 
 def create_tree(train, t_num, train_col, base_scene, gen_depth):
+    """
+    create a tree inside the compositor of blender for the given train, the tree creats of objects masks
+     and depth information of the individual trains
+    params:
+        train (MichalskiTrain): trains for which the tree is created
+        t_num (int): train id
+        train_col (string): train type
+        base_scene (string): scene in which the train is placed
+        gen_depth (boolean): whether to create the pixel wise depth information
+    """
     # switch on nodes and get reference
     bpy.context.scene.use_nodes = True
     scene = bpy.context.scene

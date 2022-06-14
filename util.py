@@ -6,11 +6,8 @@ import torch
 
 def numpy2torch(array):
     """ Converts 3D numpy (H,W,C) ndarray to 3D PyTorch (C,H,W) tensor.
-    Args:
-        array: numpy array of shape (H, W, C)
-
-    Returns:
-        tensor: torch tensor of shape (C, H, W)
+    :param:  array (numpy array)   : numpy array of shape (H, W, C)
+    :return:  tensor (torch tensor)  : torch tensor of shape (C, H, W)
     """
     array = np.moveaxis(array, -1, 0)
     tensor = torch.from_numpy(array)
@@ -19,11 +16,8 @@ def numpy2torch(array):
 
 def torch2numpy(tensor):
     """ Converts 3D PyTorch (C,H,W) tensor to 3D numpy (H,W,C) ndarray.
-    Args:
-        tensor: torch tensor of shape (C, H, W)
-
-    Returns:
-        array: numpy array of shape (H, W, C)
+    :param:  tensor (torch tensor)  : torch tensor of shape (C, H, W)
+    :return:  array (numpy array)   : numpy array of shape (H, W, C)
     """
     tensor = tensor.to("cpu")
     array = tensor.detach().numpy()
@@ -31,8 +25,13 @@ def torch2numpy(tensor):
     return array
 
 
-# appends entries of dict b to a, works inplace modifying a
 def merge(a, b):
+    """
+    appends entries of dict b to a, works inplace modifying a
+    :param:  a (dict)   : dict a
+    :param:  b (dict)   : dict b
+    :return:  a (dict)  : merged dict
+    """
     for key in b:
         if key in a:
             if isinstance(a[key], dict) and isinstance(b[key], dict):
@@ -57,6 +56,12 @@ def set_manual_seed(seed: int = 1):
 
 
 def get_baselines(datasets):
+    """
+    calculates the probability the most frequent class for each label of the datasets
+    :param:  datasets (dict)            : dictionary of datasets
+    :return:  label_freq (dict)         : Frequency of most frequent class for each label and probability of a randomly
+     chosen class for each label
+    """
     label_names = datasets['train'].dataset.labels
     for i, name in enumerate(label_names):
         if name == 'load_1' or name == 'load_2' or name == 'load_3':
@@ -76,6 +81,11 @@ def get_baselines(datasets):
 
 
 def get_baseline(dataset):
+    """
+    calculates the probability the most frequent class for each label of the dataset
+    :param:  dataset (dataset)          : dataset which is analysed
+    :return:  label_freq (dict)         : Frequency of most frequent class for each label and probability of a randomly chosen class for each label
+    """
     label_names = dataset.labels
     for i, name in enumerate(label_names):
         if name == 'load_1' or name == 'load_2' or name == 'load_3':
@@ -91,8 +101,13 @@ def get_baseline(dataset):
     return label_freq
 
 
-# calculates the probability the most frequent class for each label
 def find_highest_frequency(arr, label_names):
+    """
+    calculates the probability the most frequent class for each label
+    :param:  label_names (list of strings)      : list of label names
+    :param:  arr (np array)                      : list of actual assigned label classes
+    :return:  max_frq_for_label (list of float) : Frequency of most frequent class for each label
+    """
     arr_for_label = {}
     max_frq_for_label = {}
     unique_label_names = list(set(label_names))
@@ -112,8 +127,12 @@ def find_highest_frequency(arr, label_names):
     return max_frq_for_label
 
 
-# for each label the probability of a randomly chosen class is calculated
 def rand_choice(label_names):
+    """
+    for each label the probability of a randomly chosen class is calculated
+    :param:  label_names (list of strings)      : list of label names
+    :return:  rand_choice (list of float)       : probability of a randomly chosen class for each label
+    """
     if 'l_num' in label_names:
         classification_typ = 'class_specific'
     else:

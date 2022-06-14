@@ -9,6 +9,11 @@ import m_train
 
 
 def enable_gpus(device_type):
+    """
+    enable GPU in blender
+    params:
+        device_type (object): GPU device
+    """
     bpy.context.preferences.addons["cycles"].preferences.get_devices()
     devices = bpy.context.preferences.addons["cycles"].preferences.devices
     if len(devices) < 2:
@@ -23,6 +28,9 @@ def enable_gpus(device_type):
 
 # create camera
 def create_camera():
+    """
+    create camera in blender
+    """
     cam_data = bpy.data.cameras.new('camera')
     cam = bpy.data.objects.new('camera', cam_data)
     cam.location = (15, -3, 6)
@@ -37,6 +45,9 @@ def create_camera():
 
 
 def clean_up():
+    """
+    clean up the scene
+    """
     mats = bpy.data.materials
     for obj in bpy.data.objects:
         for slt in obj.material_slots:
@@ -69,38 +80,40 @@ def clean_up():
             bpy.data.images.remove(block)
 
 
-def rotate(point, angle_degrees, axis=(0, 1, 0)):
-    theta_degrees = angle_degrees
-    theta_radians = math.radians(theta_degrees)
-
-    rotated_point = np.dot(rotation_matrix(axis, theta_radians), point)
-
-    return rotated_point
-
-
-def rotation_matrix(axis, theta):
-    """
-    Return the rotation matrix associated with counterclockwise rotation about
-    the given axis by theta radians.
-    """
-    axis = np.asarray(axis)
-    axis = axis / math.sqrt(np.dot(axis, axis))
-    a = math.cos(theta / 2.0)
-    b, c, d = -axis * math.sin(theta / 2.0)
-    aa, bb, cc, dd = a * a, b * b, c * c, d * d
-    bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
-    return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
-                     [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
-                     [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
+# def rotate(point, angle_degrees, axis=(0, 1, 0)):
+#     theta_degrees = angle_degrees
+#     theta_radians = math.radians(theta_degrees)
+#     rotated_point = np.dot(rotation_matrix(axis, theta_radians), point)
+#     return rotated_point
+#
+#
+# def rotation_matrix(axis, theta):
+#     """
+#     Return the rotation matrix associated with counterclockwise rotation about
+#     the given axis by theta radians.
+#     axis (object): GPU device
+#     theta (object): GPU device
+#
+#     """
+#     axis = np.asarray(axis)
+#     axis = axis / math.sqrt(np.dot(axis, axis))
+#     a = math.cos(theta / 2.0)
+#     b, c, d = -axis * math.sin(theta / 2.0)
+#     aa, bb, cc, dd = a * a, b * b, c * c, d * d
+#     bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
+#     return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
+#                      [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
+#                      [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
 
 
 def replace_material(object, old_material, new_material, fit_uv=True):
     """
     replace a material in blender.
     params:
-        object - object for which we are replacing the material
-        old_material - The old material name as a string
-        new_material - The new material name as a string
+        object (bpy object): object for which we are replacing the material
+        old_material (string): The old material name
+        new_material (string): The new material name
+        fit_uv (boolean): boolean if the material shall be rescaled
     """
     # all available materials and their attributes
     material_scale = {
@@ -179,8 +192,14 @@ def replace_material(object, old_material, new_material, fit_uv=True):
                     #     me.update()
 
 
-
 def get_new_pos(init_cord, distance, alpha):
+    """
+    calculate new position according to initial position angle and distance
+    params:
+        init_cord (array): initial coordinates
+        alpha (float): angle to new position
+        distance (array): distance to new position
+    """
     new_pos = init_cord
     new_pos[0] = new_pos[0] + distance * math.cos(alpha)
     new_pos[1] = new_pos[1] + distance * math.sin(alpha)
@@ -193,6 +212,8 @@ def render_shadeless(blender_objects, path='flat.png'):
     assigned to all objects, and return a set of all colors that should be in the
     rendered image. The image itself is written to path. This is used to ensure
     that all objects will be visible in the final rendered scene.
+    params:
+        blender_objects (blender object): blender object
     """
     render_args = bpy.context.scene.render
 
@@ -250,13 +271,16 @@ def render_shadeless(blender_objects, path='flat.png'):
 
 
 def set_layer(obj, layer_idx):
-    """ Move an object to a particular layer """
+    """ Move an object to a particular layer
+    params:
+        obj (blender object): blender object
+        layer_idx (int): layer index
+    """
     # Set the target layer to True first because an object must always be on
     # at least one layer.
     obj.layers[layer_idx] = True
     for i in range(len(obj.layers)):
         obj.layers[i] = (i == layer_idx)
-
 
 # def load_materials():
 #     """
