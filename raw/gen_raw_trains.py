@@ -1,10 +1,9 @@
 import math
 import os
 import random
-import shutil
 from pyswip import Prolog
 
-import m_train
+from michalski_trains import m_train
 
 
 def gen_raw_michalski_trains(num_entries=10000, with_occlusion=False):

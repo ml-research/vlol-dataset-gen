@@ -8,7 +8,7 @@ from util import *
 import time
 
 
-def generate_image(base_scene, train_col, t_num, train, black=False, save_blender=False, replace_existing_img=True,
+def generate_image(base_scene, train_col, t_num, train, save_blender=False, replace_existing_img=True,
                    high_res=False, gen_depth=False):
     """ assemble a michalski train, render its corresponding image and generate ground truth information
     Args:
@@ -16,7 +16,6 @@ def generate_image(base_scene, train_col, t_num, train, black=False, save_blende
     :param:  train_col (string)             : typ of trains which are generated either 'RandomTrains' or 'MichalskiTrains'
     :param:  t_num (int)                    : id of the train
     :param:  train (train obj)              : train object which is assembled and rendered
-    :param:  black (bool)                   : whether to use black or silver metal for the train
     :param:  save_blender (bool)            : whether the blender scene shall be shaved
     :param:  replace_existing_img (bool)    : if there exists already an image for the id shall it be replaced?
     :param:  gen_depth (bool)               : whether to generate the depth information of the individual scenes
@@ -113,8 +112,8 @@ def generate_image(base_scene, train_col, t_num, train, black=False, save_blende
     off_z = -0.176 * train.get_blender_scale()[0] / 0.6
     train_init_cord = [xd, yd, off_z]
 
-    # load train engine
-    mat = 'black_metal' if black else None
+    # load train engine, use mat='black_metal' for black engine metal
+    mat = None
     load_engine(train_collection, train_init_cord, alpha, mat)
 
     load_obj_time = time.time()

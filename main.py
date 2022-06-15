@@ -1,62 +1,88 @@
 import logging
 from rtpt import RTPT
+
+from blender_image_generator.m_train_image_generation import generate_image
+from raw.gen_raw_trains import gen_raw_trains, read_trains
 from util import *
+import argparse
 
-os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1"
 
-
-# example train all colors:
-# east 1 rectangle short not_double none 2 1 triangle 2 bucket short not_double arc 2 1 circle 3 ellipse short not_double flat 2 1 diamond 4 u_shaped short not_double jagged 2 1 hexagon 5 hexagon short not_double peaked 2 1 utriangle
-# example full length train:
-# east 1 hexagon long not_double flat 2 1 circle 2 rectangle long not_double flat 2 1 rectangle 3 rectangle long not_double flat 2 1 circle 4 bucket long not_double flat 2 1 circle
-# example trains with all attributes
-# east 1 rectangle long not_double none 3 2 rectangle 2 bucket long not_double arc 3 3 diamond 3 ellipse short not_double flat 2 2 circle 4 hexagon short not_double jagged 2 2 triangle
-# east 1 u_shaped long not_double peaked 2 1 hexagon 2 bucket long not_double flat 2 3 utriangle
+# os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1"
 
 
 def main():
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    args = parse
+
+    device = torch.device(f"cuda:{args.cuda}" if torch.cuda.is_available() else "cpu")
     # device = torch.device("cpu" if torch.cuda.is_available() else "cpu")
 
     # michalski train dataset settings
-    train_collections = ['RandomTrains', 'MichalskiTrains']
-    train_col = train_collections[1]
-    scenes = ['base_scene', 'desert_scene', 'sky_scene', 'fisheye_scene']
-    base_scene = scenes[0]
+    train_col = args.train_type
+    base_scene = args.background_scene
 
-    # generating images
-    generate_trains = True
+    # settings
+    with_occlusion = args.with_occlusion
+    save_blender, high_res, gen_depth = args.save_blender, args.high_res, args.gen_depth
+    replace_existing_img, replace_raw = args.replace_existing_img, args.replace_raw
 
-    if generate_trains:
-        from blender_image_generator.m_train_image_generation import generate_image
-        from raw.gen_raw_trains import gen_raw_trains, read_trains
+    # generate images in range [start_ind:end_ind]
+    ds_size = args.dataset_size
+    start_ind = args.index_start
+    end_ind = args.index_end if args.index_end is not None else ds_size
+    print(f'generating {train_col} images for {base_scene}')
 
-        # settings
-        with_occlusion, black = False, False
-        save_blender, high_res, gen_depth = False, False, False
-        replace_existing_img, replace_raw = False, True
+    # generate raw trains if they do not exist or shall be replaced
+    if not os.path.isfile(f'raw/datasets/{train_col}.txt') or replace_raw:
+        gen_raw_trains(train_col, with_occlusion=with_occlusion, num_entries=ds_size)
 
-        # generate images in range [start_ind:end_ind]
-        start_ind = 000
-        end_ind = 10000
-        print(f'generating {train_col} images for {base_scene}')
+    # load trains
+    trains = read_trains(f'raw/datasets/{train_col}.txt')
 
-        # generate raw trains if they do not exist or shall be replaced
-        if not os.path.isfile(f'raw/datasets/{train_col}.txt') or replace_raw:
-            gen_raw_trains(train_col, with_occlusion=with_occlusion)
+    # render trains
+    trains = trains[start_ind:end_ind]
+    rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_col[0]}',
+                max_iterations=end_ind - start_ind)
+    rtpt.start()
+    for t_num, train in enumerate(trains, start=start_ind):
+        rtpt.step()
+        generate_image(base_scene, train_col, t_num, train, save_blender, replace_existing_img,
+                       high_res=high_res, gen_depth=True)
 
-        # load trains
-        trains = read_trains(f'raw/datasets/{train_col}.txt')
 
-        # render trains
-        trains = trains[start_ind:end_ind]
-        rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_col[0]}',
-                    max_iterations=end_ind - start_ind)
-        rtpt.start()
-        for t_num, train in enumerate(trains, start=start_ind):
-            rtpt.step()
-            generate_image(base_scene, train_col, t_num, train, black, save_blender, replace_existing_img,
-                           high_res=high_res, gen_depth=True)
+def parse():
+    # Instantiate the parser
+    parser = argparse.ArgumentParser(description='Optional app description')
+    parser.add_argument('--with_occlusion', type=bool, default=False,
+                        help='dataset size')
+    parser.add_argument('--with_occlusion', type=bool, default=False,
+                        help='A required integer positional argument')
+    parser.add_argument('--save_blender', type=bool, default=False,
+                        help='Whether the blender scene is shaved')
+    parser.add_argument('--high_res', type=bool, default=False,
+                        help='whether to render the images in high resolution (1920x1080) or standard resolution '
+                             '(480x270)')
+    parser.add_argument('--gen_depth', type=bool, default=False,
+                        help='Whether to generate the depth information of the individual scenes')
+    parser.add_argument('--replace_existing_img', type=bool, default=False,
+                        help='if there exists already an image for the id shall it be replaced?')
+    parser.add_argument('--replace_raw', type=bool, default=False,
+                        help='if the train descriptions are already generated shall they be replaced?')
+
+    parser.add_argument('--dataset_size', type=int, default=10000, help='Size of the dataset we want to create')
+    parser.add_argument('--index_start', type=int, default=0, help='start rendering images at index')
+    parser.add_argument('--index_end', type=int, default=None, help='stop rendering images at index')
+
+    parser.add_argument('--train_type', type=str, default='MichalskiTrains',
+                        help='whether to generate MichalskiTrains or RandomTrains')
+    parser.add_argument('--background_scene', type=str, default='base_scene',
+                        help='Scene in which the trains are set: base_scene, desert_scene, sky_scene or fisheye_scene')
+
+    parser.add_argument('--cuda', type=int, default=0,
+                        help='Which cuda device to use')
+
+    args = parser.parse_args()
+
+    return args
 
 
 if __name__ == '__main__':
