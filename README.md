@@ -123,11 +123,11 @@ output
 │   │
 │   └───desert_scene
 │   │   │...
-│   │
 │   │...
 │
 └───RandomTrains
-    │   ...
+│   │...
+│...
 ```
 
 The images rendered can be found in the images' folder.
@@ -149,4 +149,5 @@ If you find this dataset useful in your research, please consider citing:
     note= {unpublished},
     year={2022}
     }
-> [//]: # (    journal={arXiv preprint arXiv:2011.12854},)
+
+[//]: # (    journal={arXiv preprint arXiv:2011.12854},)
