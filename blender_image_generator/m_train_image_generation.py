@@ -12,14 +12,17 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
                    high_res=False, gen_depth=False):
     """ assemble a michalski train, render its corresponding image and generate ground truth information
     Args:
-    :param:  base_scene (string)            : background scene of the train ('base_scene', 'desert_scene', 'sky_scene', 'fisheye_scene')
-    :param:  train_col (string)             : typ of trains which are generated either 'RandomTrains' or 'MichalskiTrains'
+    :param:  base_scene (string)            : background scene of the train ('base_scene', 'desert_scene', 'sky_scene',
+     'fisheye_scene')
+    :param:  train_col (string)             : typ of trains which are generated either 'RandomTrains' or
+     'MichalskiTrains'
     :param:  t_num (int)                    : id of the train
     :param:  train (train obj)              : train object which is assembled and rendered
     :param:  save_blender (bool)            : whether the blender scene shall be shaved
     :param:  replace_existing_img (bool)    : if there exists already an image for the id shall it be replaced?
     :param:  gen_depth (bool)               : whether to generate the depth information of the individual scenes
-    :param:  high_res (bool)                : whether to render the images in high resolution (1920x1080) or standard resolution (480x270)
+    :param:  high_res (bool)                : whether to render the images in high resolution (1920x1080) or standard
+     resolution (480x270)
     """
 
     start = time.time()

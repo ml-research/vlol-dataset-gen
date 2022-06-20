@@ -23,7 +23,7 @@ train problem and establish a modern three-dimensional dataset creating a proble
 The resulting datasets allow for diagnostic insights into the method’s decision-making process as well as its
 capabilities of rule-based learning.
 
-### Instructions setting up the docker container
+## Instructions setting up the docker container
 
 This is a very brief list of instructions on how to generate a three-dimensional Michalski train dataset.
 CUDA 11.3+ must be installed.
@@ -34,14 +34,18 @@ create a screen: screen -S train_generator
 Then:
 1. cd to TrainGenerator folder
 2. docker build -t blender_train_generator -f Dockerfile .
-3. docker run --gpus device=0 --shm-size='20gb' -v $(pwd)/TrainGenerator:/home/workdir blender_train_generator python3 main.py
+3. docker run --gpus device=0 --shm-size='20gb' -v $(pwd):/home/workdir blender_train_generator python3 main.py
 
 
-### Generating Images
+## Generating Images
 
 First we generate train descriptions for the whole dataset, 
 subsequently we render images for the individual train descriptions and generate their ground truth information.
 The train generator provides a wide range of settings allowing to adapt to the given requirements.
+The default output location is TrainGenerator/output/.
+
+
+### Settings
 
 The following settings are available, the input typ and default settings are noted in parentheses:
 - dataset_size (int, 10,000) -> Size of the dataset we want to create
@@ -61,7 +65,8 @@ The start and stop indices allow for parallel execution of the code thus paralle
 - replace_existing_img (bool, False) -> Check if the image is already rendered for the individual indices.
 If there is already an image generated for a specific index shall do you want to replace it?
 
-The default output location is TrainGenerator/output/.
+
+### Classification rule
 If Michalski trains are generated, the train generator allows the creation of a labeled train dataset.
 Therefore, the labels are derived from the prolog classification rule noted in TrainGenerator/classification_rule.pl.
 By default, we resort to the classification rule known as 'Theory X' which is defined as follows:
@@ -70,7 +75,7 @@ By default, we resort to the classification rule known as 'Theory X' which is de
 
 It Prolog the rule can be expressed as follows:
 
-    eastbound([Car|Cars]):-
+    eastbound([Car│Cars]):-
     (short(Car), closed(Car));
     (has_load0(Car,triangle), has_load1(Cars,circle));
     eastbound(Cars).
@@ -88,18 +93,37 @@ This allows us to increase or decrease the complexity of the rule-based problem 
 Herby the classification rule must be expressed in the Prolog description language using the provided descriptors.
 Furthermore, by resorting the defined descriptors, it is also possible to define and apply new descriptors.
 
+### Dataset structure
 Once the dataset is generated we can find it in the folder TrainGenerator/output/. The dataset is structured as follows:
 ```
 output
 └───MichalskiTrains
-│   └───subfolder1
-│       │   file111.txt
-│       │   file112.txt
-│       │   ...
-│   
+│   │
+│   └───base_scene
+│   │   │
+│   │   └───blendfiles
+│   │   │     │0_m_train.blend
+│   │   │     │...
+│   │   │
+│   │   └───depths
+│   │   │     │0_m_train.png
+│   │   │     │...
+│   │   │
+│   │   └───images
+│   │   │     │0_m_train.png
+│   │   │     │...
+│   │   │
+│   │   └───scenes
+│   │         │0_m_train.json
+│   │         │...
+│   │
+│   └───desert_scene
+│   │   │...
+│   │
+│   │...
+│
 └───RandomTrains
-    │   file021.txt
-    │   file022.txt
+    │   ...
 ```
 
 
