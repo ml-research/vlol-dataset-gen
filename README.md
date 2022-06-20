@@ -25,10 +25,11 @@ capabilities of rule-based learning.
 
 ## Instructions setting up the docker container
 
-This is a very brief list of instructions on how to generate a three-dimensional Michalski train dataset.
-CUDA 11.3+ must be installed.
+A docker container can be used to set up the required environment.
+Additionally, CUDA 11.3+, docker and nvidia-container-toolkit must be installed to allow the
+usage of the docker container and enable image rendering.
 
-For easier handling:
+For easier handling we recommend:
 create a screen: screen -S train_generator
 
 Then:
@@ -37,43 +38,46 @@ Then:
 3. docker run --gpus device=0 --shm-size='20gb' -v $(pwd):/home/workdir blender_train_generator python3 main.py
 
 
-## Generating Images
+## Generating images
 
-First we generate train descriptions for the whole dataset, 
-subsequently we render images for the individual train descriptions and generate their ground truth information.
+This is a very brief instruction on how the three-dimensional Michalski train dataset is generated.
+At first we generate train descriptions for the whole dataset, 
+subsequently we render images for the individual train descriptions and generate their ground-truth information.
 The train generator provides a wide range of settings allowing to adapt to the given requirements.
 The default output location is TrainGenerator/output/.
 
 
-### Settings
+### Script parameters
 
 The following settings are available, the input typ and default settings are noted in parentheses:
 - dataset_size (int, 10,000) -> Size of the dataset we want to create
 - index_start (int, 0) -> start rendering images at index (index_start)
 - index_end (int, None) -> stop rendering images at index (does not render index_end).
 If None the train generator stops rendering at dataset_size.
-The start and stop indices allow for parallel execution of the code thus parallel rendering of images of the same dataset.
 
 - train_type (str, MichalskiTrains) -> The train type we want to generate. Either 'MichalskiTrains' or 'RandomTrains'
 - background_scene (str, base_scene) -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene' or 'fisheye_scene'
 
 - with_occlusion (bool, False) -> Whether to include train angles which might lead to occlusion of the individual train attributes
-- save_blender (bool, False) -> Whether the blender scene is saved
+- save_blender (bool, False) -> Whether the blender scene is saved.
+Only recommended for small image counts as the blend files are of rather big size.
 - high_res (bool, False) -> whether to render the images in high resolution (1920x1080) or standard resolution (480x270)
 - gen_depth (bool, False) -> Whether to generate the depth information of the individual scenes
 - replace_raw (bool, False) -> If the train descriptions for the dataset are already generated shall they be replaced?
 - replace_existing_img (bool, False) -> Check if the image is already rendered for the individual indices.
 If there is already an image generated for a specific index shall do you want to replace it?
 
+The start and stop indices allow for parallel execution of the code thus parallel rendering of images of the same dataset.
+Keep in mind to use different docker instances as the blender engine has problems to parallel render.
 
-### Classification rule
+### Decision rule
 If Michalski trains are generated, the train generator allows the creation of a labeled train dataset.
 Therefore, the labels are derived from the prolog classification rule noted in TrainGenerator/classification_rule.pl.
 By default, we resort to the classification rule known as 'Theory X' which is defined as follows:
 
     There is either a short, closed car, or a car with a circular load somewhere behind a car with a triangular load.
 
-It Prolog the rule can be expressed as follows:
+In Prolog the rule can be expressed as follows:
 
     eastbound([Car│Cars]):-
     (short(Car), closed(Car));
@@ -91,7 +95,7 @@ eastbound(Train) &vDash;
 The classification rule noted in classification_rule.pl can be adjusted according to the requirements.
 This allows us to increase or decrease the complexity of the rule-based problem incorporated into the generated dataset.
 Herby the classification rule must be expressed in the Prolog description language using the provided descriptors.
-Furthermore, by resorting the defined descriptors, it is also possible to define and apply new descriptors.
+However, by resorting the defined descriptors, it is also possible to define and apply new descriptors.
 
 ### Dataset structure
 Once the dataset is generated we can find it in the folder TrainGenerator/output/. The dataset is structured as follows:
@@ -126,6 +130,10 @@ output
     │   ...
 ```
 
+The images rendered can be found in the images' folder.
+The corresponding ground truth information is located in the 'scenes' folder.
+The depth information of the individual images is located in the 'depths' folder (if depth_gen is opted).
+The blender scene which is used to render the individual images is located in the 'blendfiles' folder (if save_blend is opted).
 
 
 ## References

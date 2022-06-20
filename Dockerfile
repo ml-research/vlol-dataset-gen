@@ -4,7 +4,6 @@
 #FROM nvidia/cuda:11.4.0-runtime-ubuntu20.04
 #FROM nvidia/cuda:11.4.2-devel-ubuntu20.04
 FROM nvidia/cuda:11.6.2-runtime-ubuntu20.04
-
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 # installations for python
 RUN apt-get update && apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget libbz2-dev liblzma-dev
