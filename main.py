@@ -11,7 +11,7 @@ import argparse
 
 
 def main():
-    args = parse
+    args = parse()
 
     device = torch.device(f"cuda:{args.cuda}" if torch.cuda.is_available() else "cpu")
     # device = torch.device("cpu" if torch.cuda.is_available() else "cpu")
@@ -29,7 +29,9 @@ def main():
     ds_size = args.dataset_size
     start_ind = args.index_start
     end_ind = args.index_end if args.index_end is not None else ds_size
-    print(f'generating {train_col} images for {base_scene}')
+    if start_ind > ds_size or end_ind > ds_size:
+        raise ValueError(f'start index or end index greater than dataset size')
+    print(f'generating {train_col} images in the {base_scene}')
 
     # generate raw trains if they do not exist or shall be replaced
     if not os.path.isfile(f'raw/datasets/{train_col}.txt') or replace_raw:
@@ -51,22 +53,21 @@ def main():
 
 def parse():
     # Instantiate the parser
-    parser = argparse.ArgumentParser(description='Optional app description')
+    parser = argparse.ArgumentParser(description='Blender Train Generator')
     parser.add_argument('--with_occlusion', type=bool, default=False,
-                        help='dataset size')
-    parser.add_argument('--with_occlusion', type=bool, default=False,
-                        help='A required integer positional argument')
+                        help='Whether to include train angles which might lead to occlusion of the individual '
+                             'train attributes')
     parser.add_argument('--save_blender', type=bool, default=False,
-                        help='Whether the blender scene is shaved')
+                        help='Whether the blender scene is saved')
     parser.add_argument('--high_res', type=bool, default=False,
                         help='whether to render the images in high resolution (1920x1080) or standard resolution '
                              '(480x270)')
     parser.add_argument('--gen_depth', type=bool, default=False,
                         help='Whether to generate the depth information of the individual scenes')
     parser.add_argument('--replace_existing_img', type=bool, default=False,
-                        help='if there exists already an image for the id shall it be replaced?')
+                        help='If there exists already an image for the id shall it be replaced?')
     parser.add_argument('--replace_raw', type=bool, default=False,
-                        help='if the train descriptions are already generated shall they be replaced?')
+                        help='If the train descriptions are already generated shall they be replaced?')
 
     parser.add_argument('--dataset_size', type=int, default=10000, help='Size of the dataset we want to create')
     parser.add_argument('--index_start', type=int, default=0, help='start rendering images at index')
@@ -79,7 +80,6 @@ def parse():
 
     parser.add_argument('--cuda', type=int, default=0,
                         help='Which cuda device to use')
-
     args = parser.parse_args()
 
     return args

@@ -2,7 +2,8 @@
 #FROM nvcr.io/nvidia/pytorch:21.12-py3
 #FROM python:3.9.7-slim
 #FROM nvidia/cuda:11.4.0-runtime-ubuntu20.04
-FROM nvidia/cuda:11.4.2-devel-ubuntu20.04
+#FROM nvidia/cuda:11.4.2-devel-ubuntu20.04
+FROM nvidia/cuda:11.6.2-runtime-ubuntu20.04
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 # installations for python
@@ -84,8 +85,8 @@ RUN cp -a /home/blender-git/build_linux/bin/. /usr/local/lib/python3.9/site-pack
 
 EXPOSE 8282
 # create workdir
-RUN mkdir /home/Master_thesis
-WORKDIR /home/Master_thesis
+RUN mkdir /home/workdir
+WORKDIR /home/workdir
 
 # copy and extract precompiled blender module
 #RUN tar xvfz /home/Master_thesis/modules/blender_module.tar.gz -C /usr/local/lib/python3.9/site-packages
