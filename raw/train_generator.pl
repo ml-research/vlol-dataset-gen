@@ -140,26 +140,26 @@ has_car(T,C) :- member(C,T).
 
 infront(T,C1,C2) :- append(_,[C1,C2|_],T).
 
-ellipse(C) :- arg(2,C,ellipse). hexagon(C) :- arg(2,C,hexagon).
-
-rectangle(C) :- arg(2,C,rectangle). u_shaped(C) :- arg(2,C,u_shaped).
-
+ellipse(C) :- arg(2,C,ellipse).
+hexagon(C) :- arg(2,C,hexagon).
+rectangle(C) :- arg(2,C,rectangle).
+u_shaped(C) :- arg(2,C,u_shaped).
 bucket(C) :- arg(2,C,bucket).
 
-long(C) :- arg(3,C,long). short(C) :- arg(3,C,short).
+long(C) :- arg(3,C,long).
+short(C) :- arg(3,C,short).
 
 double(C) :- arg(4,C,double).
 
 has_roof(C,r(R,N)) :- arg(1,C,N), arg(5,C,R).
 
-open(C) :- arg(5,C,none). closed(C) :- not(open(C)).
+open(C) :- arg(5,C,none).
+closed(C) :- not(open(C)).
 
 has_wheel(C,w(NC,W)) :- arg(1,C,NC), arg(6,C,NW), nlist(1,NW,L), member(W,L).
 
 has_load(C,Load) :- arg(7,C,l(_,NLoad)), nlist(1,NLoad,L), member(Load,L).
-
 has_load0(C,Shape) :- arg(7,C,l(Shape,N)), 1=<N.
-
 has_load1(T,Shape) :- has_car(T,C), has_load0(C,Shape).
 
 none(r(none,_)). flat(r(flat,_)).

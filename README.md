@@ -41,9 +41,13 @@ Then:
 ## Generating images
 
 This is a very brief instruction on how the three-dimensional Michalski train dataset is generated.
-At first we generate train descriptions for the whole dataset, 
-subsequently we render images for the individual train descriptions and generate their ground-truth information.
+At first, we generate train descriptions for the whole dataset resorting to a slightly adapted version of Muggleton's train generator.
+We have extended the code to assign labels to the generated train descriptions according to a specified decision rule.
+A default decision rule is specified in TrainGenerator/classification_rule.pl which can be adjusted as desired.
+Subsequently, we render images for the individual train descriptions and generate their ground-truth information.
 The train generator provides a wide range of settings allowing to adapt to the given requirements.
+When labeled trains are generated they are evenly distributed in the two classes 
+
 The default output location is TrainGenerator/output/.
 
 
@@ -73,6 +77,9 @@ Keep in mind to use different docker instances as the blender engine has problem
 ### Decision rule
 If Michalski trains are generated, the train generator allows the creation of a labeled train dataset.
 Therefore, the labels are derived from the prolog classification rule noted in TrainGenerator/classification_rule.pl.
+The trains generated are subject to a balanced distribution of the individual classes so that we have an equal number of eastbound and westbound trains.
+Accordingly, defining too specific decision rules can have a strong influence on the distribution of train attributes, which in turn can lead to very similar images being generated.
+
 By default, we resort to the classification rule known as 'Theory X' which is defined as follows:
 
     There is either a short, closed car, or a car with a circular load somewhere behind a car with a triangular load.
@@ -94,8 +101,51 @@ eastbound(Train) &vDash;
 
 The classification rule noted in classification_rule.pl can be adjusted according to the requirements.
 This allows us to increase or decrease the complexity of the rule-based problem incorporated into the generated dataset.
-Herby the classification rule must be expressed in the Prolog description language using the provided descriptors.
-However, by resorting the defined descriptors, it is also possible to define and apply new descriptors.
+Herby the classification rule must be expressed in the Prolog description language using the provided descriptors predicates.
+However, by resorting the defined predicates, it is also possible to define and apply new predicates.
+
+At default the following predefined descriptors are available.
+While T refers to the whole train as in input, C, C1, C2 refer to a single car.
+
+- Car descriptors
+  - has_car(T,C)
+  - infront(T,C1,C2)
+
+- Car shape descriptors
+  - ellipse(C)
+  - hexagon(C)
+  - rectangle(C)
+  - u_shaped(C)
+  - bucket(C)
+
+- Car length descriptors
+  - long(C)
+  - short(C)
+
+- Car wall descriptor
+  - double(C)
+
+- Car roof descriptors (R: roof, N: car number)
+  - has_roof(C,r(R,N))
+  - open(C)
+  - closed(C)
+
+- Car wheel count descriptor (W: wheel count, NC: car number)
+  - has_wheel(C,w(NC,W)) :- arg(1,C,NC), arg(6,C,NW), nlist(1,NW,L), member(W,L).
+
+- Car payload descriptor
+  - has_load0(C,Shape)
+  - has_load1(T,Shape)
+
+The defined descriptors can be allocated the following descriptor values:
+
+    car_shape(1,ellipse). car_shape(2,hexagon). car_shape(3,rectangle). car_shape(4,u_shaped). car_shape(5,bucket).
+    car_length(1,short). car_length(2,long).
+    car_open(1,open). car_open(2,closed).
+    car_double(1,not_double). car_double(2,double).
+    roof_shape(1,none). roof_shape(2,flat). roof_shape(3,jagged). roof_shape(4,peaked). roof_shape(5,arc).
+    load_shape(1,circle). load_shape(2,diamond). load_shape(3,hexagon). load_shape(4,rectangle). load_shape(5,triangle). load_shape(6,utriangle).
+
 
 ### Dataset structure
 Once the dataset is generated we can find it in the folder TrainGenerator/output/. The dataset is structured as follows:
