@@ -69,7 +69,7 @@ def parse():
     parser.add_argument('--replace_raw', type=bool, default=False,
                         help='If the train descriptions are already generated shall they be replaced?')
 
-    parser.add_argument('--dataset_size', type=int, default=10000, help='Size of the dataset we want to create')
+    parser.add_argument('--dataset_size', type=int, default=10, help='Size of the dataset we want to create')
     parser.add_argument('--index_start', type=int, default=0, help='start rendering images at index')
     parser.add_argument('--index_end', type=int, default=None, help='stop rendering images at index')
 

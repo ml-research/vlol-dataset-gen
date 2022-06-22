@@ -2,14 +2,14 @@
 #FROM nvcr.io/nvidia/pytorch:21.12-py3
 #FROM python:3.9.7-slim
 #FROM nvidia/cuda:11.4.0-runtime-ubuntu20.04
-#FROM nvidia/cuda:11.4.2-devel-ubuntu20.04
-FROM nvidia/cuda:11.6.2-runtime-ubuntu20.04
+FROM nvidia/cuda:11.4.2-devel-ubuntu20.04
+#FROM nvidia/cuda:11.6.2-runtime-ubuntu20.04
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 # installations for python
 RUN apt-get update && apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget libbz2-dev liblzma-dev
 # installations for blender and other
 RUN apt-get update && apt-get install -y git subversion cmake libx11-dev libxxf86vm-dev libxcursor-dev libxi-dev libxrandr-dev libxinerama-dev libglew-dev libwayland-dev wayland-protocols libegl-dev libxkbcommon-dev libdbus-1-dev linux-libc-dev sudo
-# install popper dependencies
+# install prolog dependencies
 RUN apt-get update && apt-get install -y gringo swi-prolog
 RUN apt-get upgrade -y
 #RUN cp /usr/lib/python3.9/lib-dynload/_bz2.cpython-38-x86_64-linux-gnu.so  /usr/local/lib/python3.9/
