@@ -182,15 +182,15 @@ Accordingly, we have transformed the original train representation relying on mo
 descriptor values.  For detailed information on the transformation see ###paper.
 An overview of the three-dimensional Michalski train descriptors and their assignable values can be found below:
 
-| Car position | Car colour | Car length | Wall type | Roof shape  |                                  Number of wheels                                  | Payload 1 | Payload 2 | Payload 3 |
-|:------------:|:----------:|:----------:|:---------:|:-----------:|:----------------------------------------------------------------------------------:|:---------:|:---------:|:---------:|
-|      1       |   yellow   |   short    |   full    |    none     | 2                                                           <td colspan=3>blue box |
-|      2       |   green    |    long    |  braced   | foundation  |      3                                             <td colspan=3>golden vase       |
-|      3       |    grey    |     	      |    		     | solid roof  |                                <td colspan=3>barrel                                |
-|      4       |    red     |     		     |    			    | braced roof |                               <td colspan=3>diamond                                |
-|              |   	blue	   |     		     |    		     | peaked roof |     		                                                 <td colspan=3>metal pot     |
-|     			      |     		     |     		     |    			    |     		      |                              <td colspan=3>oval vase                               |
-|      		      |     		     |     		     |    			    |     		      |                                 <td colspan=3>none                                 |
+| Car position | Car colour | Car length | Wall type | Roof shape  | Number of wheels | Payload 1 & Payload 2 & Payload 3 | orientation |
+|:------------:|:----------:|:----------:|:---------:|:-----------:|:----------------:|:---------------------------------:|:-----------:|
+|      1       |   yellow   |   short    |   full    |    none     |        2         |             blue box              |    alpha    |
+|      2       |   green    |    long    |  braced   | foundation  |        3         |            golden vase            |
+|      3       |    grey    |     	      |    		     | solid roof  |                  |              barrel               |
+|      4       |    red     |     		     |    			    | braced roof |                  |              diamond              |
+|              |   	blue	   |     		     |    		     | peaked roof |        		        |             metal pot             |
+|     			      |     		     |     		     |    			    |     		      |                  |             oval vase             |
+|      		      |     		     |     		     |    			    |     		      |                  |               none                |
 
 The following image illustrates the above described descriptors.
 
