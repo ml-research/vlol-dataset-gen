@@ -259,10 +259,10 @@ m_train.json
 The following shows an overview of some of the ground truth information described above:
 
 <div align="center">
-  <img src="example_images/scene_representation/original.png" height="270px"  alt="">
-  <img src="example_images/scene_representation/depth.png" height="270px"  alt="">
-  <img src="example_images/scene_representation/box.png" height="270px"  alt="">
-  <img src="example_images/scene_representation/mask.png" height="270px"  alt="">
+  <img src="example_images/scene_representation/original.png" width="400"  alt="">
+  <img src="example_images/scene_representation/depth.png" width="400"  alt="">
+  <img src="example_images/scene_representation/box.png" width="400"  alt="">
+  <img src="example_images/scene_representation/mask.png" width="400"  alt="">
 </div>
 
 ### Dataset structure
