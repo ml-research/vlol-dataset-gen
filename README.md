@@ -23,6 +23,16 @@ train problem and establish a modern three-dimensional dataset creating a proble
 The resulting datasets allow for diagnostic insights into the method’s decision-making process as well as its
 capabilities of rule-based learning.
 
+You can use this code to generate Michalski train descriptions, render their corresponding images and
+create a three-dimensional Michalski train dataset.
+
+[//]: # (and compositional questions for those images, like this:)
+
+<div align="center">
+  <img src="example_images/michalski_original.png" height="270px"  alt="">
+  <img src="example_images/background/base_scene.png" height="270px"  alt="">
+</div>
+
 ## Instructions setting up the docker container
 
 A docker container can be used to set up the required environment.
@@ -73,19 +83,28 @@ The following settings are available, the input typ and default settings are not
 - replace_existing_img (bool, False) -> Check if the image is already rendered for the individual indices.
   If there is already an image generated for a specific index shall do you want to replace it?
 
-The start and stop indices allow for parallel execution of the code thus parallel rendering of images of the same
-dataset.
-Keep in mind to use different docker instances as the blender engine has problems to parallel render.
+The following shows example images of the four background scenes 'base_scene', 'desert_scene', 'sky_scene' and '
+fisheye_scene':
+
+<div align="center">
+  <img src="example_images/background/base_scene.png" height="270px"  alt="">
+  <img src="example_images/background/desert_scene.png" height="270px"  alt="">
+  <img src="example_images/background/sky_scene.png" height="270px"  alt="">
+  <img src="example_images/background/fisheye_scene.png" height="270px"  alt="">
+</div>
+
+The start and stop indices parameters allow for parallelization when one dataset is established.
+Therefore, you need to start multiple docker containers each generation images at different indices at the dataset.
+Keep in mind to use different docker containers as the blender engine has problems to render parallel.
 
 ### Decision rule
 
 If Michalski trains are generated, the train generator allows the creation of a labeled train dataset.
 Therefore, the labels are derived from the prolog classification rule noted in TrainGenerator/classification_rule.pl.
 The trains generated are subject to a balanced distribution of the individual classes so that we have an equal
-number of trains heading eastbound as well as westbound.
+number of trains heading eastbound and westbound within our dataset.
 Be aware that defining a very specific decision rules can have a strong influence on the distribution of train
-attributes,
-which in turn can lead to similar images being generated.
+attributes, which in turn can lead to similar images being generated.
 
 By default, we resort to the classification rule known as 'Theory X' which is defined as follows:
 
@@ -154,49 +173,32 @@ The defined descriptors can be allocated the following descriptor values:
     roof_shape(1,none). roof_shape(2,flat). roof_shape(3,jagged). roof_shape(4,peaked). roof_shape(5,arc).
     load_shape(1,circle). load_shape(2,diamond). load_shape(3,hexagon). load_shape(4,rectangle). load_shape(5,triangle). load_shape(6,utriangle).
 
-### Dataset structure
+### Transformation into a three-dimensional Representation
 
-Once the dataset is generated we can find it in the folder TrainGenerator/output/. The dataset is structured as follows:
+Some of the above listed descriptors which were used in the original Michalski train representation heavily rely on
+their
+two-dimensional delineation and do not meet the requirements of a vivid three-dimensional visualization.
+Accordingly, we have transformed the original train representation relying on more appropriate descriptors and
+descriptor values.  For detailed information on the transformation see ###paper.
+An overview of the three-dimensional Michalski train descriptors and their assignable values can be found below:
 
-```
-output
-│
-└───MichalskiTrains
-│   │
-│   └───base_scene
-│   │   │
-│   │   └───blendfiles
-│   │   │     │0_m_train.blend
-│   │   │     │...
-│   │   │
-│   │   └───depths
-│   │   │     │0_m_train.png
-│   │   │     │...
-│   │   │
-│   │   └───images
-│   │   │     │0_m_train.png
-│   │   │     │...
-│   │   │
-│   │   └───scenes
-│   │         │0_m_train.json
-│   │         │...
-│   │
-│   └───desert_scene
-│   │   │...
-│   │...
-│
-└───RandomTrains
-│   │...
-│...
-```
+| Car position | Car colour | Car length | Wall type | Roof shape  |                                  Number of wheels                                  | Payload 1 | Payload 2 | Payload 3 |
+|:------------:|:----------:|:----------:|:---------:|:-----------:|:----------------------------------------------------------------------------------:|:---------:|:---------:|:---------:|
+|      1       |   yellow   |   short    |   full    |    none     | 2                                                           <td colspan=3>blue box |
+|      2       |   green    |    long    |  braced   | foundation  |      3                                             <td colspan=3>golden vase       |
+|      3       |    grey    |     	      |    		     | solid roof  |                                <td colspan=3>barrel                                |
+|      4       |    red     |     		     |    			    | braced roof |                               <td colspan=3>diamond                                |
+|              |   	blue	   |     		     |    		     | peaked roof |     		                                                 <td colspan=3>metal pot     |
+|     			      |     		     |     		     |    			    |     		      |                              <td colspan=3>oval vase                               |
+|      		      |     		     |     		     |    			    |     		      |                                 <td colspan=3>none                                 |
 
-The images rendered can be found in the images' folder.
-The corresponding ground truth information is located in the 'scenes' folder.
-The depth information of the individual images is located in the 'depths' folder (if depth_gen is opted).
-The blender scene which is used to render the individual images is located in the 'blendfiles' folder (if save_blend is
-opted).
+The following image illustrates the above described descriptors.
 
-#### Scene information
+<div align="center">
+  <img src="example_images/overview.png" height="350px"  alt="">
+</div>
+
+### Ground truth scene information
 
 For each image the ground truth information of the scene is saved as a Json file inside the 'scenes' folder.
 For each car we save the binary mask in form of an encoded RLE file.
@@ -252,9 +254,58 @@ m_train.json
     },
     ...
    }
+```
 
+The following shows an overview of some of the ground truth information described above:
+
+<div align="center">
+  <img src="example_images/scene_representation/original.png" height="270px"  alt="">
+  <img src="example_images/scene_representation/depth.png" height="270px"  alt="">
+  <img src="example_images/scene_representation/box.png" height="270px"  alt="">
+  <img src="example_images/scene_representation/mask.png" height="270px"  alt="">
+</div>
+
+### Dataset structure
+
+Once the dataset is generated we can find it in the folder TrainGenerator/output/. The dataset is structured as follows:
 
 ```
+output
+│
+└───MichalskiTrains
+│   │
+│   └───base_scene
+│   │   │
+│   │   └───blendfiles
+│   │   │     │0_m_train.blend
+│   │   │     │...
+│   │   │
+│   │   └───depths
+│   │   │     │0_m_train.png
+│   │   │     │...
+│   │   │
+│   │   └───images
+│   │   │     │0_m_train.png
+│   │   │     │...
+│   │   │
+│   │   └───scenes
+│   │         │0_m_train.json
+│   │         │...
+│   │
+│   └───desert_scene
+│   │   │...
+│   │...
+│
+└───RandomTrains
+│   │...
+│...
+```
+
+The images rendered can be found in the images' folder.
+The corresponding ground truth information is located in the 'scenes' folder.
+The depth information of the individual images is located in the 'depths' folder (if depth_gen is opted).
+The blender scene which is used to render the individual images is located in the 'blendfiles' folder (if save_blend is
+opted).
 
 ## References
 
