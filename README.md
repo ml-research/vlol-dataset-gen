@@ -29,8 +29,8 @@ create a three-dimensional Michalski train dataset.
 [//]: # (and compositional questions for those images, like this:)
 
 <div align="center">
-  <img src="example_images/michalski_original.png" height="270px"  alt="">
-  <img src="example_images/background/base_scene.png" height="270px"  alt="">
+  <img src="example_images/michalski_original.png" height="220"  alt="">
+  <img src="example_images/background/base_scene.png" height="220"  alt="">
 </div>
 
 ## Instructions setting up the docker container
@@ -87,10 +87,10 @@ The following shows example images of the four background scenes 'base_scene', '
 fisheye_scene':
 
 <div align="center">
-  <img src="example_images/background/base_scene.png" height="270px"  alt="">
-  <img src="example_images/background/desert_scene.png" height="270px"  alt="">
-  <img src="example_images/background/sky_scene.png" height="270px"  alt="">
-  <img src="example_images/background/fisheye_scene.png" height="270px"  alt="">
+  <img src="example_images/background/base_scene.png" width="400"  alt="">
+  <img src="example_images/background/desert_scene.png" width="400"  alt="">
+  <img src="example_images/background/sky_scene.png" width="400"  alt="">
+  <img src="example_images/background/fisheye_scene.png" width="400"  alt="">
 </div>
 
 The start and stop indices parameters allow for parallelization when one dataset is established.
