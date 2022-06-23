@@ -173,22 +173,22 @@ The defined descriptors can be allocated the following descriptor values:
     roof_shape(1,none). roof_shape(2,flat). roof_shape(3,jagged). roof_shape(4,peaked). roof_shape(5,arc).
     load_shape(1,circle). load_shape(2,diamond). load_shape(3,hexagon). load_shape(4,rectangle). load_shape(5,triangle). load_shape(6,utriangle).
 
-### Transformation into a three-dimensional Representation
+### Transformation into a three-dimensional train representation
 
 Some of the above listed descriptors which were used in the original Michalski train representation heavily rely on
 their
 two-dimensional delineation and do not meet the requirements of a vivid three-dimensional visualization.
 Accordingly, we have transformed the original train representation relying on more appropriate descriptors and
-descriptor values.  For detailed information on the transformation see ###paper.
+descriptor values. For detailed information on the transformation see ###paper.
 An overview of the three-dimensional Michalski train descriptors and their assignable values can be found below:
 
-| Car position | Car colour | Car length | Wall type | Roof shape  | Number of wheels | Payload 1 & Payload 2 & Payload 3 | orientation |
+| Car position | Car colour | Car length | Wall type | Roof shape  | Number of wheels | Payload 1 & Payload 2 & Payload 3 | Orientation |
 |:------------:|:----------:|:----------:|:---------:|:-----------:|:----------------:|:---------------------------------:|:-----------:|
-|      1       |   yellow   |   short    |   full    |    none     |        2         |             blue box              |    alpha    |
+|      1       |   yellow   |   short    |   full    |    none     |        2         |             blue box              | angle alpha |
 |      2       |   green    |    long    |  braced   | foundation  |        3         |            golden vase            |
 |      3       |    grey    |     	      |    		     | solid roof  |                  |              barrel               |
 |      4       |    red     |     		     |    			    | braced roof |                  |              diamond              |
-|              |   	blue	   |     		     |    		     | peaked roof |        		        |             metal pot             |
+|              |    blue    |     		     |    		     | peaked roof |        		        |             metal pot             |
 |     			      |     		     |     		     |    			    |     		      |                  |             oval vase             |
 |      		      |     		     |     		     |    			    |     		      |                  |               none                |
 
@@ -197,6 +197,20 @@ The following image illustrates the above described descriptors.
 <div align="center">
   <img src="example_images/overview.png" height="350px"  alt="">
 </div>
+
+### Transformation into a three-dimensional simple representation
+
+The Train generator also allows for a simpler visualization relying on less complex objects.
+This representation is based on the following descriptors:
+
+| Object position | Color  | Size  | Outside line type | Outside shape | Object alignment |   Object shape   | Number of objects | Orientation |
+|:---------------:|:------:|:-----:|:-----------------:|:-------------:|:----------------:|:----------------:|:-----------------:|:-----------:|
+|        1        | yellow | small |       solid       |    circle     |     vertical     |      sphere      |         2         | angle alpha |
+|        2        | green  | large |      dashed       |   triangle    |    horizontal    |     pyramid      |         3         |
+|        3        |  grey  |   	   |        		         |   rectangle   |                  |       cube       |         4         |
+|        4        |  red   |  		   |        			        |   pentagon    |                  |     cylinder     |         5         |
+|                 |  blue  |  		   |        		         |    octagon    |        		        |       cone       |
+|       			       |   		   |  		   |        			        |      		       |                  | pentagonal prism |
 
 ### Ground truth scene information
 
