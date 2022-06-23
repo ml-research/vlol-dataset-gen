@@ -29,8 +29,8 @@ create a three-dimensional Michalski train dataset.
 [//]: # (and compositional questions for those images, like this:)
 
 <div align="center">
-  <img src="example_images/michalski_original.png" height="220"  alt="">
-  <img src="example_images/background/base_scene.png" height="220"  alt="">
+  <img src="example_images/michalski_original.png" height="200"  alt="">
+  <img src="example_images/background/base_scene.png" height="200"  alt="">
 </div>
 
 ## Instructions setting up the docker container
