@@ -4,6 +4,7 @@ from blender_image_generator.blender_util import enable_gpus, clean_up
 from blender_image_generator.compositor import create_tree
 from blender_image_generator.load_assets import *
 from blender_image_generator.json_util import restore_img, restore_depth_map
+from blender_image_generator.load_simple_assets import create_simple_scene
 from util import *
 import time
 
@@ -126,12 +127,16 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
     off_z = -0.155 * train.get_blender_scale()[0] / 0.6
     rail_cord = offset + [off_z]
     # rail_cord = get_new_pos(rail_cord, - get_car_length['engine'], alpha)
-    load_rails(train_collection, rail_cord, alpha, base_scene)
+    if train_col != 'SimpleObjects':
+        load_rails(train_collection, rail_cord, alpha, base_scene)
 
     rail_time = time.time()
     # print('time needed rails: ' + str(rail_time - load_obj_time))
     # create and load trains into blender
-    create_train(train, train_collection, train_init_cord, alpha)
+    if train_col != 'SimpleObjects':
+        create_train(train, train_collection, train_init_cord, alpha)
+    else:
+        create_simple_scene(train, train_collection, train_init_cord, alpha)
     asset_time = time.time()
     # print('time needed asset: ' + str(asset_time - rail_time))
     # delete duplicate materials
@@ -148,6 +153,7 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
 
     # print('time needed for compositor: ' + str(setup_end - load_obj_time))
     bpy.ops.render.render(write_still=1)
+
     render_time = time.time()
 
     # print('time needed for render: ' + str(render_time - tree_time))

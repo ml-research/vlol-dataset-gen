@@ -26,14 +26,12 @@ capabilities of rule-based learning.
 You can use this code to generate Michalski train descriptions, render their corresponding images and
 create a three-dimensional Michalski train dataset.
 
-[//]: # (and compositional questions for those images, like this:)
-
 <div align="center">
   <img src="example_images/michalski_original.png" height="200"  alt="">
   <img src="example_images/background/base_scene.png" height="200"  alt="">
 </div>
 
-## Instructions setting up the docker container
+## Instructions for setting up the docker container
 
 A docker container can be used to set up the required environment.
 Additionally, CUDA 11.3+, docker and nvidia-container-toolkit must be installed to allow the
@@ -203,14 +201,29 @@ The following image illustrates the above described descriptors.
 The Train generator also allows for a simpler visualization relying on less complex objects.
 This representation is based on the following descriptors:
 
-| Object position | Color  | Size  | Outside line type | Outside shape | Object alignment |   Object shape   | Number of objects | Orientation |
-|:---------------:|:------:|:-----:|:-----------------:|:-------------:|:----------------:|:----------------:|:-----------------:|:-----------:|
-|        1        | yellow | small |       solid       |    circle     |     vertical     |      sphere      |         2         | angle alpha |
-|        2        | green  | large |      dashed       |   triangle    |    horizontal    |     pyramid      |         3         |
-|        3        |  grey  |   	   |        		         |   rectangle   |                  |       cube       |         4         |
-|        4        |  red   |  		   |        			        |   pentagon    |                  |     cylinder     |         5         |
-|                 |  blue  |  		   |        		         |    octagon    |        		        |       cone       |
-|       			       |   		   |  		   |        			        |      		       |                  | pentagonal prism |
+| Object position | Color  | Size  | Outside line type | Outside shape | Object alignment | Object shape | Number of objects | Orientation |
+|:---------------:|:------:|:-----:|:-----------------:|:-------------:|:----------------:|:------------:|:-----------------:|:-----------:|
+|        1        | yellow | small |       solid       |    circle     |     vertical     |    sphere    |         2         | angle alpha |
+|        2        | green  | large |      dashed       |   triangle    |    horizontal    |   pyramid    |         3         |
+|        3        |  grey  |   	   |        		         |   rectangle   |                  |     cube     |         4         |
+|        4        |  red   |  		   |        			        |   pentagon    |                  |   cylinder   |         5         |
+|                 |  blue  |  		   |        		         |    octagon    |        		        |     cone     |
+|       			       |   		   |  		   |        			        |      		       |                  |    torus     |
+
+
+
+| Object position | Color  | Platform height | Platform material |  Platform shape  | Platform alignment | Object 1 & Object 2 & Object 3 | Orientation |
+|:---------------:|:------:|:---------------:|:-----------------:|:----------------:|:------------------:|:------------------------------:|:-----------:|
+|        1        | yellow |      high       |       matte       |       cube       |      vertical      |             sphere             | angle alpha |
+|        2        | green  |       low       |      glossy       |     cylinder     |     horizontal     |            pyramid             |
+|        3        |  grey  |        	        |        		         |    hemisphere    |                    |              cube              |
+|        4        |  red   |       		        |        			        | triangular prism |                    |            cylinder            |
+|                 |  blue  |       		        |        		         | hexagonal prism  |         		         |              cone              |
+|       			       |   		   |       		        |        			        |        		        |                    |             torus              |
+|       		        |   		   |       		        |        			        |        		        |                    |              none              |
+
+
+The following image illustrates the above described descriptors.
 
 ### Ground truth scene information
 
@@ -331,11 +344,17 @@ pp. 349–361. doi: 10.1109/TPAMI.1980.4767034.
 ## Citation
 
 If you find this dataset useful in your research, please consider citing:
-> @unpublished{HelffTrains,
-> title={Bringing the third dimension into the Michalski train problem},
-> author={Helff, Lukas and Stammer, Wolfgang and Kersting, Kristian},
-> note= {unpublished},
-> year={2022}
-> }
+
+[//]: # (> @unpublished{HelffTrains,)
+
+[//]: # (> title={Bringing the third dimension into the Michalski train problem},)
+
+[//]: # (> author={Helff, Lukas and Stammer, Wolfgang and Kersting, Kristian},)
+
+[//]: # (> note= {unpublished},)
+
+[//]: # (> year={2022})
+
+[//]: # (> })
 
 [//]: # (    journal={arXiv preprint arXiv:2011.12854},)

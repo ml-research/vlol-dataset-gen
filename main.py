@@ -64,17 +64,20 @@ def parse():
                              '(480x270)')
     parser.add_argument('--gen_depth', type=bool, default=False,
                         help='Whether to generate the depth information of the individual scenes')
-    parser.add_argument('--replace_existing_img', type=bool, default=False,
+    # parser.add_argument('--replace_existing_img', type=bool, default=False,
+    parser.add_argument('--replace_existing_img', type=bool, default=True,
                         help='If there exists already an image for the id shall it be replaced?')
-    parser.add_argument('--replace_raw', type=bool, default=False,
+    # parser.add_argument('--replace_raw', type=bool, default=False,
+    parser.add_argument('--replace_raw', type=bool, default=True,
                         help='If the train descriptions are already generated shall they be replaced?')
 
+    # parser.add_argument('--dataset_size', type=int, default=10000, help='Size of the dataset we want to create')
     parser.add_argument('--dataset_size', type=int, default=10, help='Size of the dataset we want to create')
     parser.add_argument('--index_start', type=int, default=0, help='start rendering images at index')
     parser.add_argument('--index_end', type=int, default=None, help='stop rendering images at index')
 
     parser.add_argument('--train_type', type=str, default='MichalskiTrains',
-                        help='whether to generate MichalskiTrains or RandomTrains')
+                        help='whether to generate MichalskiTrains, RandomTrains or SimpleObjects')
     parser.add_argument('--background_scene', type=str, default='base_scene',
                         help='Scene in which the trains are set: base_scene, desert_scene, sky_scene or fisheye_scene')
 

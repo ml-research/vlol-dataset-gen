@@ -87,6 +87,9 @@ EXPOSE 8282
 RUN mkdir /home/workdir
 WORKDIR /home/workdir
 
+#RUN mkdir /home/workdir/blenderdata
+#RUN cp -a /home/blender-git/build_linux/bin/. /home/workdir/blenderdata/
+
 # copy and extract precompiled blender module
 #RUN tar xvfz /home/Master_thesis/modules/blender_module.tar.gz -C /usr/local/lib/python3.9/site-packages
 
