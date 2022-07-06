@@ -65,11 +65,9 @@ def parse():
                              '(480x270)')
     parser.add_argument('--gen_depth', type=bool, default=False,
                         help='Whether to generate the depth information of the individual scenes')
-    # parser.add_argument('--replace_existing_img', type=bool, default=False,
-    parser.add_argument('--replace_existing_img', type=bool, default=True,
+    parser.add_argument('--replace_existing_img', type=bool, default=False,
                         help='If there exists already an image for the id shall it be replaced?')
-    # parser.add_argument('--replace_raw', type=bool, default=False,
-    parser.add_argument('--replace_raw', type=bool, default=True,
+    parser.add_argument('--replace_raw', type=bool, default=False,
                         help='If the train descriptions are already generated shall they be replaced?')
 
     # parser.add_argument('--dataset_size', type=int, default=10000, help='Size of the dataset we want to create')

@@ -8,11 +8,20 @@ from blender_image_generator.load_assets import add_position
 def create_simple_scene(train, train_collection, train_init_cord, alpha):
     train_tail_coord = train_init_cord
 
+    prev_car_long = True
+    length_dict = {
+        'long': 1.5,
+        'short': 1.25,
+    }
+
     for car in train.m_cars:
+        distance = length_dict[car.get_car_length()]
+        distance += .25 if prev_car_long else 0
+        train_tail_coord = get_new_pos(train_tail_coord, distance, alpha)
+        prev_car_long = True if car.get_car_length() == 'long' else False
+
         car_collection = create_platform(car, train_tail_coord, train_collection, alpha)
         load_objects(car_collection, train_tail_coord, car, alpha)
-
-        train_tail_coord = get_new_pos(train_tail_coord, car.get_car_length_scalar(), alpha)
 
 
 def create_platform(car, train_tail_coord, train_collection, alpha):
@@ -30,20 +39,20 @@ def create_platform(car, train_tail_coord, train_collection, alpha):
     train_collection.children.link(my_collection)
 
     # platform height is represented by car length
-    platform_height = car.get_car_length()
+    platform_length = car.get_car_length()
 
     # the michalski roof shape represents the platform shape in the simple representation
     platform_shape_dict = {
         'none': 'cube',
         'roof_foundation': 'cylinder',
         'solid_roof': 'hemisphere',
-        'braced_roof': 'triangular_prism',
+        'braced_roof': 'frustum',
         'peaked_roof': 'hexagonal_prism',
     }
     pl_shape = platform_shape_dict[car.get_blender_roof()]
     scale = [.5, .5, .5]
-    scale[0] = .75 if platform_height == 'long' else .5
-    scale[2] = 0.5 if pl_shape == 'hemisphere' else 1
+    scale[0] = .75 if platform_length == 'long' else .5
+    scale[2] = 1 if pl_shape == 'hemisphere' else .5
 
     filepath_car = f'data/shapes/simple_objects/platform/{pl_shape}.blend'
 
@@ -81,9 +90,9 @@ def load_objects(car_collection, train_tail, car, alpha):
         filepath = f'data/shapes/simple_objects/objects/{obj_shape_dict[payload]}.blend'
 
         # distance between beginning of platform and the object
-        tail_to_payload = 0.3
+        tail_to_payload = 0.4 if payload_num == 3 else 0.2
         # distance between payloads
-        d_payloads = 0.75
+        d_payloads = 0.4
 
         payload_pos = [train_tail[0], train_tail[1], train_tail[2] + 1]
         payload_pos = get_new_pos(payload_pos, -tail_to_payload, alpha)
@@ -104,7 +113,9 @@ def load_objects(car_collection, train_tail, car, alpha):
                     ob.rotation_euler[2] += alpha
                     ob.location = payload_pos
                     ob.pass_index = pass_index
-                    ob.scale = (.1, .1, .1)
+                    ob.scale = (.15, .15, .15)
+                    m = bpy.data.materials['orange_glossy']
+                    obj.active_material = m
                     payload_pos = get_new_pos(payload_pos, d_payloads, alpha)
                     bpy.context.view_layer.update()
 
@@ -150,25 +161,35 @@ def load_simple_asset(filepath, material, alpha, location, collection, link, shi
             obj.pass_index = pass_index
             bpy.context.view_layer.objects.active = obj
 
-            if not isinstance(material, str):
-                raise ValueError('unknown material defined')
-            new_material = bpy.data.materials.new(name=material)
-            new_material.diffuse_color = color_dict[material]
-            new_material.diffuse_color = (0, 0, 1, 0.8)
-
-            if shiny:
-                new_material.use_nodes = True
-                nodes = new_material.node_tree.nodes
-                links = new_material.node_tree.links
-
-                for node in nodes:
-                    nodes.remove(node)
-                glossy_node = nodes.new('ShaderNodeBsdfGlossy')
-                output_node = nodes.new('ShaderNodeOutputMaterial')
-                links.new(
-                    glossy_node.outputs["BSDF"],
-                    output_node.inputs["Surface"]
-                )
-            obj.active_material = new_material
+            if isinstance(material, str):
+                # raise ValueError('unknown material defined')
+                m = bpy.data.materials[material]
+            # new_material = bpy.data.materials.new(name=material+'_plain')
+            # new_material.diffuse_color = color_dict[material]
+            #
+            # if shiny:
+            #     new_material.use_nodes = True
+            #     nodes = new_material.node_tree.nodes
+            #     links = new_material.node_tree.links
+            #
+            #     for node in nodes:
+            #         nodes.remove(node)
+            #     glossy_node = nodes.new('ShaderNodeBsdfGlossy')
+            #     output_node = nodes.new('ShaderNodeOutputMaterial')
+            #     links.new(
+            #         glossy_node.outputs["BSDF"],
+            #         output_node.inputs["Surface"]
+            #     )
+                obj.active_material = m
 
     return objs
+
+
+def load_simple_engine(train_collection, train_init_cord, alpha):
+    filepath = 'data/shapes/simple_objects/train/train.blend'
+    collection = 'train'
+    # append, set to true to keep the link to the original file
+    link = False
+    my_collection = bpy.data.collections.new(collection)
+    train_collection.children.link(my_collection)
+    load_simple_asset(filepath, None, alpha, train_init_cord, my_collection, link, init_obj_scale=(.75, .5, .5))

@@ -4,7 +4,7 @@ from blender_image_generator.blender_util import enable_gpus, clean_up
 from blender_image_generator.compositor import create_tree
 from blender_image_generator.load_assets import *
 from blender_image_generator.json_util import restore_img, restore_depth_map
-from blender_image_generator.load_simple_assets import create_simple_scene
+from blender_image_generator.load_simple_assets import create_simple_scene, load_simple_engine
 from util import *
 import time
 
@@ -118,7 +118,13 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
 
     # load train engine, use mat='black_metal' for black engine metal
     mat = None
-    load_engine(train_collection, train_init_cord, alpha, mat)
+    if train_col == 'SimpleObjects':
+        train_init_cord[2] = 0
+        load_simple_engine(train_collection, train_init_cord, alpha)
+    else:
+        load_engine(train_collection, train_init_cord, alpha, mat)
+
+
 
     load_obj_time = time.time()
     # print('time needed pre set up: ' + str(load_obj_time - start))

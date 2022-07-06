@@ -64,6 +64,7 @@ def load_engine(train_collection, location, alpha, metal_mat=None):
     :param:  metal_mat (string)             : whether to paint the metal of the engin black if 'black_metal'
     """
     filepath = f'data/shapes/train/engine/engine.blend'
+
     collection = 'train'
     # append, set to true to keep the link to the original file
     link = False

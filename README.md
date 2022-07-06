@@ -201,26 +201,16 @@ The following image illustrates the above described descriptors.
 The Train generator also allows for a simpler visualization relying on less complex objects.
 This representation is based on the following descriptors:
 
-| Object position | Color  | Size  | Outside line type | Outside shape | Object alignment | Object shape | Number of objects | Orientation |
-|:---------------:|:------:|:-----:|:-----------------:|:-------------:|:----------------:|:------------:|:-----------------:|:-----------:|
-|        1        | yellow | small |       solid       |    circle     |     vertical     |    sphere    |         2         | angle alpha |
-|        2        | green  | large |      dashed       |   triangle    |    horizontal    |   pyramid    |         3         |
-|        3        |  grey  |   	   |        		         |   rectangle   |                  |     cube     |         4         |
-|        4        |  red   |  		   |        			        |   pentagon    |                  |   cylinder   |         5         |
-|                 |  blue  |  		   |        		         |    octagon    |        		        |     cone     |
-|       			       |   		   |  		   |        			        |      		       |                  |    torus     |
 
-
-
-| Object position | Color  | Platform height | Platform material |  Platform shape  | Platform alignment | Object 1 & Object 2 & Object 3 | Orientation |
-|:---------------:|:------:|:---------------:|:-----------------:|:----------------:|:------------------:|:------------------------------:|:-----------:|
-|        1        | yellow |      high       |       matte       |       cube       |      vertical      |             sphere             | angle alpha |
-|        2        | green  |       low       |      glossy       |     cylinder     |     horizontal     |            pyramid             |
-|        3        |  grey  |        	        |        		         |    hemisphere    |                    |              cube              |
-|        4        |  red   |       		        |        			        | triangular prism |                    |            cylinder            |
-|                 |  blue  |       		        |        		         | hexagonal prism  |         		         |              cone              |
-|       			       |   		   |       		        |        			        |        		        |                    |             torus              |
-|       		        |   		   |       		        |        			        |        		        |                    |              none              |
+| Object position | Color  | Platform length | Platform material | Platform shape  | Platform alignment | Object 1 & Object 2 & Object 3 | Orientation |
+|:---------------:|:------:|:---------------:|:-----------------:|:---------------:|:------------------:|:------------------------------:|:-----------:|
+|        1        | yellow |      long       |       matte       |      cube       |      vertical      |             sphere             | angle alpha |
+|        2        | green  |      short      |      glossy       |    cylinder     |     horizontal     |            pyramid             |
+|        3        |  grey  |        	        |        		         |   hemisphere    |                    |              cube              |
+|        4        |  red   |       		        |        			        |     frustum     |                    |            cylinder            |
+|                 |  blue  |       		        |        		         | hexagonal prism |         		         |              cone              |
+|       			       |   		   |       		        |        			        |       		        |                    |             torus              |
+|       		        |   		   |       		        |        			        |       		        |                    |              none              |
 
 
 The following image illustrates the above described descriptors.
