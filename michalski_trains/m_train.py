@@ -62,6 +62,15 @@ class MichalskiTrain(object):
     def get_init_rotation(self):
         return self.blender_init_rotation
 
+    def update_pass_indicies(self):
+        index = 1
+        for car in self.m_cars:
+            indicies = {"car": index, "wall": index, "roof": index, "wheels": index}
+            index += 1
+            for load_number in range(car.get_load_number()):
+                indicies["payload" + str(load_number)] = index
+                index += 1
+            car.set_index(indicies)
 
 class MichalskiCar(object):
     def __init__(self, n, shape, length, double, roof, wheels, l_num, l_shape, scale=(0.5, 0.5, 0.5)):

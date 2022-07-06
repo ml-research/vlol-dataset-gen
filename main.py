@@ -33,12 +33,13 @@ def main():
         raise ValueError(f'start index or end index greater than dataset size')
     print(f'generating {train_col} images in the {base_scene}')
 
+    raw_trains = train_col if train_col != 'SimpleObjects' else 'MichalskiTrains'
     # generate raw trains if they do not exist or shall be replaced
-    if not os.path.isfile(f'raw/datasets/{train_col}.txt') or replace_raw:
-        gen_raw_trains(train_col, with_occlusion=with_occlusion, num_entries=ds_size)
+    if not os.path.isfile(f'raw/datasets/{raw_trains}.txt') or replace_raw:
+        gen_raw_trains(raw_trains, with_occlusion=with_occlusion, num_entries=ds_size)
 
     # load trains
-    trains = read_trains(f'raw/datasets/{train_col}.txt')
+    trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=train_col == 'SimpleObjects')
 
     # render trains
     trains = trains[start_ind:end_ind]

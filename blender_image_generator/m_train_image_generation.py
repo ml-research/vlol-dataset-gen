@@ -136,6 +136,7 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
     if train_col != 'SimpleObjects':
         create_train(train, train_collection, train_init_cord, alpha)
     else:
+        train_init_cord[2] = 0
         create_simple_scene(train, train_collection, train_init_cord, alpha)
     asset_time = time.time()
     # print('time needed asset: ' + str(asset_time - rail_time))

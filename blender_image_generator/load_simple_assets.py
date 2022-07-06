@@ -31,36 +31,43 @@ def create_platform(car, train_tail_coord, train_collection, alpha):
 
     # platform height is represented by car length
     platform_height = car.get_car_length()
-    scale = (2, 2, 4) if platform_height == 'long' else (2, 2, 2)
 
     # the michalski roof shape represents the platform shape in the simple representation
     platform_shape_dict = {
         'none': 'cube',
-        'foundation': 'cylinder',
+        'roof_foundation': 'cylinder',
         'solid_roof': 'hemisphere',
         'braced_roof': 'triangular_prism',
         'peaked_roof': 'hexagonal_prism',
     }
-    filepath_car = f'data/shapes/simple_objects/platform/{platform_shape_dict[car.get_blender_roof()]}.blend'
+    pl_shape = platform_shape_dict[car.get_blender_roof()]
+    scale = [.5, .5, .5]
+    scale[0] = .75 if platform_height == 'long' else .5
+    scale[2] = 0.5 if pl_shape == 'hemisphere' else 1
+
+    filepath_car = f'data/shapes/simple_objects/platform/{pl_shape}.blend'
 
     # load platform / car
     obj = load_simple_asset(filepath_car, car.get_blender_car_color(), alpha, train_tail_coord, my_collection,
-                            link, pass_index=car.get_index('car'), init_obj_scale=scale)
+                            link, pass_index=car.get_index('car'), init_obj_scale=tuple(scale))
     add_position(car, obj, 'car')
+    add_position(car, obj, 'wheels')
+    add_position(car, obj, 'roof')
+    add_position(car, obj, 'wall')
 
     return my_collection
 
 
 def load_objects(car_collection, train_tail, car, alpha):
     """
-    load the payload of the car to the scene
+    load the objects and place them on the platform the scene
     :param:  car (object)                   : car which is added to the scene
     :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
     :param:  train_collection (object)      : blender collection in which the car is added
     :param:  alpha (int)                    : angle of rotation
     """
     obj_shape_dict = {
-        'blue_box': 'sphere',
+        'box': 'sphere',
         'golden_vase': 'pyramid',
         'barrel': 'cube',
         'diamond': 'cylinder',
@@ -68,17 +75,17 @@ def load_objects(car_collection, train_tail, car, alpha):
         'oval_vase': 'torus',
     }
     payload_num = car.get_load_number()
+    # platform_height = 1 if car.get_car_length() == 'short' else 2
     if payload_num > 0:
         payload = car.get_blender_payload()
         filepath = f'data/shapes/simple_objects/objects/{obj_shape_dict[payload]}.blend'
 
-        tail_to_payload = 0.15 * car.get_scale()[0]
+        # distance between beginning of platform and the object
+        tail_to_payload = 0.3
         # distance between payloads
-        d_payloads = 1 * car.get_scale()[0]
-        # z-distance between tail and payload (height difference)
-        height_payload = 1.52 * car.get_scale()[0]
+        d_payloads = 0.75
 
-        payload_pos = [train_tail[0], train_tail[1], train_tail[2] + height_payload]
+        payload_pos = [train_tail[0], train_tail[1], train_tail[2] + 1]
         payload_pos = get_new_pos(payload_pos, -tail_to_payload, alpha)
 
         # append, set to true to keep the link to the original file
@@ -97,7 +104,8 @@ def load_objects(car_collection, train_tail, car, alpha):
                     ob.rotation_euler[2] += alpha
                     ob.location = payload_pos
                     ob.pass_index = pass_index
-                    payload_pos = get_new_pos(payload_pos, -d_payloads, alpha)
+                    ob.scale = (.1, .1, .1)
+                    payload_pos = get_new_pos(payload_pos, d_payloads, alpha)
                     bpy.context.view_layer.update()
 
 
