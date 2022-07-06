@@ -195,7 +195,7 @@ def get_new_pos(init_cord, distance, alpha):
         alpha (float): angle to new position
         distance (array): distance to new position
     """
-    new_pos = init_cord
+    new_pos = init_cord.copy()
     new_pos[0] = new_pos[0] + distance * math.cos(alpha)
     new_pos[1] = new_pos[1] + distance * math.sin(alpha)
     return new_pos

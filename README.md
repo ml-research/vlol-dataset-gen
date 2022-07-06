@@ -202,15 +202,15 @@ The Train generator also allows for a simpler visualization relying on less comp
 This representation is based on the following descriptors:
 
 
-| Object position | Color  | Platform length | Platform material | Platform shape  | Platform alignment | Object 1 & Object 2 & Object 3 | Orientation |
-|:---------------:|:------:|:---------------:|:-----------------:|:---------------:|:------------------:|:------------------------------:|:-----------:|
-|        1        | yellow |      long       |       matte       |      cube       |      vertical      |             sphere             | angle alpha |
-|        2        | green  |      short      |      glossy       |    cylinder     |     horizontal     |            pyramid             |
-|        3        |  grey  |        	        |        		         |   hemisphere    |                    |              cube              |
-|        4        |  red   |       		        |        			        |     frustum     |                    |            cylinder            |
-|                 |  blue  |       		        |        		         | hexagonal prism |         		         |              cone              |
-|       			       |   		   |       		        |        			        |       		        |                    |             torus              |
-|       		        |   		   |       		        |        			        |       		        |                    |              none              |
+| Object position | Color  | Platform length | Side object frustum | Platform shape  | Side object torus | Object 1 & Object 2 & Object 3 | Orientation |
+|:---------------:|:------:|:---------------:|:-------------------:|:---------------:|:-----------------:|:------------------------------:|:-----------:|
+|        1        | yellow |      long       |        none         |      cube       |       none        |             sphere             | angle alpha |
+|        2        | green  |      short      |        True         |    cylinder     |       True        |            pyramid             |
+|        3        |  grey  |        	        |         		          |   hemisphere    |                   |              cube              |
+|        4        |  red   |       		        |         			         |     frustum     |                   |            cylinder            |
+|                 |  blue  |       		        |         		          | hexagonal prism |        		         |              cone              |
+|       			       |   		   |       		        |         			         |       		        |                   |             torus              |
+|       		        |   		   |       		        |         			         |       		        |                   |              none              |
 
 
 The following image illustrates the above described descriptors.

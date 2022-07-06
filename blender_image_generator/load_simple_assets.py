@@ -10,8 +10,8 @@ def create_simple_scene(train, train_collection, train_init_cord, alpha):
 
     prev_car_long = True
     length_dict = {
-        'long': 1.5,
-        'short': 1.25,
+        'long': 1.75,
+        'short': 1.5,
     }
 
     for car in train.m_cars:
@@ -22,6 +22,7 @@ def create_simple_scene(train, train_collection, train_init_cord, alpha):
 
         car_collection = create_platform(car, train_tail_coord, train_collection, alpha)
         load_objects(car_collection, train_tail_coord, car, alpha)
+        load_side_obj(car_collection, train_tail_coord, car, alpha)
 
 
 def create_platform(car, train_tail_coord, train_collection, alpha):
@@ -101,10 +102,12 @@ def load_objects(car_collection, train_tail, car, alpha):
         link = False
         with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
             data_to.objects = data_from.objects[:]
+        m = bpy.data.materials['orange_glossy']
 
         for obj in data_to.objects:
             if obj is not None:
-                objs = [obj] + [bpy.data.objects.new(payload + str(n), obj.data.copy()) for n in range(payload_num - 1)]
+                objs = [obj] + [bpy.data.objects.new(obj_shape_dict[payload] + str(n), obj.data.copy()) for n in
+                                range(payload_num - 1)]
                 for load_num, ob in enumerate(objs):
                     pass_index = car.get_index('payload' + str(load_num))
                     add_position(car, [obj], 'payload_' + str(load_num))
@@ -114,10 +117,49 @@ def load_objects(car_collection, train_tail, car, alpha):
                     ob.location = payload_pos
                     ob.pass_index = pass_index
                     ob.scale = (.15, .15, .15)
-                    m = bpy.data.materials['orange_glossy']
-                    obj.active_material = m
+                    ob.active_material = m
                     payload_pos = get_new_pos(payload_pos, d_payloads, alpha)
                     bpy.context.view_layer.update()
+
+
+def load_side_obj(collection, train_tail, car, alpha):
+    filepath_torus = f'data/shapes/simple_objects/objects/torus.blend'
+    filepath_frustum = f'data/shapes/simple_objects/platform/frustum.blend'
+    camera_direction = alpha - math.pi / 2 if (math.pi / 2 < alpha < 3 * math.pi / 2) else alpha + math.pi / 2
+    location = get_new_pos(train_tail, 1.5, camera_direction)
+    m1 = bpy.data.materials['black_metal']
+    m2 = bpy.data.materials['violet']
+    link = False
+
+    if car.get_wheel_count() == 3:
+        with bpy.data.libraries.load(filepath_torus, link=link) as (data_from, data_to):
+            data_to.objects = data_from.objects[:]
+        objs = []
+        for obj in data_to.objects:
+            if obj is not None:
+                objs.append(obj)
+                collection.objects.link(obj)
+                obj.rotation_euler[2] += alpha
+                obj.scale = (.25, .25, .25)
+                obj.location = location
+                obj.pass_index = car.get_index('car')
+                bpy.context.view_layer.objects.active = obj
+                obj.active_material = m1
+    if car.get_car_wall() == 'double':
+        with bpy.data.libraries.load(filepath_frustum, link=link) as (data_from, data_to):
+            data_to.objects = data_from.objects[:]
+        # link object to current scene
+        objs = []
+        for obj in data_to.objects:
+            if obj is not None:
+                objs.append(obj)
+                collection.objects.link(obj)
+                obj.rotation_euler[2] += alpha
+                obj.scale = (.25, .25, .4)
+                obj.location = location
+                obj.pass_index = car.get_index('car')
+                bpy.context.view_layer.objects.active = obj
+                obj.active_material = m2
 
 
 def load_simple_asset(filepath, material, alpha, location, collection, link, shiny=False, pass_index=0,
@@ -164,32 +206,32 @@ def load_simple_asset(filepath, material, alpha, location, collection, link, shi
             if isinstance(material, str):
                 # raise ValueError('unknown material defined')
                 m = bpy.data.materials[material]
-            # new_material = bpy.data.materials.new(name=material+'_plain')
-            # new_material.diffuse_color = color_dict[material]
-            #
-            # if shiny:
-            #     new_material.use_nodes = True
-            #     nodes = new_material.node_tree.nodes
-            #     links = new_material.node_tree.links
-            #
-            #     for node in nodes:
-            #         nodes.remove(node)
-            #     glossy_node = nodes.new('ShaderNodeBsdfGlossy')
-            #     output_node = nodes.new('ShaderNodeOutputMaterial')
-            #     links.new(
-            #         glossy_node.outputs["BSDF"],
-            #         output_node.inputs["Surface"]
-            #     )
+                # new_material = bpy.data.materials.new(name=material+'_plain')
+                # new_material.diffuse_color = color_dict[material]
+                #
+                # if shiny:
+                #     new_material.use_nodes = True
+                #     nodes = new_material.node_tree.nodes
+                #     links = new_material.node_tree.links
+                #
+                #     for node in nodes:
+                #         nodes.remove(node)
+                #     glossy_node = nodes.new('ShaderNodeBsdfGlossy')
+                #     output_node = nodes.new('ShaderNodeOutputMaterial')
+                #     links.new(
+                #         glossy_node.outputs["BSDF"],
+                #         output_node.inputs["Surface"]
+                #     )
                 obj.active_material = m
 
     return objs
 
 
 def load_simple_engine(train_collection, train_init_cord, alpha):
-    filepath = 'data/shapes/simple_objects/train/train.blend'
+    filepath = 'data/shapes/simple_objects/train/trainv1.blend'
     collection = 'train'
     # append, set to true to keep the link to the original file
     link = False
     my_collection = bpy.data.collections.new(collection)
     train_collection.children.link(my_collection)
-    load_simple_asset(filepath, None, alpha, train_init_cord, my_collection, link, init_obj_scale=(.75, .5, .5))
+    load_simple_asset(filepath, None, alpha, train_init_cord, my_collection, link, init_obj_scale=(.8, .4, .4))
