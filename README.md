@@ -204,8 +204,8 @@ This representation is based on the following descriptors:
 
 | Object position | Color  | Platform length | Side object frustum | Platform shape  | Side object torus | Object 1 & Object 2 & Object 3 | Orientation |
 |:---------------:|:------:|:---------------:|:-------------------:|:---------------:|:-----------------:|:------------------------------:|:-----------:|
-|        1        | yellow |      long       |        none         |      cube       |       none        |             sphere             | angle alpha |
-|        2        | green  |      short      |        True         |    cylinder     |       True        |            pyramid             |
+|        1        | yellow |      long       |   larger side up    |      cube       |       above       |             sphere             | angle alpha |
+|        2        | green  |      short      |  larger side down   |    cylinder     |       below       |            pyramid             |
 |        3        |  grey  |        	        |         		          |   hemisphere    |                   |              cube              |
 |        4        |  red   |       		        |         			         |     frustum     |                   |            cylinder            |
 |                 |  blue  |       		        |         		          | hexagonal prism |        		         |              cone              |

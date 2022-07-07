@@ -61,7 +61,6 @@ def create_platform(car, train_tail_coord, train_collection, alpha):
     obj = load_simple_asset(filepath_car, car.get_blender_car_color(), alpha, train_tail_coord, my_collection,
                             link, pass_index=car.get_index('car'), init_obj_scale=tuple(scale))
     add_position(car, obj, 'car')
-    add_position(car, obj, 'wheels')
     add_position(car, obj, 'roof')
     add_position(car, obj, 'wall')
 
@@ -122,6 +121,7 @@ def load_objects(car_collection, train_tail, car, alpha):
                     bpy.context.view_layer.update()
 
 
+
 def load_side_obj(collection, train_tail, car, alpha):
     filepath_torus = f'data/shapes/simple_objects/objects/torus.blend'
     filepath_frustum = f'data/shapes/simple_objects/platform/frustum.blend'
@@ -131,35 +131,48 @@ def load_side_obj(collection, train_tail, car, alpha):
     m2 = bpy.data.materials['violet']
     link = False
 
-    if car.get_wheel_count() == 3:
-        with bpy.data.libraries.load(filepath_torus, link=link) as (data_from, data_to):
-            data_to.objects = data_from.objects[:]
-        objs = []
-        for obj in data_to.objects:
-            if obj is not None:
-                objs.append(obj)
-                collection.objects.link(obj)
-                obj.rotation_euler[2] += alpha
-                obj.scale = (.25, .25, .25)
-                obj.location = location
-                obj.pass_index = car.get_index('car')
-                bpy.context.view_layer.objects.active = obj
-                obj.active_material = m1
-    if car.get_car_wall() == 'double':
-        with bpy.data.libraries.load(filepath_frustum, link=link) as (data_from, data_to):
-            data_to.objects = data_from.objects[:]
-        # link object to current scene
-        objs = []
-        for obj in data_to.objects:
-            if obj is not None:
-                objs.append(obj)
-                collection.objects.link(obj)
-                obj.rotation_euler[2] += alpha
-                obj.scale = (.25, .25, .4)
-                obj.location = location
-                obj.pass_index = car.get_index('car')
-                bpy.context.view_layer.objects.active = obj
-                obj.active_material = m2
+    with bpy.data.libraries.load(filepath_torus, link=link) as (data_from, data_to):
+        data_to.objects = data_from.objects[:]
+    objs = []
+    for obj in data_to.objects:
+        if obj is not None:
+            objs.append(obj)
+            collection.objects.link(obj)
+            obj.rotation_euler[2] += alpha
+            new_loc = list(location)
+            if car.get_wheel_count() == 2:
+                if car.get_car_wall() == 'not_double':
+                    new_loc[2] += .4 * 2
+                else:
+                    new_loc[2] += .305 * 2
+            obj.scale = (.2, .2, .2)
+            obj.location = new_loc
+            obj.pass_index = car.get_index('car')
+            bpy.context.view_layer.objects.active = obj
+            obj.active_material = m1
+            add_position(car, [obj], 'wheels')
+    with bpy.data.libraries.load(filepath_frustum, link=link) as (data_from, data_to):
+        data_to.objects = data_from.objects[:]
+    # link object to current scene
+    objs = []
+    for obj in data_to.objects:
+        if obj is not None:
+            objs.append(obj)
+            collection.objects.link(obj)
+            obj.rotation_euler[2] += alpha
+            new_loc = list(location)
+            if car.get_car_wall() == 'double':
+                obj.rotation_euler[0] += math.pi
+                new_loc[2] += .4 * 2
+                if car.get_wheel_count() == 3:
+                    new_loc[2] += .2 * .5
+            obj.scale = (.25, .25, .4)
+            obj.location = tuple(new_loc)
+            obj.pass_index = car.get_index('car')
+            bpy.context.view_layer.objects.active = obj
+            obj.active_material = m2
+            add_position(car, [obj], 'wall')
+
 
 
 def load_simple_asset(filepath, material, alpha, location, collection, link, shiny=False, pass_index=0,
@@ -204,24 +217,7 @@ def load_simple_asset(filepath, material, alpha, location, collection, link, shi
             bpy.context.view_layer.objects.active = obj
 
             if isinstance(material, str):
-                # raise ValueError('unknown material defined')
                 m = bpy.data.materials[material]
-                # new_material = bpy.data.materials.new(name=material+'_plain')
-                # new_material.diffuse_color = color_dict[material]
-                #
-                # if shiny:
-                #     new_material.use_nodes = True
-                #     nodes = new_material.node_tree.nodes
-                #     links = new_material.node_tree.links
-                #
-                #     for node in nodes:
-                #         nodes.remove(node)
-                #     glossy_node = nodes.new('ShaderNodeBsdfGlossy')
-                #     output_node = nodes.new('ShaderNodeOutputMaterial')
-                #     links.new(
-                #         glossy_node.outputs["BSDF"],
-                #         output_node.inputs["Surface"]
-                #     )
                 obj.active_material = m
 
     return objs

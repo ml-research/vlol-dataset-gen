@@ -120,30 +120,30 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
     mat = None
     if train_col == 'SimpleObjects':
         train_init_cord[2] = 0
+        train_init_cord = get_new_pos(train_init_cord, - 1.5, alpha)
+
         load_simple_engine(train_collection, train_init_cord, alpha)
+        train_init_cord[2] = 0
+        # create and load trains into blender
+        create_simple_scene(train, train_collection, train_init_cord, alpha)
     else:
         load_engine(train_collection, train_init_cord, alpha, mat)
+        # load rails at scale 0.6, z = -0.155
+        off_z = -0.155 * train.get_blender_scale()[0] / 0.6
+        rail_cord = offset + [off_z]
+        # load rails
+        load_rails(train_collection, rail_cord, alpha, base_scene)
+        # create and load trains into blender
+        create_train(train, train_collection, train_init_cord, alpha)
 
 
 
     load_obj_time = time.time()
     # print('time needed pre set up: ' + str(load_obj_time - start))
-
-    # load rails at scale 0.6, z = -0.155
-    off_z = -0.155 * train.get_blender_scale()[0] / 0.6
-    rail_cord = offset + [off_z]
-    # rail_cord = get_new_pos(rail_cord, - get_car_length['engine'], alpha)
-    if train_col != 'SimpleObjects':
-        load_rails(train_collection, rail_cord, alpha, base_scene)
-
     rail_time = time.time()
     # print('time needed rails: ' + str(rail_time - load_obj_time))
-    # create and load trains into blender
-    if train_col != 'SimpleObjects':
-        create_train(train, train_collection, train_init_cord, alpha)
-    else:
-        train_init_cord[2] = 0
-        create_simple_scene(train, train_collection, train_init_cord, alpha)
+
+
     asset_time = time.time()
     # print('time needed asset: ' + str(asset_time - rail_time))
     # delete duplicate materials
