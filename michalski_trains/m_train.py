@@ -65,7 +65,11 @@ class MichalskiTrain(object):
     def update_pass_indicies(self):
         index = 1
         for car in self.m_cars:
-            indicies = {"car": index, "wall": index, "roof": index, "wheels": index}
+            indicies = {"car": index, "roof": index}
+            index += 1
+            indicies["wall"] = index
+            index += 1
+            indicies["wheels"] = index
             index += 1
             for load_number in range(car.get_load_number()):
                 indicies["payload" + str(load_number)] = index

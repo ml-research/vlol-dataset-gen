@@ -2,10 +2,12 @@ import logging
 from rtpt import RTPT
 
 from blender_image_generator.m_train_image_generation import generate_image
+from michalski_trains import m_train_dataset
 from raw.gen_raw_trains import gen_raw_trains, read_trains
 from util import *
 import argparse
 
+from visualization.vis import show_masked_im
 
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1"
 
@@ -20,36 +22,41 @@ def main():
     train_col = args.train_type
     base_scene = args.background_scene
 
-    # settings
-    with_occlusion = args.with_occlusion
-    save_blender, high_res, gen_depth = args.save_blender, args.high_res, args.gen_depth
-    replace_existing_img, replace_raw = args.replace_existing_img, args.replace_raw
+    if args.command == 'image_generator':
+        # settings
+        with_occlusion = args.with_occlusion
+        save_blender, high_res, gen_depth = args.save_blender, args.high_res, args.gen_depth
+        replace_existing_img, replace_raw = args.replace_existing_img, args.replace_raw
 
-    # generate images in range [start_ind:end_ind]
-    ds_size = args.dataset_size
-    start_ind = args.index_start
-    end_ind = args.index_end if args.index_end is not None else ds_size
-    if start_ind > ds_size or end_ind > ds_size:
-        raise ValueError(f'start index or end index greater than dataset size')
-    print(f'generating {train_col} images in the {base_scene}')
+        # generate images in range [start_ind:end_ind]
+        ds_size = args.dataset_size
+        start_ind = args.index_start
+        end_ind = args.index_end if args.index_end is not None else ds_size
+        if start_ind > ds_size or end_ind > ds_size:
+            raise ValueError(f'start index or end index greater than dataset size')
+        print(f'generating {train_col} images in the {base_scene}')
 
-    raw_trains = train_col if train_col != 'SimpleObjects' else 'MichalskiTrains'
-    # generate raw trains if they do not exist or shall be replaced
-    if not os.path.isfile(f'raw/datasets/{raw_trains}.txt') or replace_raw:
-        gen_raw_trains(raw_trains, with_occlusion=with_occlusion, num_entries=ds_size)
+        raw_trains = train_col if train_col != 'SimpleObjects' else 'MichalskiTrains'
+        # generate raw trains if they do not exist or shall be replaced
+        if not os.path.isfile(f'raw/datasets/{raw_trains}.txt') or replace_raw:
+            gen_raw_trains(raw_trains, with_occlusion=with_occlusion, num_entries=ds_size)
 
-    # load trains
-    trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=train_col == 'SimpleObjects')
+        # load trains
+        trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=train_col == 'SimpleObjects')
 
-    # render trains
-    trains = trains[start_ind:end_ind]
-    rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_col[0]}',
-                max_iterations=end_ind - start_ind)
-    rtpt.start()
-    for t_num, train in enumerate(trains, start=start_ind):
-        rtpt.step()
-        generate_image(base_scene, train_col, t_num, train, save_blender, replace_existing_img,
-                       high_res=high_res, gen_depth=True)
+        # render trains
+        trains = trains[start_ind:end_ind]
+        rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_col[0]}',
+                    max_iterations=end_ind - start_ind)
+        rtpt.start()
+        for t_num, train in enumerate(trains, start=start_ind):
+            rtpt.step()
+            generate_image(base_scene, train_col, t_num, train, save_blender, replace_existing_img,
+                           high_res=high_res, gen_depth=True)
+
+    if args.command == 'vis':
+        full_ds = m_train_dataset.get_datasets(base_scene, train_col, 10, total_image_count=10, y_val='mask')
+        show_masked_im(full_ds)
 
 
 def parse():
@@ -82,6 +89,9 @@ def parse():
 
     parser.add_argument('--cuda', type=int, default=0,
                         help='Which cuda device to use')
+    parser.add_argument('--command', type=str, default='image_generator',
+                        help='whether to generate images (image_generator) or visualize generated images (vis)')
+
     args = parser.parse_args()
 
     return args

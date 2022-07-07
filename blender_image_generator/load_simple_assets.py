@@ -62,7 +62,6 @@ def create_platform(car, train_tail_coord, train_collection, alpha):
                             link, pass_index=car.get_index('car'), init_obj_scale=tuple(scale))
     add_position(car, obj, 'car')
     add_position(car, obj, 'roof')
-    add_position(car, obj, 'wall')
 
     return my_collection
 
@@ -121,7 +120,6 @@ def load_objects(car_collection, train_tail, car, alpha):
                     bpy.context.view_layer.update()
 
 
-
 def load_side_obj(collection, train_tail, car, alpha):
     filepath_torus = f'data/shapes/simple_objects/objects/torus.blend'
     filepath_frustum = f'data/shapes/simple_objects/platform/frustum.blend'
@@ -147,7 +145,7 @@ def load_side_obj(collection, train_tail, car, alpha):
                     new_loc[2] += .305 * 2
             obj.scale = (.2, .2, .2)
             obj.location = new_loc
-            obj.pass_index = car.get_index('car')
+            obj.pass_index = car.get_index('wheels')
             bpy.context.view_layer.objects.active = obj
             obj.active_material = m1
             add_position(car, [obj], 'wheels')
@@ -168,11 +166,10 @@ def load_side_obj(collection, train_tail, car, alpha):
                     new_loc[2] += .2 * .5
             obj.scale = (.25, .25, .4)
             obj.location = tuple(new_loc)
-            obj.pass_index = car.get_index('car')
+            obj.pass_index = car.get_index('wall')
             bpy.context.view_layer.objects.active = obj
             obj.active_material = m2
             add_position(car, [obj], 'wall')
-
 
 
 def load_simple_asset(filepath, material, alpha, location, collection, link, shiny=False, pass_index=0,

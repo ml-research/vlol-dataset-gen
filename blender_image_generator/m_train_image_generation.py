@@ -120,7 +120,7 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
     mat = None
     if train_col == 'SimpleObjects':
         train_init_cord[2] = 0
-        train_init_cord = get_new_pos(train_init_cord, - 1.5, alpha)
+        train_init_cord = get_new_pos(train_init_cord, - 1, alpha)
 
         load_simple_engine(train_collection, train_init_cord, alpha)
         train_init_cord[2] = 0
