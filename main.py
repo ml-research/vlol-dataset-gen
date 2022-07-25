@@ -2,12 +2,9 @@ import logging
 from rtpt import RTPT
 
 from blender_image_generator.m_train_image_generation import generate_image
-from michalski_trains import m_train_dataset
 from raw.gen_raw_trains import gen_raw_trains, read_trains
 from util import *
 import argparse
-
-from visualization.vis import show_masked_im
 
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1"
 
@@ -19,7 +16,8 @@ def main():
     # device = torch.device("cpu" if torch.cuda.is_available() else "cpu")
 
     # michalski train dataset settings
-    train_col = args.train_type
+    raw_trains = args.description
+    train_vis = args.visualtization
     base_scene = args.background_scene
 
     if args.command == 'image_generator':
@@ -34,28 +32,34 @@ def main():
         end_ind = args.index_end if args.index_end is not None else ds_size
         if start_ind > ds_size or end_ind > ds_size:
             raise ValueError(f'start index or end index greater than dataset size')
-        print(f'generating {train_col} images in the {base_scene}')
+        print(f'generating {train_vis} images using {raw_trains} descriptions in the {base_scene}')
+        print(f'The images are set in the {base_scene} background')
 
-        raw_trains = train_col if train_col != 'SimpleObjects' else 'MichalskiTrains'
+
         # generate raw trains if they do not exist or shall be replaced
         if not os.path.isfile(f'raw/datasets/{raw_trains}.txt') or replace_raw:
             gen_raw_trains(raw_trains, with_occlusion=with_occlusion, num_entries=ds_size)
-
+        num_lines = sum(1 for line in open(f'raw/datasets/{raw_trains}.txt'))
+        if num_lines != ds_size:
+            raise ValueError(f'size of generated raw michalski trains ({num_lines}) does not equal defined dataset '
+                             f'size of {ds_size}')
         # load trains
-        trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=train_col == 'SimpleObjects')
+        trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=raw_trains == 'SimpleObjects')
 
         # render trains
         trains = trains[start_ind:end_ind]
-        rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_col[0]}',
+        rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_vis[0]}',
                     max_iterations=end_ind - start_ind)
         rtpt.start()
         for t_num, train in enumerate(trains, start=start_ind):
             rtpt.step()
-            generate_image(base_scene, train_col, t_num, train, save_blender, replace_existing_img,
+            generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
                            high_res=high_res, gen_depth=True)
 
     if args.command == 'vis':
-        full_ds = m_train_dataset.get_datasets(base_scene, train_col, 10, total_image_count=10, y_val='mask')
+        from visualization.vis import show_masked_im
+        from michalski_trains import m_train_dataset
+        full_ds = m_train_dataset.get_datasets(base_scene, raw_trains, train_vis, 10, total_image_count=10, y_val='mask')
         show_masked_im(full_ds)
 
 
@@ -77,13 +81,15 @@ def parse():
     parser.add_argument('--replace_raw', type=bool, default=False,
                         help='If the train descriptions are already generated shall they be replaced?')
 
-    # parser.add_argument('--dataset_size', type=int, default=10000, help='Size of the dataset we want to create')
-    parser.add_argument('--dataset_size', type=int, default=10, help='Size of the dataset we want to create')
+    parser.add_argument('--dataset_size', type=int, default=10000, help='Size of the dataset we want to create')
     parser.add_argument('--index_start', type=int, default=0, help='start rendering images at index')
     parser.add_argument('--index_end', type=int, default=None, help='stop rendering images at index')
 
-    parser.add_argument('--train_type', type=str, default='MichalskiTrains',
-                        help='whether to generate MichalskiTrains, RandomTrains or SimpleObjects')
+    parser.add_argument('--description', type=str, default='MichalskiTrains',
+                        help='whether to generate descriptions of MichalskiTrains, RandomTrains')
+    parser.add_argument('--visualization', type=str, default='Trains', help='whether to transform the generated train '
+                                                                            'description and generate 3D images of: '
+                                                                            'Trains or SimpleObjects')
     parser.add_argument('--background_scene', type=str, default='base_scene',
                         help='Scene in which the trains are set: base_scene, desert_scene, sky_scene or fisheye_scene')
 

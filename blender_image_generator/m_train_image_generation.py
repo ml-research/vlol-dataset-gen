@@ -9,14 +9,15 @@ from util import *
 import time
 
 
-def generate_image(base_scene, train_col, t_num, train, save_blender=False, replace_existing_img=True,
+def generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender=False, replace_existing_img=True,
                    high_res=False, gen_depth=False):
     """ assemble a michalski train, render its corresponding image and generate ground truth information
     Args:
     :param:  base_scene (string)            : background scene of the train ('base_scene', 'desert_scene', 'sky_scene',
      'fisheye_scene')
-    :param:  train_col (string)             : typ of trains which are generated either 'RandomTrains' or
-     'MichalskiTrains'
+    :param:  raw_trains (string)            : typ of train descriptions 'RandomTrains' or 'MichalskiTrains'
+    :param:  train_vis (string)             : visualization of the train description either 'MichalskiTrains' or
+    'SimpleObjects'
     :param:  t_num (int)                    : id of the train
     :param:  train (train obj)              : train object which is assembled and rendered
     :param:  save_blender (bool)            : whether the blender scene shall be shaved
@@ -27,17 +28,17 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
     """
 
     start = time.time()
-    output_image = f'output/image_generator/{train_col}/{base_scene}/images/{t_num}_m_train.png'
-    output_blendfile = f'output/image_generator/{train_col}/{base_scene}/blendfiles/{t_num}_m_train.blend'
-    output_scene = f'output/image_generator/{train_col}/{base_scene}/scenes/{t_num}_m_train.json'
-    output_depth_map = f'output/image_generator/{train_col}/{base_scene}/depths/{t_num}_m_train.png'
+    output_image = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/images/{t_num}_m_train.png'
+    output_blendfile = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/blendfiles/{t_num}_m_train.blend'
+    output_scene = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/scenes/{t_num}_m_train.json'
+    output_depth_map = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/depths/{t_num}_m_train.png'
     if os.path.isfile(output_image) and os.path.isfile(output_scene) and (os.path.isfile(
             output_depth_map) or not gen_depth) and not replace_existing_img:
         return
-    os.makedirs(f'output/image_generator/{train_col}/{base_scene}/images', exist_ok=True)
-    os.makedirs(f'output/image_generator/{train_col}/{base_scene}/blendfiles', exist_ok=True)
-    os.makedirs(f'output/image_generator/{train_col}/{base_scene}/scenes', exist_ok=True)
-    os.makedirs(f'output/image_generator/{train_col}/{base_scene}/depths', exist_ok=True)
+    os.makedirs(f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/images', exist_ok=True)
+    os.makedirs(f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/blendfiles', exist_ok=True)
+    os.makedirs(f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/scenes', exist_ok=True)
+    os.makedirs(f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/depths', exist_ok=True)
 
     # collection = 'base_scene'
     # load_base_scene(filepath, collection)
@@ -82,7 +83,8 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
     # This will give ground-truth information about the scene and its objects
     scene_struct = {
         'base_scene': base_scene,
-        'train_type': train_col,
+        'train_description': raw_trains,
+        'train_visualization': train_vis,
         'image_index': t_num,
         'image_filename': os.path.basename(output_image),
         'blender_filename': os.path.basename(output_blendfile),
@@ -118,9 +120,9 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
 
     # load train engine, use mat='black_metal' for black engine metal
     mat = None
-    if train_col == 'SimpleObjects':
+    if train_vis == 'SimpleObjects':
         train_init_cord[2] = 0
-        train_init_cord = get_new_pos(train_init_cord, - 1, alpha)
+        train_init_cord = get_new_pos(train_init_cord, -1, alpha)
 
         load_simple_engine(train_collection, train_init_cord, alpha)
         train_init_cord[2] = 0
@@ -151,7 +153,7 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
     assets_time = time.time()
     # print('time needed load assets: ' + str(assets_time - load_obj_time))
 
-    create_tree(train, t_num, train_col, base_scene, gen_depth)
+    create_tree(train, t_num, raw_trains, train_vis, base_scene, gen_depth)
     tree_time = time.time()
 
     # print('time needed tree: ' + str(tree_time - asset_time))
@@ -165,15 +167,15 @@ def generate_image(base_scene, train_col, t_num, train, save_blender=False, repl
 
     # print('time needed for render: ' + str(render_time - tree_time))
 
-    obj_mask = restore_img(train, t_num, train_col, base_scene)
+    obj_mask = restore_img(train, t_num, raw_trains, train_vis, base_scene)
 
     scene_struct['car_masks'] = obj_mask
 
     if gen_depth:
-        restore_depth_map(t_num, output_depth_map, train_col, base_scene)
+        restore_depth_map(t_num, output_depth_map, raw_trains, train_vis, base_scene)
 
     if save_blender:
-        bpy.ops.wm.save_as_mainfile(filepath=output_blendfile)
+        bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(output_blendfile))
 
     with open(output_scene, 'w+') as f:
         json.dump(scene_struct, f, indent=2)

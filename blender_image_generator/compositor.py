@@ -1,14 +1,16 @@
 import bpy
 
 
-def create_tree(train, t_num, train_col, base_scene, gen_depth):
+def create_tree(train, t_num, raw_trains, train_vis, base_scene, gen_depth):
     """
     create a tree inside the compositor of blender for the given train, the tree creats of objects masks
      and depth information of the individual trains
     params:
         train (MichalskiTrain): trains for which the tree is created
         t_num (int): train id
-        train_col (string): train type
+        :param:  raw_trains (string): typ of train descriptions 'RandomTrains' or 'MichalskiTrains'
+        :param:  train_vis (string): visualization of the train description either 'MichalskiTrains' or
+        'SimpleObjects'
         base_scene (string): scene in which the train is placed
         gen_depth (boolean): whether to create the pixel wise depth information
     """
@@ -20,7 +22,7 @@ def create_tree(train, t_num, train_col, base_scene, gen_depth):
     links = tree.links
     margin = 200
     pos_x, pos_y = 300, 0
-    base_path = f'tmp/tmp_graph_output/{train_col}/{base_scene}/'
+    base_path = f'tmp/tmp_graph_output/{raw_trains}/{train_vis}/{base_scene}/'
 
     # clear default nodes
     for node in nodes:
@@ -97,7 +99,7 @@ def create_tree(train, t_num, train_col, base_scene, gen_depth):
 
     if gen_depth:
         depth_map_out = nodes.new("CompositorNodeOutputFile")
-        depth_map_out.base_path = f'tmp/depth/{train_col}/{base_scene}/t_{t_num}_depth'
+        depth_map_out.base_path = f'tmp/depth/{raw_trains}/{train_vis}/{base_scene}/t_{t_num}_depth'
         depth_map_out.location = pos_x, 0
         depth_map_out.format.file_format = 'OPEN_EXR'
         links.new(

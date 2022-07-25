@@ -19,12 +19,15 @@ from blender_image_generator.json_util import merge_json_files
 
 
 class MichalskiTrainDataset(Dataset):
-    def __init__(self, base_scene, train_col, train_count=10000, val=False, resize=False,
+    def __init__(self, base_scene, raw_trains, train_vis, train_count=10000, val=False, resize=False,
                  X_val='image', y_val='direction'):
         """ MichalskiTrainDataset
             Args:
                 val: bool if model is used for vaildation
                 resize: bool if true images are resized to 224x224
+                :param:  raw_trains (string): typ of train descriptions 'RandomTrains' or 'MichalskiTrains'
+                :param:  train_vis (string): visualization of the train description either 'MichalskiTrains' or
+                'SimpleObjects'
                 X_val: X value output for training data returned in __getitem__()
                 ['image', 'predicted_attributes', 'gt_attributes', 'gt_attributes_individual_class', 'predicted_mask', gt_mask]
                         image (torch): image of michalski train
@@ -68,12 +71,13 @@ class MichalskiTrainDataset(Dataset):
         self.train_count = train_count
         self.y_val = y_val
         self.X_val = X_val
-        self.base_scene, self.train_col = base_scene, train_col
-        self.image_base_path = f'dataset/{train_col}/{base_scene}/images'
-        self.scene_base_path = f'dataset/{train_col}/{base_scene}/scenes'
-        self.all_scenes_path = f'dataset/{train_col}/{base_scene}/all_scenes'
-        self.predictions_path = f'output/detectron/{train_col}/{base_scene}/predictions.json'
-        self.predictions_coords_path = f'output/predictions/{train_col}/{base_scene}/world_coord_predictions.npy'
+        ds_typ = f'{raw_trains}/{train_vis}/{base_scene}/'
+        self.base_scene = base_scene
+        self.image_base_path = f'dataset/{ds_typ}/images'
+        self.scene_base_path = f'dataset/{ds_typ}/scenes'
+        self.all_scenes_path = f'dataset/{ds_typ}/all_scenes'
+        self.predictions_path = f'output/detectron/{ds_typ}/predictions.json'
+        self.predictions_coords_path = f'output/predictions/{ds_typ}/world_coord_predictions.npy'
         self.predictions_im_count = 8000
 
         color = ['yellow', 'green', 'grey', 'red', 'blue']
@@ -136,9 +140,9 @@ class MichalskiTrainDataset(Dataset):
             from models.detectron import setup, predict_instances
             if not os.path.isfile(self.predictions_path):
                 conf_path = "./configs/mask_rcnn_R_101_FPN_3x.yaml"
-                cfg = setup(conf_path, self.base_scene, self.train_col)
+                cfg = setup(conf_path, self.base_scene, ds_typ)
                 print('predicting instances using detectron')
-                predict_instances(self.base_scene, self.train_col, cfg)
+                predict_instances(self.base_scene, ds_typ, cfg)
 
             with open(self.predictions_path, 'r') as f:
                 predictions = json.load(f)
@@ -153,11 +157,12 @@ class MichalskiTrainDataset(Dataset):
 
         if 'predicted_attributes' in self.X_val:
             model_name = ['attr_predictor', 'resnet18'][1]
-            # predictions_descriptions_path = f'output/models/attr_predictor/attribute_classification/{self.train_col}/{self.base_scene}/predicted_descriptions/{train_count}/fold_0.npy'
+            # predictions_descriptions_path =
+            # f'output/models/attr_predictor/attribute_classification/{self.train_col}/{self.base_scene}/predicted_descriptions/{train_count}/fold_0.npy'
             predicted_train_description = {
-                100: np.load(f'output/models/{model_name}/attribute_classification/{self.train_col}/{self.base_scene}/predicted_descriptions/100/fold_0.npy', allow_pickle=True),
-                1000: np.load(f'output/models/{model_name}/attribute_classification/{self.train_col}/{self.base_scene}/predicted_descriptions/1000/fold_0.npy', allow_pickle=True),
-                8000: np.load(f'output/models/{model_name}/attribute_classification/{self.train_col}/{self.base_scene}/predicted_descriptions/8000/fold_0.npy', allow_pickle=True)
+                100: np.load(f'output/models/{model_name}/attribute_classification/{ds_typ}/predicted_descriptions/100/fold_0.npy', allow_pickle=True),
+                1000: np.load(f'output/models/{model_name}/attribute_classification/{ds_typ}/predicted_descriptions/1000/fold_0.npy', allow_pickle=True),
+                8000: np.load(f'output/models/{model_name}/attribute_classification/{ds_typ}/predicted_descriptions/8000/fold_0.npy', allow_pickle=True)
             }
             attr = np.empty(0)
             for i in range(10000):
@@ -615,10 +620,10 @@ class MichalskiTrainParser(Parser):
         return filename
 
 
-def get_datasets(base_scene, train_col, image_count, y_val='direction', X_val='image', total_image_count=10000,
+def get_datasets(base_scene, raw_trains, train_vis, image_count, y_val='direction', X_val='image', total_image_count=10000,
                  resize=False, ):
-    path_ori = f'output/image_generator/{train_col}/{base_scene}'
-    path_des = f'dataset/{train_col}/{base_scene}'
+    path_ori = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}'
+    path_des = f'dataset/{raw_trains}/{train_vis}/{base_scene}'
     if not os.path.isdir(path_des):
         im_path = path_ori + '/images'
         if not os.path.isdir(im_path):
@@ -633,12 +638,12 @@ def get_datasets(base_scene, train_col, image_count, y_val='direction', X_val='i
 
         copy_tree(path_ori, path_des)
         shutil.rmtree(path_ori)
-        if len(os.listdir(f'output/image_generator/{train_col}/')) == 0:
-            os.rmdir(f'output/image_generator/{train_col}/')
+        if len(os.listdir(f'output/image_generator/{raw_trains}/{train_vis}/')) == 0:
+            os.rmdir(f'output/image_generator/{raw_trains}/{train_vis}/')
     # merge json files to one if it does not already exist
     if not os.path.isfile(path_des + '/all_scenes/all_scenes.json'):
         merge_json_files(path_des)
     # image_count = None for standard image count
-    full_ds = MichalskiTrainDataset(base_scene=base_scene, train_col=train_col, y_val=y_val,
+    full_ds = MichalskiTrainDataset(base_scene=base_scene, raw_trains=raw_trains, train_vis=train_vis, y_val=y_val,
                                     train_count=image_count, resize=resize, X_val=X_val)
     return full_ds
