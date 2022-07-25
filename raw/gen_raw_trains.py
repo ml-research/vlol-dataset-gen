@@ -3,7 +3,7 @@ import os
 import random
 from pyswip import Prolog
 
-from michalski_trains import m_train
+from michalski_trains.m_train import BlenderCar, MichalskiCar, MichalskiTrain, SimpleCar
 
 
 def gen_raw_michalski_trains(num_entries=10000, with_occlusion=False):
@@ -128,11 +128,14 @@ def read_trains(file, toSimpleObjs=False):
         for c in range(len(l) // 8):
             ind = c * 8
             # a = (l[ind+i] for i in range(8))
-            car = m_train.MichalskiCar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6],
-                                               l[ind + 7], l[ind + 8], l[ind + 9].strip('\n'))
+            car = BlenderCar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6], l[ind + 7], l[ind + 8],
+                             l[ind + 9].strip('\n'))
+            if toSimpleObjs:
+                car = SimpleCar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6], l[ind + 7], l[ind + 8],
+                             l[ind + 9].strip('\n'))
 
             m_cars.append(car)
-        train = m_train.MichalskiTrain(m_cars, dir, t_angle)
+        train = MichalskiTrain(m_cars, dir, t_angle)
         if toSimpleObjs is True:
             train.update_pass_indicies()
         # t_angle = get_random_angle(with_occlusion, angle)

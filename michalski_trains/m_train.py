@@ -134,6 +134,9 @@ class MichalskiCar(object):
 
 
 class BlenderCar(MichalskiCar):
+    def __init__(self, n, shape, length, double, roof, wheels, l_num, l_shape, scale=(0.5, 0.5, 0.5)):
+        super().__init__(n, shape, length, double, roof, wheels, l_num, l_shape, scale)
+
     # get blender m_train attributes
     # michalski car shape is blender car color
     def get_blender_car_color(self):
@@ -218,7 +221,10 @@ class BlenderCar(MichalskiCar):
         return self.blender_cords[obj_name]
 
 
-class SimpleCar(MichalskiCar):
+class SimpleCar(BlenderCar):
+    def __init__(self, n, shape, length, double, roof, wheels, l_num, l_shape, scale=(0.5, 0.5, 0.5)):
+        super().__init__(n, shape, length, double, roof, wheels, l_num, l_shape, scale)
+
     def get_simple_color(self):
         car_shape_to_material = {
             'rectangle': 'yellow',

@@ -35,7 +35,6 @@ def main():
         print(f'generating {train_vis} images using {raw_trains} descriptions in the {base_scene}')
         print(f'The images are set in the {base_scene} background')
 
-
         # generate raw trains if they do not exist or shall be replaced
         if not os.path.isfile(f'raw/datasets/{raw_trains}.txt') or replace_raw:
             gen_raw_trains(raw_trains, with_occlusion=with_occlusion, num_entries=ds_size)
@@ -59,7 +58,8 @@ def main():
     if args.command == 'vis':
         from visualization.vis import show_masked_im
         from michalski_trains import m_train_dataset
-        full_ds = m_train_dataset.get_datasets(base_scene, raw_trains, train_vis, 10, total_image_count=10, y_val='mask')
+        full_ds = m_train_dataset.get_datasets(base_scene, raw_trains, train_vis, 10, total_image_count=10,
+                                               y_val='mask')
         show_masked_im(full_ds)
 
 
