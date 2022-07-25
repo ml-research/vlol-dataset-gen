@@ -96,7 +96,7 @@ def restore_img(m_train, t_num, raw_trains, train_vis, base_scene):
         path = base_path + f't_{t_num}_car_{car_number}_roof'
         obj_mask[current_car]["roof"] = {}
         obj_mask[current_car]["roof"]["label"] = car.get_blender_roof()
-        if car.get_blender_roof() != 'none':
+        if car.get_blender_roof() != 'none' or train_vis == 'SimpleObjects':
             index = car.get_index('roof')
             objects = blender_objects[index]
             b_box = get_b_box(bpy.context, objects)

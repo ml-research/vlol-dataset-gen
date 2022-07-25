@@ -78,31 +78,11 @@ class MichalskiTrain(object):
 
 
 class MichalskiCar(object):
-    def __init__(self, n, shape, length, double, roof, wheels, l_num, l_shape, scale=(0.5, 0.5, 0.5)):
+    def __init__(self, n, shape, length, double, roof, wheels, l_num, l_shape):
         self.index = None
         self.blender_cords = {}
-        self.n, self.shape, self.length, self.double, self.roof, self.wheels, self.l_num, self.l_shape, self.scale = int(
-            n), shape, length, double, roof, int(wheels), int(l_num), l_shape, scale
-        self.car_length_scalar = {
-            # short train length (2,9 - 0,909) = 1,991 along x axis
-            "long": 3.54121375 * self.scale[0],
-            # long train length (2,9 - 0.067029) = 2,832971 along x axis
-            "short": 2.48875 * self.scale[0],
-            # engine length (2,9 - 0.067029) = 2,832971 along x axis
-            "engine": 3.75 * self.scale[0]
-        }[self.length]
-
-        self.payload_scale = {
-            "golden_vase": (0.015, 0.015, 0.05),
-            "barrel": (0.4, 0.4, 0.4),
-            "diamond": (40, 40, 40),
-            "metal_pot": (1.2, 1.2, 1.2),
-            "oval_vase": (2.5, 2.5, 2.5),
-        }
-        self.init_rotation = {
-            "barrel": (0, 0, math.radians(90)),
-            "oval_vase": (0, 0, math.radians(90)),
-        }
+        self.n, self.shape, self.length, self.double, self.roof, self.wheels, self.l_num, self.l_shape = int(
+            n), shape, length, double, roof, int(wheels), int(l_num), l_shape
 
     # get michalski attributes
     def get_car_number(self):
@@ -135,7 +115,27 @@ class MichalskiCar(object):
 
 class BlenderCar(MichalskiCar):
     def __init__(self, n, shape, length, double, roof, wheels, l_num, l_shape, scale=(0.5, 0.5, 0.5)):
-        super().__init__(n, shape, length, double, roof, wheels, l_num, l_shape, scale)
+        super().__init__(n, shape, length, double, roof, wheels, l_num, l_shape)
+        self.scale = scale
+        self.car_length_scalar = {
+            # short train length (2,9 - 0,909) = 1,991 along x axis
+            "long": 3.54121375 * self.scale[0],
+            # long train length (2,9 - 0.067029) = 2,832971 along x axis
+            "short": 2.48875 * self.scale[0],
+            # engine length (2,9 - 0.067029) = 2,832971 along x axis
+            "engine": 3.75 * self.scale[0]
+        }[self.length]
+        self.payload_scale = {
+            "golden_vase": (0.015, 0.015, 0.05),
+            "barrel": (0.4, 0.4, 0.4),
+            "diamond": (40, 40, 40),
+            "metal_pot": (1.2, 1.2, 1.2),
+            "oval_vase": (2.5, 2.5, 2.5),
+        }
+        self.init_rotation = {
+            "barrel": (0, 0, math.radians(90)),
+            "oval_vase": (0, 0, math.radians(90)),
+        }
 
     # get blender m_train attributes
     # michalski car shape is blender car color

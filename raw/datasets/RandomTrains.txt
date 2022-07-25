@@ -1,0 +1,10 @@
+none -12 1 u_shaped short double arc 2 2 diamond 2 u_shaped long not_double flat 2 2 triangle 3 hexagon long double peaked 2 3 diamond
+none 167 1 u_shaped short not_double arc 2 1 triangle 2 u_shaped short not_double flat 2 2 utriangle 3 rectangle short not_double jagged 2 0 triangle 4 hexagon long not_double none 3 0 circle
+none -66 1 rectangle short double jagged 2 2 triangle 2 hexagon short double flat 2 1 triangle 3 hexagon short double arc 2 2 rectangle
+none 170 1 rectangle short double jagged 2 2 utriangle 2 rectangle short not_double arc 2 0 utriangle 3 rectangle long double arc 2 1 hexagon
+none 166 1 ellipse short not_double flat 2 2 triangle 2 u_shaped short double arc 2 1 triangle 3 hexagon long double flat 2 2 hexagon
+none 204 1 rectangle long not_double arc 3 1 diamond 2 ellipse long double arc 3 1 hexagon 3 ellipse short double peaked 2 0 hexagon 4 hexagon short not_double jagged 2 2 diamond
+none 148 1 rectangle short not_double peaked 2 0 triangle 2 ellipse long not_double peaked 3 0 utriangle 3 hexagon long not_double peaked 2 0 circle
+none 47 1 hexagon short not_double flat 2 2 diamond 2 rectangle long not_double arc 2 2 circle 3 u_shaped long double arc 3 0 utriangle 4 bucket short double peaked 2 2 utriangle
+none 168 1 hexagon short double flat 2 1 rectangle 2 hexagon long double arc 2 1 rectangle 3 hexagon long double none 3 2 diamond 4 u_shaped long not_double jagged 3 1 diamond
+none 7 1 ellipse short not_double flat 2 0 rectangle 2 hexagon long double peaked 2 1 hexagon 3 u_shaped long not_double none 2 0 rectangle

@@ -62,10 +62,10 @@ def gen_raw_random_trains(num_entries=10000, with_occlusion=False):
         with_occlusion: boolean whether to include occlusion of the train payloads
     """
     try:
-        os.remove('RandomTrains')
+        os.remove('raw/datasets/RandomTrains')
     except OSError:
         pass
-    with open('raw/RandomTrains.txt', 'w+') as text_file:
+    with open('raw/datasets/RandomTrains.txt', 'w+') as text_file:
         for i in range(num_entries):
             t_angle = get_random_angle(with_occlusion)
             m_cars = f'none {t_angle} '
