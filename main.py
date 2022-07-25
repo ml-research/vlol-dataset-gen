@@ -17,7 +17,7 @@ def main():
 
     # michalski train dataset settings
     raw_trains = args.description
-    train_vis = args.visualtization
+    train_vis = args.visualization
     base_scene = args.background_scene
 
     if args.command == 'image_generator':
@@ -44,7 +44,7 @@ def main():
             raise ValueError(f'size of generated raw michalski trains ({num_lines}) does not equal defined dataset '
                              f'size of {ds_size}')
         # load trains
-        trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=raw_trains == 'SimpleObjects')
+        trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=train_vis == 'SimpleObjects')
 
         # render trains
         trains = trains[start_ind:end_ind]

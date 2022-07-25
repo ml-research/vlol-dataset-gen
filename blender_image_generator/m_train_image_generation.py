@@ -84,7 +84,7 @@ def generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender
     scene_struct = {
         'base_scene': base_scene,
         'train_description': raw_trains,
-        'train_visualization': train_vis,
+        'visualization': train_vis,
         'image_index': t_num,
         'image_filename': os.path.basename(output_image),
         'blender_filename': os.path.basename(output_blendfile),

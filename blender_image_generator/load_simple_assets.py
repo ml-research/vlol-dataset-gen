@@ -172,7 +172,7 @@ def load_side_obj(collection, train_tail, car, alpha):
             add_position(car, [obj], 'wall')
 
 
-def load_simple_asset(filepath, material, alpha, location, collection, link, shiny=False, pass_index=0,
+def load_simple_asset(filepath, material, alpha, location, collection, link, pass_index=0,
                       init_obj_rotation=(0, 0, 0), init_obj_scale=(1, 1, 1)):
     """
     load and add an asset to the blender scene

@@ -76,6 +76,7 @@ class MichalskiTrain(object):
                 index += 1
             car.set_index(indicies)
 
+
 class MichalskiCar(object):
     def __init__(self, n, shape, length, double, roof, wheels, l_num, l_shape, scale=(0.5, 0.5, 0.5)):
         self.index = None
@@ -131,6 +132,8 @@ class MichalskiCar(object):
     def get_load_shape(self):
         return self.l_shape
 
+
+class BlenderCar(MichalskiCar):
     # get blender m_train attributes
     # michalski car shape is blender car color
     def get_blender_car_color(self):
@@ -183,7 +186,7 @@ class MichalskiCar(object):
         return self.shape, self.length, self.double, self.roof, self.wheels, self.l_num, self.l_shape
 
     def get_all_blender_att(self):
-        return self.get_blender_car_color(), self.get_car_length(), self.get_blender_wall(), self.get_blender_roof(),\
+        return self.get_blender_car_color(), self.get_car_length(), self.get_blender_wall(), self.get_blender_roof(), \
                self.get_car_wheels(), self.get_load_number(), self.get_blender_payload()
 
     # attribute index used for blender segmentation
@@ -213,3 +216,53 @@ class MichalskiCar(object):
 
     def get_blender_world_cord(self, obj_name):
         return self.blender_cords[obj_name]
+
+
+class SimpleCar(MichalskiCar):
+    def get_simple_color(self):
+        car_shape_to_material = {
+            'rectangle': 'yellow',
+            'bucket': 'green',
+            'ellipse': 'grey',
+            'hexagon': 'red',
+            'u_shaped': 'blue',
+        }
+        return car_shape_to_material[self.shape]
+
+    def get_simple_platform_length(self):
+        return self.get_car_length()
+
+    def get_simple_side_object_frustum(self):
+        roof_to_frustum = {
+            "double": "down",
+            "not_double": 'up',
+        }
+        return roof_to_frustum[self.double]
+
+    def get_simple_platform_shape(self):
+        roof_to_b_obj = {
+            "none": 'cube',
+            "arc": 'cylinder',
+            "flat": 'hemisphere',
+            "jagged": 'frustum',
+            "peaked": 'hexagonal_prism'
+        }
+        return roof_to_b_obj[self.roof]
+
+    def get_simple_side_object_torus(self):
+        wheel_to_frustum = {
+            2: 'top',
+            3: 'bottom',
+        }
+        return wheel_to_frustum[self.get_wheel_count()]
+
+    def get_simple_object_shape(self):
+        load_to_b_obj = {
+            "rectangle": "sphere",
+            "triangle": "pyramid",
+            "circle": 'cube',
+            "diamond": 'cylinder',
+            "hexagon": 'cone',
+            "utriangle": 'torus'
+        }
+        return load_to_b_obj[self.l_shape]
