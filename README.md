@@ -67,7 +67,8 @@ The following settings are available, the input typ and default settings are not
 - index_end (int, None) -> stop rendering images at index (does not render index_end).
   If None the train generator stops rendering at dataset_size.
 
-- train_type (str, MichalskiTrains) -> The train type we want to generate. Either 'MichalskiTrains' or 'RandomTrains'
+- description (str, MichalskiTrains) -> The train descriptions we want to generate. Either 'MichalskiTrains' or 'RandomTrains'
+- visualization (str, MichalskiTrains) -> The way we want to visualize the train descriptions. Either as 'Trains' or 'SimpleObjects'.
 - background_scene (str, base_scene) -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
   or 'fisheye_scene'
 
