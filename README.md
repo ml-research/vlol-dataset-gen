@@ -2,8 +2,8 @@
 
 <div align="center">
   <img src="example_images/michalski_original.png" height="200"  alt="">
-  <img src="example_images/background/base_scene.png" height="200"  alt="">
   <em>Left: original Michalski trains.</em> 
+  <img src="example_images/background/base_scene.png" height="200"  alt="">
   <em>Right: Our 3D Michalski trains.</em>
 </div>
 
