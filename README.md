@@ -1,35 +1,35 @@
 # The Three Dimensional Michalski Train Generator
 
+<div align="center">
+  <img src="example_images/michalski_original.png" height="200"  alt="">
+  <img src="example_images/background/base_scene.png" height="200"  alt="">
+  <em>Left: original Michalski trains. Right: Our 3D Michalski trains.</em>
+</div>
+
 Repository for the three-dimensional Michalski train generator introduced in
 Bringing the third dimension into the Michalski train problem.
 
 The Michalski train problem [[1]](#1) proposed by Ryszard S. Michalski in 1980 represents
 one of the most prominent challenges in the domain of relational learning. The problem
-constitutes a set of trains, which are composed of a wide variety of properties and labelled
-into the two categories eastbound and westbound trains. Now it is up to the viewer
-to ascertain a classification hypothesis governing what kinds of trains head eastbound
-and what kinds head westbound. The conjectured hypothesis should accomplish both
-assigning correct labels while retaining the highest possible degree of simplicity. It is
+constitutes a set of trains, which are composed of a wide variety of properties and labeled
+into the two categories ``Eastbound'' and ``Westbound'' trains. It is up to the viewer
+to generate a classification hypothesis governing what trains are eastbound
+and what are westbound. The conjectured hypothesis should accomplish both
+assigning the correct labels while retaining the a degree of generality. It is
 certainly easy to find a classification hypothesis satisfying a given set of Michalski trains,
 e.g. learning the trains by heart. However, due to the great number of train properties, it
-is a major challenge to find the most simple and general decision hypothesis.
+is a major challenge to find the most general decision hypothesis.
 
-This study takes the Michalski train problem even a step further by introducing a three-dimensional
+This study takes the Michalski train problem one step further by introducing a three-dimensional
 Michalski train generator. An image generator that allows to establish versatile datasets for deep image understanding,
 relational and analogical (grounded) visual reasoning.
 This research aims to contribute an ILP dataset which allows to incorporate the complex rule-based logic of the
-Michalski
-train problem and establish a modern three-dimensional dataset creating a problem of inductive inference.
-The resulting datasets allow for diagnostic insights into the method’s decision-making process as well as its
+Michalski train problem and establish a modern three-dimensional dataset creating a problem of inductive inference.
+The resulting datasets allow for diagnostic insights into an AI model’s decision-making process as well as its
 capabilities of rule-based learning.
 
 You can use this code to generate Michalski train descriptions, render their corresponding images and
 create a three-dimensional Michalski train dataset.
-
-<div align="center">
-  <img src="example_images/michalski_original.png" height="200"  alt="">
-  <img src="example_images/background/base_scene.png" height="200"  alt="">
-</div>
 
 ## Instructions for setting up the docker container
 
@@ -37,14 +37,13 @@ A docker container can be used to set up the required environment.
 Additionally, CUDA 11.3+, docker and nvidia-container-toolkit must be installed to allow the
 usage of the docker container and enable image rendering.
 
-For easier handling we recommend:
-create a screen: screen -S train_generator
+For easier handling we recommend to create a screen: `screen -S train_generator`
 
 Then:
 
-1. cd to TrainGenerator folder
-2. docker build -t blender_train_generator -f Dockerfile .
-3. docker run --gpus device=0 -v $(pwd):/home/workdir blender_train_generator python3 main.py
+1. `cd to TrainGenerator folder`
+2. `docker build -t blender_train_generator -f Dockerfile.`
+3. `docker run --gpus device=0 -v $(pwd):/home/workdir blender_train_generator python3 main.py`
 
 ## Generating images
 
@@ -56,7 +55,7 @@ A default decision rule is specified in TrainGenerator/classification_rule.pl wh
 Subsequently, we render images for the individual train descriptions, generate their ground-truth information creating a
 dataset.
 The train generator provides a wide range of settings allowing to adapt to the given requirements.
-The default output location is TrainGenerator/output/image_generator/.
+The default output location is `TrainGenerator/output/image_generator/`.
 
 ### Script parameters
 
