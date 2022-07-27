@@ -1,14 +1,6 @@
 # The Three Dimensional Michalski Train Generator
 
-<div align="center">
-  <img src="example_images/michalski_original.png" height="200"  alt="">
-  <em>Left: original Michalski trains.</em> 
-  <img src="example_images/background/base_scene.png" height="200"  alt="">
-  <em>Right: Our 3D Michalski trains.</em>
-</div>
-
-Repository for the three-dimensional Michalski train generator introduced in
-Bringing the third dimension into the Michalski train problem.
+Repository for the three-dimensional Michalski train generator introduced in `...` .
 
 The Michalski train problem [[1]](#1) proposed by Ryszard S. Michalski in 1980 represents
 one of the most prominent challenges in the domain of relational learning. The problem
@@ -16,7 +8,7 @@ constitutes a set of trains, which are composed of a wide variety of properties 
 into the two categories ``Eastbound'' and ``Westbound'' trains. It is up to the viewer
 to generate a classification hypothesis governing what trains are eastbound
 and what are westbound. The conjectured hypothesis should accomplish both
-assigning the correct labels while retaining the a degree of generality. It is
+assigning the correct labels while retaining a degree of generality. It is
 certainly easy to find a classification hypothesis satisfying a given set of Michalski trains,
 e.g. learning the trains by heart. However, due to the great number of train properties, it
 is a major challenge to find the most general decision hypothesis.
@@ -29,7 +21,14 @@ Michalski train problem and establish a modern three-dimensional dataset creatin
 The resulting datasets allow for diagnostic insights into an AI model’s decision-making process as well as its
 capabilities of rule-based learning.
 
-You can use this code to generate Michalski train descriptions, render their corresponding images and
+<div align="center">
+  <img src="example_images/michalski_original.png" height="200"  alt="">
+  <img src="example_images/background/base_scene.png" height="200"  alt="">
+</div>
+
+In the left image you can see the original Michalsko train problem, in the right image you can see an example train from our novel 3D Michalski train generator.
+
+You can use the code of this repository to generate Michalski train descriptions, render their corresponding images and
 create a three-dimensional Michalski train dataset. We provide detailed descriptions and steps below.
 
 ## Instructions for setting up the docker container
