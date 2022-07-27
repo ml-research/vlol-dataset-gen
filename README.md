@@ -22,8 +22,11 @@ The resulting datasets allow for diagnostic insights into an AI model’s decisi
 capabilities of rule-based learning.
 
 <div align="center">
-  <img src="example_images/michalski_original.png" height="200"  alt="">
-  <img src="example_images/background/base_scene.png" height="200"  alt="">
+  <img src="example_images/michalski_original.png" width="600"  alt="">
+</div>
+<div align="center">
+  <img src="example_images/background/base_scene.png" width="400"  alt="">
+  <img src="example_images/background/base_scene.png" width="400"  alt="">
 </div>
 
 In the left image you can see the original Michalsko train problem, in the right image you can see an example train from our novel 3D Michalski train generator.
@@ -128,7 +131,7 @@ Herby the classification rule must be expressed in the Prolog description langua
 predicates.
 However, by resorting the defined predicates, it is also possible to define and apply new predicates.
 
-At default the following predefined descriptors are available.
+At default the train descriptors are defined by the following predicates.
 While T refers to the whole train as in input, C, C1, C2 refer to a single car.
 
 - Car descriptors
@@ -213,6 +216,10 @@ This representation is based on the following descriptors:
 
 
 The following image illustrates the above described descriptors.
+
+<div align="center">
+  <img src="example_images/overview_simple_objs.png" height="350px"  alt="">
+</div>
 
 ### Ground truth scene information
 
