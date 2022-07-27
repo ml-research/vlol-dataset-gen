@@ -3,7 +3,8 @@
 <div align="center">
   <img src="example_images/michalski_original.png" height="200"  alt="">
   <img src="example_images/background/base_scene.png" height="200"  alt="">
-  <em>Left: original Michalski trains. Right: Our 3D Michalski trains.</em>
+  <em>Left: original Michalski trains.</em> 
+  <em>Right: Our 3D Michalski trains.</em>
 </div>
 
 Repository for the three-dimensional Michalski train generator introduced in
@@ -29,7 +30,7 @@ The resulting datasets allow for diagnostic insights into an AI model’s decisi
 capabilities of rule-based learning.
 
 You can use this code to generate Michalski train descriptions, render their corresponding images and
-create a three-dimensional Michalski train dataset.
+create a three-dimensional Michalski train dataset. We provide detailed descriptions and steps below.
 
 ## Instructions for setting up the docker container
 
@@ -51,7 +52,7 @@ This is a very brief instruction on how the three-dimensional Michalski train da
 At first, we generate train descriptions for the whole dataset resorting to a slightly adapted version of Muggleton's
 train generator.
 We have extended the code to assign labels to the generated train descriptions according to a specified decision rule.
-A default decision rule is specified in TrainGenerator/classification_rule.pl which can be adjusted as desired.
+A default decision rule is specified in `TrainGenerator/classification_rule.pl` which can be adjusted as desired (see section below).
 Subsequently, we render images for the individual train descriptions, generate their ground-truth information creating a
 dataset.
 The train generator provides a wide range of settings allowing to adapt to the given requirements.
@@ -61,24 +62,24 @@ The default output location is `TrainGenerator/output/image_generator/`.
 
 The following settings are available, the input typ and default settings are noted in parentheses:
 
-- dataset_size (int, 10,000) -> Size of the dataset we want to create
-- index_start (int, 0) -> start rendering images at index (index_start)
-- index_end (int, None) -> stop rendering images at index (does not render index_end).
+- `dataset_size` (int, 10,000) -> Size of the dataset we want to create
+- `index_start` (int, 0) -> start rendering images at index (index_start)
+- `index_end` (int, None) -> stop rendering images at index (does not render index_end).
   If None the train generator stops rendering at dataset_size.
 
-- description (str, MichalskiTrains) -> The train descriptions we want to generate. Either 'MichalskiTrains' or 'RandomTrains'
-- visualization (str, MichalskiTrains) -> The way we want to visualize the train descriptions. Either as 'Trains' or 'SimpleObjects'.
-- background_scene (str, base_scene) -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
+- `description` (str, MichalskiTrains) -> The train descriptions we want to generate. Either 'MichalskiTrains' or 'RandomTrains'
+- `visualization` (str, MichalskiTrains) -> The way we want to visualize the train descriptions. Either as 'Trains' or 'SimpleObjects'.
+- `background_scene` (str, base_scene) -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
   or 'fisheye_scene'
 
-- with_occlusion (bool, False) -> Whether to include train angles which might lead to occlusion of the individual train
+- `with_occlusion` (bool, False) -> Whether to include train angles which might lead to occlusion of the individual train
   attributes
-- save_blender (bool, False) -> Whether the blender scene is saved.
+- `save_blender` (bool, False) -> Whether the blender scene is saved.
   Only recommended for small image counts as the blend files are of rather big size.
-- high_res (bool, False) -> whether to render the images in high resolution (1920x1080) or standard resolution (480x270)
-- gen_depth (bool, False) -> Whether to generate the depth information of the individual scenes
-- replace_raw (bool, False) -> If the train descriptions for the dataset are already generated shall they be replaced?
-- replace_existing_img (bool, False) -> Check if the image is already rendered for the individual indices.
+- `high_res` (bool, False) -> whether to render the images in high resolution (1920x1080) or standard resolution (480x270)
+- `gen_depth` (bool, False) -> Whether to generate the depth information of the individual scenes
+- `replace_raw` (bool, False) -> If the train descriptions for the dataset are already generated shall they be replaced?
+- `replace_existing_img` (bool, False) -> Check if the image is already rendered for the individual indices.
   If there is already an image generated for a specific index shall do you want to replace it?
 
 The following shows example images of the four background scenes 'base_scene', 'desert_scene', 'sky_scene' and '
@@ -97,12 +98,11 @@ Keep in mind to use different docker containers as the blender engine has proble
 
 ### Decision rule
 
-If Michalski trains are generated, the train generator allows the creation of a labeled train dataset.
-Therefore, the labels are derived from the prolog classification rule noted in TrainGenerator/classification_rule.pl.
-The trains generated are subject to a balanced distribution of the individual classes so that we have an equal
+The labels of each generated train are derived from the prolog classification rule noted in `TrainGenerator/classification_rule.pl`.
+The generated trains are subject to a balanced distribution of the individual classes so that we have an equal
 number of trains heading eastbound and westbound within our dataset.
 Be aware that defining a very specific decision rules can have a strong influence on the distribution of train
-attributes, which in turn can lead to similar images being generated.
+attributes, which in turn can lead to similar images being generated as it might become difficult to create random variations based on a very specific rule.
 
 By default, we resort to the classification rule known as 'Theory X' which is defined as follows:
 
