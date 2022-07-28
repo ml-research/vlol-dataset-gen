@@ -52,7 +52,7 @@ Then:
 
 This is a very brief instruction on how the three-dimensional Michalski train dataset is generated.
 At first, we generate train descriptions for the whole dataset resorting to a slightly adapted version of Muggleton's
-train generator.
+train generator [[2]](#2).
 We have extended the code to assign labels to the generated train descriptions according to a specified decision rule.
 A default decision rule is specified in `TrainGenerator/classification_rule.pl` which can be adjusted as desired (see section below).
 Subsequently, we render images for the individual train descriptions, generate their ground-truth information creating a
@@ -62,7 +62,7 @@ The default output location is `TrainGenerator/output/image_generator/`.
 
 ### Script parameters
 
-The following settings are available, the input typ and default settings are noted in parentheses:
+The following settings are available, the corresponding input types and default settings are noted in parentheses:
 
 - `dataset_size` (int, 10,000) -> Size of the dataset we want to create
 - `index_start` (int, 0) -> Start rendering images at index (index_start)
@@ -337,6 +337,9 @@ opted).
 Ryszard S. Michalski. “Pattern Recognition as Rule-Guided Inductive Inference”. In:
 IEEE Transactions on Pattern Analysis and Machine Intelligence PAMI-2.4 (1980),
 pp. 349–361. doi: 10.1109/TPAMI.1980.4767034.
+
+<a id="1">[2]</a>
+Stephen Muggleton. Random train generator. 1998. url: https://www.doc.ic.ac.uk/~shm/Software/GenerateTrains/.
 
 ## Citation
 
