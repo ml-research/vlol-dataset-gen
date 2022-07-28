@@ -25,14 +25,14 @@ capabilities of rule-based learning.
   <img src="example_images/michalski_original.png" width="600"  alt="">
 </div>
 <div align="center">
-  <img src="example_images/background/base_scene.png" width="400"  alt="">
-  <img src="example_images/background/base_scene.png" width="400"  alt="">
+  <img src="example_images/michalski_3D.png" width="500"  alt="">
+  <img src="example_images/simple_scene.png" width="500"  alt="">
 </div>
 
-In the left image you can see the original Michalsko train problem, in the right image you can see an example train from our novel 3D Michalski train generator.
+In the top image you can see the original Michalski trains, in the bottom images you can see example images from our novel 3D Michalski train generator.
 
 You can use the code of this repository to generate Michalski train descriptions, render their corresponding images and
-create a three-dimensional Michalski train dataset. We provide detailed descriptions and steps below.
+create a three-dimensional Michalski train dataset. Below we provide detailed descriptions and explanations of the necessary steps to create the datasets.
 
 ## Instructions for setting up the docker container
 
@@ -65,8 +65,8 @@ The default output location is `TrainGenerator/output/image_generator/`.
 The following settings are available, the input typ and default settings are noted in parentheses:
 
 - `dataset_size` (int, 10,000) -> Size of the dataset we want to create
-- `index_start` (int, 0) -> start rendering images at index (index_start)
-- `index_end` (int, None) -> stop rendering images at index (does not render index_end).
+- `index_start` (int, 0) -> Start rendering images at index (index_start)
+- `index_end` (int, None) -> Stop rendering images at index (does not render index_end).
   If None the train generator stops rendering at dataset_size.
 
 - `description` (str, MichalskiTrains) -> The train descriptions we want to generate. Either 'MichalskiTrains' or 'RandomTrains'
@@ -78,11 +78,12 @@ The following settings are available, the input typ and default settings are not
   attributes
 - `save_blender` (bool, False) -> Whether the blender scene is saved.
   Only recommended for small image counts as the blend files are of rather big size.
-- `high_res` (bool, False) -> whether to render the images in high resolution (1920x1080) or standard resolution (480x270)
+- `high_res` (bool, False) -> Whether to render the images in high resolution (1920x1080) or standard resolution (480x270)
 - `gen_depth` (bool, False) -> Whether to generate the depth information of the individual scenes
 - `replace_raw` (bool, False) -> If the train descriptions for the dataset are already generated shall they be replaced?
-- `replace_existing_img` (bool, False) -> Check if the image is already rendered for the individual indices.
-  If there is already an image generated for a specific index shall do you want to replace it?
+- `replace_existing_img` (bool, False) -> Whether to replace existing images. 
+Checks if the image is already rendered for the dataset which is generated.
+If there is already an image generated for a specific index do you want to replace it?
 
 The following shows example images of the four background scenes 'base_scene', 'desert_scene', 'sky_scene' and '
 fisheye_scene':
@@ -195,7 +196,7 @@ An overview of the three-dimensional Michalski train descriptors and their assig
 The following image illustrates the above described descriptors.
 
 <div align="center">
-  <img src="example_images/overview.png" height="350px"  alt="">
+  <img src="example_images/descriptor_overview/overview.png" height="350px"  alt="">
 </div>
 
 ### Transformation into a three-dimensional simple representation
@@ -218,7 +219,7 @@ This representation is based on the following descriptors:
 The following image illustrates the above described descriptors.
 
 <div align="center">
-  <img src="example_images/overview_simple_objs.png" height="350px"  alt="">
+  <img src="example_images/descriptor_overview/overview_simple_objs.png" height="350px"  alt="">
 </div>
 
 ### Ground truth scene information
