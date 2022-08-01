@@ -277,6 +277,8 @@ def set_layer(obj, layer_idx):
     for i in range(len(obj.layers)):
         obj.layers[i] = (i == layer_idx)
 
+
+
 # def load_materials():
 #     """
 #     Load materials from a directory. We assume that the directory contains .blend

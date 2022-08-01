@@ -205,3 +205,13 @@ def merge_json_files(path):
     # args.output_scene_file.split('.json')[0]+'_classid_'+str(args.img_class_id)+'.json'
     with open(json_pth, 'w+') as f:
         json.dump(output, f)
+
+
+def combine_json(base_scene, raw_trains, train_vis, total_image_count=10000):
+    path_ori = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}'
+    if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
+        im_path = path_ori + '/images'
+        if os.path.isdir(im_path):
+            files = os.listdir(im_path)
+            if len(files) == total_image_count:
+                merge_json_files(path_ori)

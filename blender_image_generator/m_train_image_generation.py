@@ -3,7 +3,7 @@ import json
 from blender_image_generator.blender_util import enable_gpus, clean_up
 from blender_image_generator.compositor import create_tree
 from blender_image_generator.load_assets import *
-from blender_image_generator.json_util import restore_img, restore_depth_map
+from blender_image_generator.json_util import restore_img, restore_depth_map, combine_json
 from blender_image_generator.load_simple_assets import create_simple_scene, load_simple_engine
 from util import *
 import time
@@ -182,5 +182,7 @@ def generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
     fin_time = time.time()
+
+
 
     # print('finish it time: ' + str(fin_time - render_time))

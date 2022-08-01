@@ -25,8 +25,8 @@ capabilities of rule-based learning.
   <img src="example_images/michalski_original.png" width="600"  alt="">
 </div>
 <div align="center">
-  <img src="example_images/michalski_3D.png" width="500"  alt="">
-  <img src="example_images/simple_scene.png" width="500"  alt="">
+  <img src="example_images/michalski_3D.png" width="400"  alt="">
+  <img src="example_images/simple_scene.png" width="400"  alt="">
 </div>
 
 In the top image you can see the original Michalski trains, in the bottom images you can see example images from our novel 3D Michalski train generator.
@@ -280,7 +280,7 @@ m_train.json
    }
 ```
 
-The following shows an overview of some of the ground truth information described above:
+The following shows an overview of the ground truth information described above:
 
 <div align="center">
   <img src="example_images/scene_representation/original.png" width="400"  alt="">
@@ -298,30 +298,35 @@ output
 │
 └───MichalskiTrains
 │   │
-│   └───base_scene
+│   └───SimpleObjects
 │   │   │
-│   │   └───blendfiles
-│   │   │     │0_m_train.blend
-│   │   │     │...
+│   │   └───base_scene
+│   │   │   │
+│   │   │   └───blendfiles
+│   │   │   │     │0_m_train.blend
+│   │   │   │     │...
+│   │   │   │
+│   │   │   └───depths
+│   │   │   │     │0_m_train.png
+│   │   │   │     │...
+│   │   │   │
+│   │   │   └───images
+│   │   │   │     │0_m_train.png
+│   │   │   │     │...
+│   │   │   │
+│   │   │   └───scenes
+│   │   │         │0_m_train.json
+│   │   │         │...
 │   │   │
-│   │   └───depths
-│   │   │     │0_m_train.png
-│   │   │     │...
-│   │   │
-│   │   └───images
-│   │   │     │0_m_train.png
-│   │   │     │...
-│   │   │
-│   │   └───scenes
-│   │         │0_m_train.json
-│   │         │...
+│   │   └───desert_scene
+│   │       │...
 │   │
-│   └───desert_scene
-│   │   │...
-│   │...
+│   └───Trains
+│       │...
 │
 └───RandomTrains
 │   │...
+│
 │...
 ```
 

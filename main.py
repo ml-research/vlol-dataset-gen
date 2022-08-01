@@ -1,6 +1,7 @@
 import logging
 from rtpt import RTPT
 
+from blender_image_generator.json_util import combine_json
 from blender_image_generator.m_train_image_generation import generate_image
 from raw.gen_raw_trains import gen_raw_trains, read_trains
 from util import *
@@ -54,6 +55,7 @@ def main():
             rtpt.step()
             generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
                            high_res=high_res, gen_depth=True)
+        combine_json(base_scene, raw_trains, train_vis, ds_size)
 
     if args.command == 'vis':
         from visualization.vis import show_masked_im
