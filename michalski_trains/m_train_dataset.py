@@ -15,7 +15,7 @@ from timm.data.parsers.parser import Parser
 from torchvision.transforms import InterpolationMode
 from tqdm.contrib import tenumerate
 
-from blender_image_generator.json_util import merge_json_files
+from blender_image_generator.json_util import merge_json_files, combine_json
 
 
 class MichalskiTrainDataset(Dataset):
@@ -160,9 +160,15 @@ class MichalskiTrainDataset(Dataset):
             # predictions_descriptions_path =
             # f'output/models/attr_predictor/attribute_classification/{self.train_col}/{self.base_scene}/predicted_descriptions/{train_count}/fold_0.npy'
             predicted_train_description = {
-                100: np.load(f'output/models/{model_name}/attribute_classification/{ds_typ}/predicted_descriptions/100/fold_0.npy', allow_pickle=True),
-                1000: np.load(f'output/models/{model_name}/attribute_classification/{ds_typ}/predicted_descriptions/1000/fold_0.npy', allow_pickle=True),
-                8000: np.load(f'output/models/{model_name}/attribute_classification/{ds_typ}/predicted_descriptions/8000/fold_0.npy', allow_pickle=True)
+                100: np.load(
+                    f'output/models/{model_name}/attribute_classification/{ds_typ}/predicted_descriptions/100/fold_0.npy',
+                    allow_pickle=True),
+                1000: np.load(
+                    f'output/models/{model_name}/attribute_classification/{ds_typ}/predicted_descriptions/1000/fold_0.npy',
+                    allow_pickle=True),
+                8000: np.load(
+                    f'output/models/{model_name}/attribute_classification/{ds_typ}/predicted_descriptions/8000/fold_0.npy',
+                    allow_pickle=True)
             }
             attr = np.empty(0)
             for i in range(10000):
@@ -173,7 +179,8 @@ class MichalskiTrainDataset(Dataset):
             acc1000 = accuracy_score(attr, predicted_train_description[1000].flatten())
             acc100 = accuracy_score(attr, predicted_train_description[100].flatten())
 
-            print(f'percent of correct predicted attributes: 100 ims: {acc100}, 1000 ims: {acc1000}, 8000 ims: {acc8000}')
+            print(
+                f'percent of correct predicted attributes: 100 ims: {acc100}, 1000 ims: {acc1000}, 8000 ims: {acc8000}')
 
             self.predicted_train_description = predicted_train_description
 
@@ -620,32 +627,34 @@ class MichalskiTrainParser(Parser):
         return filename
 
 
-def get_datasets(base_scene, raw_trains, train_vis, image_count, y_val='direction', X_val='image', total_image_count=10000,
+def get_datasets(base_scene, raw_trains, train_vis, ds_size, y_val='direction', X_val='image',
                  resize=False, ):
     path_ori = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}'
-    path_des = f'dataset/{raw_trains}/{train_vis}/{base_scene}'
-    if not os.path.isdir(path_des):
-        im_path = path_ori + '/images'
-        if not os.path.isdir(im_path):
-            raise AssertionError('dataset not found, please generate images first')
+    if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
+        combine_json(base_scene, raw_trains, train_vis, ds_size)
+        raise Warning(f'Dataloader did not find JSON ground truth information.'
+                      f'Might be caused by interruptions during process of image generation.'
+                      f'Generating new JSON file at: {path_ori + "/all_scenes/all_scenes.json"}')
+    im_path = path_ori + '/images'
+    if not os.path.isdir(im_path):
+        raise AssertionError('dataset not found, please generate images first')
 
-        files = os.listdir(im_path)
-        # total image count equals 10.000 adjust if not all images need to be generated
-        if len(files) != total_image_count:
-            raise AssertionError(
-                f'not enough images in dataset: expected {total_image_count}, present: {len(files)}'
-                f' please generate the missing images')
+    files = os.listdir(im_path)
+    # total image count equals 10.000 adjust if not all images need to be generated
+    if len(files) < ds_size:
+        raise AssertionError(
+            f'not enough images in dataset: expected {ds_size}, present: {len(files)}'
+            f' please generate the missing images')
+    elif len(files) > ds_size:
+        raise Warning(
+            f' dataloader did not select all images of the dataset, number of selected images:  {ds_size},'
+            f' available images in dataset: {len(files)}')
 
-        copy_tree(path_ori, path_des)
-        shutil.rmtree(path_ori)
-        if len(os.listdir(f'output/image_generator/{raw_trains}/{train_vis}/')) == 0:
-            os.rmdir(f'output/image_generator/{raw_trains}/{train_vis}/')
     # merge json files to one if it does not already exist
-    if not os.path.isfile(path_des + '/all_scenes/all_scenes.json'):
-        merge_json_files(path_des)
+    if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
+        raise AssertionError(
+            f'no JSON found')
     # image_count = None for standard image count
     full_ds = MichalskiTrainDataset(base_scene=base_scene, raw_trains=raw_trains, train_vis=train_vis, y_val=y_val,
-                                    train_count=image_count, resize=resize, X_val=X_val)
+                                    train_count=ds_size, resize=resize, X_val=X_val)
     return full_ds
-
-

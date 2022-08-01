@@ -54,14 +54,13 @@ def main():
         for t_num, train in enumerate(trains, start=start_ind):
             rtpt.step()
             generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
-                           high_res=high_res, gen_depth=True)
+                           high_res=high_res, gen_depth=gen_depth)
         combine_json(base_scene, raw_trains, train_vis, ds_size)
 
     if args.command == 'vis':
         from visualization.vis import show_masked_im
         from michalski_trains import m_train_dataset
-        full_ds = m_train_dataset.get_datasets(base_scene, raw_trains, train_vis, 10, total_image_count=10,
-                                               y_val='mask')
+        full_ds = m_train_dataset.get_datasets(base_scene, raw_trains, train_vis, 10)
         show_masked_im(full_ds)
 
 
