@@ -63,6 +63,15 @@ def main():
         full_ds = m_train_dataset.get_datasets(base_scene, raw_trains, train_vis, 10)
         show_masked_im(full_ds)
 
+    if args.command == 'ct':
+        from pyswip import Prolog
+        concept_tester = 'raw/concept_tester.pl'
+        prolog = Prolog()
+        prolog.consult(concept_tester)
+
+        for _ in prolog.query(f"direction([c(1, u_shaped, short, not_double, flat, 2, l(1, triangle)),c(2, rectangle, short, not_double, none, 2, l(1, circle))])."):
+            continue
+
 
 def parse():
     # Instantiate the parser
@@ -97,7 +106,8 @@ def parse():
     parser.add_argument('--cuda', type=int, default=0,
                         help='Which cuda device to use')
     parser.add_argument('--command', type=str, default='image_generator',
-                        help='whether to generate images (image_generator) or visualize generated images (vis)')
+                        help='whether to generate images (image_generator) or visualize generated images (vis)'
+                             'or concept tester (ct)')
 
     args = parser.parse_args()
 
