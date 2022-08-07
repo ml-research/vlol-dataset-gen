@@ -1,0 +1,1 @@
+east 180 1 u_shaped short not_double none 2 1 circle 2 bucket short double flat 2 1 hexagon 3 hexagon long double peaked 3 1 triangle 4 rectangle long not_double jagged 2 1 utriangle 5 ellipse long not_double peaked 2 1 diamond 6 ellipse long not_double none 2 1 rectangle
