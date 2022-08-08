@@ -8,7 +8,7 @@ direction(Train) :-
 
 eastbound([Car|Cars]):-
   (short(Car), closed(Car));
-  (has_load0(Car,triangle), has_load1(Cars,circle));
+  peaked(Car);
   eastbound(Cars).
 
 has_car(T,C) :- member(C,T).

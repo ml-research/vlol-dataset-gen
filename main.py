@@ -64,13 +64,8 @@ def main():
         show_masked_im(full_ds)
 
     if args.command == 'ct':
-        from pyswip import Prolog
-        concept_tester = 'raw/concept_tester.pl'
-        prolog = Prolog()
-        prolog.consult(concept_tester)
-
-        for _ in prolog.query(f"direction([c(1, u_shaped, short, not_double, flat, 2, l(1, triangle)),c(2, rectangle, short, not_double, none, 2, l(1, circle))])."):
-            continue
+        from concept_tester import eval_rule
+        eval_rule()
 
 
 def parse():
