@@ -10,6 +10,11 @@ eastbound([Car|Cars]):-
 (has_load0(Car,triangle), has_load1(Cars,circle));
 eastbound(Cars).
 
+%eastbound([Car|Cars]):-
+%(short(Car), closed(Car));
+%(has_load0(Car,triangle), has_load1(Cars,circle));
+%eastbound(Cars).
+
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Other example classification rules:
 

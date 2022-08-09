@@ -132,8 +132,8 @@ Herby the classification rule must be expressed in the Prolog description langua
 predicates.
 However, by resorting the defined predicates, it is also possible to define and apply new predicates.
 
-At default the train descriptors are defined by the following predicates.
-While T refers to the whole train as in input, C, C1, C2 refer to a single car.
+At default the train descriptors are expressed by the following predicates.
+While T refers to the whole train as an input, C, C1, C2 refer to a single car.
 
 - Car descriptors
     - has_car(T,C)
@@ -153,7 +153,7 @@ While T refers to the whole train as in input, C, C1, C2 refer to a single car.
 - Car wall descriptor
     - double(C)
 
-- Car roof descriptors (R: roof, N: car number)
+- Car roof descriptors (R: roof shape, N: car number)
     - has_roof(C,r(R,N))
     - open(C)
     - closed(C)
@@ -161,18 +161,36 @@ While T refers to the whole train as in input, C, C1, C2 refer to a single car.
 - Car wheel count descriptor (W: wheel count, NC: car number)
     - has_wheel(C,w(NC,W))
 
-- Car payload descriptor
+- Car payload descriptor (Shape: roof shape, NLoad: number of loads)
+    - has_load(C,l(Shape,NLoad))
     - has_load0(C,Shape)
     - has_load1(T,Shape)
 
-The defined descriptors can be allocated the following descriptor values:
+[//]: # (The defined descriptors can be allocated the following descriptor values:)
 
-    car_shape(1,ellipse). car_shape(2,hexagon). car_shape(3,rectangle). car_shape(4,u_shaped). car_shape(5,bucket).
-    car_length(1,short). car_length(2,long).
-    car_open(1,open). car_open(2,closed).
-    car_double(1,not_double). car_double(2,double).
-    roof_shape(1,none). roof_shape(2,flat). roof_shape(3,jagged). roof_shape(4,peaked). roof_shape(5,arc).
-    load_shape(1,circle). load_shape(2,diamond). load_shape(3,hexagon). load_shape(4,rectangle). load_shape(5,triangle). load_shape(6,utriangle).
+[//]: # ()
+[//]: # (    car_shape&#40;1,ellipse&#41;. car_shape&#40;2,hexagon&#41;. car_shape&#40;3,rectangle&#41;. car_shape&#40;4,u_shaped&#41;. car_shape&#40;5,bucket&#41;.)
+
+[//]: # (    car_length&#40;1,short&#41;. car_length&#40;2,long&#41;.)
+
+[//]: # (    car_open&#40;1,open&#41;. car_open&#40;2,closed&#41;.)
+
+[//]: # (    car_double&#40;1,not_double&#41;. car_double&#40;2,double&#41;.)
+
+[//]: # (    roof_shape&#40;1,none&#41;. roof_shape&#40;2,flat&#41;. roof_shape&#40;3,jagged&#41;. roof_shape&#40;4,peaked&#41;. roof_shape&#40;5,arc&#41;.)
+
+[//]: # (    load_shape&#40;1,circle&#41;. load_shape&#40;2,diamond&#41;. load_shape&#40;3,hexagon&#41;. load_shape&#40;4,rectangle&#41;. load_shape&#40;5,triangle&#41;. load_shape&#40;6,utriangle&#41;.)
+
+An overview of the descriptor's assignable values can be found below:
+
+| Car number | Car shape | Car length | Wall type | Roof shape | Number of wheels | Shape of loads | Number of loads |
+|:----------:|:---------:|:----------:|:---------:|:----------:|:----------------:|:--------------:|:---------------:|
+|     1      | rectangle |   short    |  single   |    none    |        2         |   rectangle    |        0        |
+|     2      |  bucket   |    long    |  double   |    arc     |        3         |    triangle    |        1        |
+|     3      |  ellipse  |     	      |    		     |    flat    |                  |     circle     |        2        |
+|     4      |  hexagon  |     		     |    			    |   jagged   |                  |    diamond     |        3        |
+|            | u shaped  |     		     |    		     |   peaked   |        		        |    hexagon     |
+|    			     |    		     |     		     |    			    |     		     |                  |   u_triangle   |
 
 ### Transformation into a three-dimensional train representation
 

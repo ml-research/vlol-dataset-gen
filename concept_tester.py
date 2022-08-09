@@ -3,20 +3,21 @@ import os
 
 def eval_rule():
     from pyswip import Prolog, Query, Functor
-    train_descriptions = f'raw/datasets/MichalskiTrains.txt'
-    concept_tester_tmp = 'raw/tmp/concept_tester_tmp.pl'
-    try:
-        os.remove(concept_tester_tmp)
-    except OSError:
-        pass
-    with open("raw/train_generator.pl", 'r') as gen, open("classification_rule.pl", 'r') as rule:
-        with open(concept_tester_tmp, 'w+') as generator:
-            generator.write(gen.read())
-            generator.write(rule.read())
 
-    # concept_tester = 'raw/concept_tester.pl'
+    # concept_tester_tmp = 'raw/tmp/concept_tester_tmp.pl'
+    # try:
+    #     os.remove(concept_tester_tmp)
+    # except OSError:
+    #     pass
+    # with open("raw/train_generator.pl", 'r') as gen, open("classification_rule.pl", 'r') as rule:
+    #     with open(concept_tester_tmp, 'w+') as generator:
+    #         generator.write(gen.read())
+    #         generator.write(rule.read())
+
+    train_descriptions = f'raw/datasets/MichalskiTrains.txt'
+    concept_tester = 'raw/concept_tester.pl'
     prolog = Prolog()
-    prolog.consult(concept_tester_tmp)
+    prolog.consult(concept_tester)
     dirs = ['west', 'east']
     f = open(train_descriptions, "r")
     TP = 0
@@ -49,6 +50,6 @@ def eval_rule():
             print(train)
     print(f'concept tester')
     print(f'ACC:{(TP + TN) / (FN + TN + TP + FP)}, '
-          # f'Precision:{TP / (TP + FP)}, Recall:{TP / (TP + FN)}, '
+          f'Precision:{(TP / (TP + FP)) if (TP + FP) > 0 else 0}, Recall:{(TP / (TP + FN))if (TP + FN) > 0 else 0}, '
           f'TP:{TP}, FN:{FN}, TN:{TN}, FP:{FP}')
-    os.remove(concept_tester_tmp)
+    # os.remove(concept_tester_tmp)

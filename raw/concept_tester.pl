@@ -1,20 +1,19 @@
-loves(a, b).
-
-loves(b,a) :- loves(a,b).
-
-loves(b,b) :- loves(b,a), loves(a, b).
-
-
 direction(Train) :-
   open('raw/concept_tester.txt', append, OS),
   (eastbound(Train) -> (format(OS, "~w" , [east]), write('Eastbound train'), nl)
   ;otherwise -> (format(OS, "~w" , [west]), write('Westbound train'), nl)),
   close(OS).
 
+%eastbound([Car|Cars]):-
+%  (short(Car), closed(Car));
+%  (has_load0(Car,triangle), has_load1(Cars,circle));
+%  eastbound(Cars).
+
 eastbound([Car|Cars]):-
   (short(Car), closed(Car));
-  (has_load0(Car,triangle), has_load1(Cars,circle));
+  ellipse(Car);
   eastbound(Cars).
+
 
 has_car(T,C) :- member(C,T).
 
