@@ -78,7 +78,7 @@ class MichalskiTrain(object):
 
 
 class MichalskiCar(object):
-    def __init__(self, n, shape, length, double, roof, wheels, l_num, l_shape):
+    def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num):
         self.index = None
         self.blender_cords = {}
         self.n, self.shape, self.length, self.double, self.roof, self.wheels, self.l_num, self.l_shape = int(
@@ -114,8 +114,8 @@ class MichalskiCar(object):
 
 
 class BlenderCar(MichalskiCar):
-    def __init__(self, n, shape, length, double, roof, wheels, l_num, l_shape, scale=(0.5, 0.5, 0.5)):
-        super().__init__(n, shape, length, double, roof, wheels, l_num, l_shape)
+    def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num, scale=(0.5, 0.5, 0.5)):
+        super().__init__(n, shape, length, double, roof, wheels, l_shape, l_num)
         self.scale = scale
         self.car_length_scalar = {
             # short train length (2,9 - 0,909) = 1,991 along x axis
@@ -222,8 +222,8 @@ class BlenderCar(MichalskiCar):
 
 
 class SimpleCar(BlenderCar):
-    def __init__(self, n, shape, length, double, roof, wheels, l_num, l_shape, scale=(0.5, 0.5, 0.5)):
-        super().__init__(n, shape, length, double, roof, wheels, l_num, l_shape, scale)
+    def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num, scale=(0.5, 0.5, 0.5)):
+        super().__init__(n, shape, length, double, roof, wheels, l_shape, l_num, scale)
 
     def get_simple_color(self):
         car_shape_to_material = {

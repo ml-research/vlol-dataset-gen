@@ -102,7 +102,7 @@ show0([]).
 show0([C|Cs]) :-
   C=c(N,Shape,Length,Double,Roof,Wheels,l(Lshape,Lno)),
   open('raw/tmp/MichalskiTrains.txt', append, OS),
-  format(OS, ' ~w ~w ~w ~w ~w ~w ~w ~w', [N,Shape,Length,Double,Roof,Wheels,Lno,Lshape]),
+  format(OS, ' ~w ~w ~w ~w ~w ~w ~w ~w', [N,Shape,Length,Double,Roof,Wheels,Lshape,Lno]),
   writes(['Car ',N,': Shape = ',Shape,
   ', Length = ',Length,', Double = ',Double,nl, tab(8),
   'Roof = ',Roof,
