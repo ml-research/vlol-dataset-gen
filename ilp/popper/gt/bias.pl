@@ -6,7 +6,7 @@ max_body(6).
 head_pred(f,1).
 body_pred(has_car,2).
 body_pred(has_load,2).
-body_pred(behind,2).
+%body_pred(behind,2).
 %% colors
 body_pred(yellow,1).
 body_pred(green,1).
@@ -29,8 +29,12 @@ body_pred(peaked_roof,1).
 %% walls
 body_pred(braced_wall,1).
 body_pred(solid_wall,1).
-%% payloads
+%% payload number
 body_pred(zero_load,1).
+body_pred(one_load,1).
+body_pred(two_load,1).
+body_pred(three_load,1).
+%% payload shape
 body_pred(barrel,1).
 body_pred(golden_vase,1).
 body_pred(box,1).
@@ -43,7 +47,7 @@ body_pred(oval_vase,1).
 type(f,(train,)).
 type(has_car,(train,car)).
 type(has_load,(car,load)).
-type(behind,(car,car)).
+%type(behind,(car,car)).
 %% colors
 type(yellow,(car,)).
 type(green,(car,)).
@@ -66,8 +70,12 @@ type(peaked_roof,(car,)).
 %% walls
 type(braced_wall,(car,)).
 type(solid_wall,(car,)).
-%% payloads
+%% payload number
 type(zero_load,(car,)).
+type(one_load,(car,)).
+type(two_load,(car,)).
+type(three_load,(car,)).
+%% payload shape
 type(barrel,(load,)).
 type(golden_vase,(load,)).
 type(box,(load,)).
@@ -79,7 +87,7 @@ type(oval_vase,(load,)).
 direction(f,(in,)).
 direction(has_car,(in,out)).
 direction(has_load,(in,out)).
-direction(behind,(in,out)).
+%direction(behind,(in,out)).
 %% colors
 direction(yellow,(in,)).
 direction(green,(in,)).
@@ -99,8 +107,12 @@ direction(roof_foundation,(in,)).
 direction(solid_roof,(in,)).
 direction(braced_roof,(in,)).
 direction(peaked_roof,(in,)).
-%% payloads
+%% payload number
 direction(zero_load,(in,)).
+direction(one_load,(in,)).
+direction(two_load,(in,)).
+direction(three_load,(in,)).
+%% payload shape
 direction(barrel,(in,)).
 direction(golden_vase,(in,)).
 direction(box,(in,)).

@@ -54,12 +54,12 @@ def main():
         trains = trains[start_ind:end_ind]
         rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_vis[0]}',
                     max_iterations=end_ind - start_ind)
-        rtpt.start()
-        for t_num, train in enumerate(trains, start=start_ind):
-            rtpt.step()
-            generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
-                           high_res=high_res, gen_depth=gen_depth)
-        combine_json(base_scene, raw_trains, train_vis, ds_size)
+        # rtpt.start()
+        # for t_num, train in enumerate(trains, start=start_ind):
+        #     rtpt.step()
+        #     generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
+        #                    high_res=high_res, gen_depth=gen_depth)
+        # combine_json(base_scene, raw_trains, train_vis, ds_size)
 
     if args.command == 'vis':
         from visualization.vis import show_masked_im
@@ -81,7 +81,7 @@ def main():
         path = 'ilp/popper/gt'
         kb = 'models/popper'
         prog, score, stats = learn_solution(
-            Settings(path, debug=True, show_stats=True, eval_timeout=10, max_body=6, max_vars=15, timeout=600))
+            Settings(path, debug=True, show_stats=True))
         if prog is not None:
             print_prog_score(prog, score)
 
