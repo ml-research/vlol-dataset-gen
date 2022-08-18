@@ -107,7 +107,6 @@ class MichalskiTrainDataset(Dataset):
         return X, y
 
     def __len__(self):
-
         return self.train_count
 
     def get_direction(self, item):

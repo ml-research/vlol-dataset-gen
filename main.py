@@ -41,8 +41,12 @@ def main():
             gen_raw_trains(raw_trains, with_occlusion=with_occlusion, num_entries=ds_size)
         num_lines = sum(1 for line in open(f'raw/datasets/{raw_trains}.txt'))
         if num_lines != ds_size:
-            raise ValueError(f'size of generated raw michalski trains ({num_lines}) does not equal defined dataset '
-                             f'size of {ds_size}')
+            raise ValueError(
+                f'defined dataset size: {ds_size}\n'
+                f'existing train descriptions: {num_lines}\n'
+                f'{num_lines} raw train descriptions were previously generated in raw/datasets/{raw_trains}.txt \n '
+                f'add \'--replace_raw\' True to command line to the replace existing train descriptions and '
+                f'generate the correct number of michalski trains')
         # load trains
         trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=train_vis == 'SimpleObjects')
 
@@ -66,6 +70,20 @@ def main():
     if args.command == 'ct':
         from concept_tester import eval_rule
         eval_rule()
+
+    if args.command == 'ilp':
+        from popper.loop import learn_solution
+        from popper.util import Settings, print_prog_score
+        from ilp.setup import create_bk
+        num_trains = 8000
+        noise = True
+        create_bk(base_scene, num_trains, noise)
+        path = 'ilp/popper/gt'
+        kb = 'models/popper'
+        prog, score, stats = learn_solution(
+            Settings(path, debug=True, show_stats=True, eval_timeout=10, max_body=6, max_vars=15, timeout=600))
+        if prog is not None:
+            print_prog_score(prog, score)
 
 
 def parse():

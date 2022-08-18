@@ -162,6 +162,9 @@ has_load(C,Load) :- arg(7,C,l(_,NLoad)), nlist(1,NLoad,L), member(Load,L).
 has_load0(C,Shape) :- arg(7,C,l(Shape,N)), 1=<N.
 has_load1(T,Shape) :- has_car(T,C), has_load0(C,Shape).
 
+load_num(C, N) :- arg(7,C,l(_,N)).
+car_num(C,N) :- arg(1,C,N).
+
 none(r(none,_)). flat(r(flat,_)).
 jagged(r(jagged,_)). peaked(r(peaked,_)).
 arc(r(arc,_)).

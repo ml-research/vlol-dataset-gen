@@ -5,7 +5,7 @@ Repository for the three-dimensional Michalski train generator introduced in `..
 The Michalski train problem [[1]](#1) proposed by Ryszard S. Michalski in 1980 represents
 one of the most prominent challenges in the domain of relational learning. The problem
 constitutes a set of trains, which are composed of a wide variety of properties and labeled
-into the two categories ``Eastbound'' and ``Westbound'' trains. It is up to the viewer
+into the two categories `Eastbound` and `Westbound` trains. It is up to the viewer
 to generate a classification hypothesis governing what trains are eastbound
 and what are westbound. The conjectured hypothesis should accomplish both
 assigning the correct labels while retaining a degree of generality. It is
