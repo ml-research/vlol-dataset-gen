@@ -76,8 +76,8 @@ def main():
         from popper.util import Settings, print_prog_score
         from ilp.setup import create_bk
         num_trains = 8000
-        noise = True
-        create_bk(base_scene, num_trains, noise)
+        noise = 0.01
+        create_bk(num_trains, noise)
         path = 'ilp/popper/gt'
         kb = 'models/popper'
         prog, score, stats = learn_solution(
