@@ -6,7 +6,12 @@ max_body(6).
 head_pred(f,1).
 body_pred(has_car,2).
 body_pred(has_load,2).
-%body_pred(behind,2).
+%%body_pred(behind,2).
+%% car number
+body_pred(first_car,1).
+body_pred(second_car,1).
+body_pred(third_car,1).
+body_pred(fourth_car,1).
 %% colors
 body_pred(yellow,1).
 body_pred(green,1).
@@ -48,6 +53,11 @@ type(f,(train,)).
 type(has_car,(train,car)).
 type(has_load,(car,load)).
 %type(behind,(car,car)).
+%% car number
+type(first_car,(car,)).
+type(second_car,(car,)).
+type(third_car,(car,)).
+type(fourth_car,(car,)).
 %% colors
 type(yellow,(car,)).
 type(green,(car,)).
@@ -87,7 +97,12 @@ type(oval_vase,(load,)).
 direction(f,(in,)).
 direction(has_car,(in,out)).
 direction(has_load,(in,out)).
-%direction(behind,(in,out)).
+%%direction(behind,(in,out)).
+%% car number
+direction(first_car,(in,)).
+direction(second_car,(in,)).
+direction(third_car,(in,)).
+direction(fourth_car,(in,)).
 %% colors
 direction(yellow,(in,)).
 direction(green,(in,)).

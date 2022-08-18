@@ -14,7 +14,6 @@ def create_bk(base_scene, ds_size, noise=0.01):
     y_val = 'direction'
     X_val = 'gt_attributes'
 
-
     train_c = 0
     path = './ilp/popper/gt/'
     path_dilp = './ilp/dilp/gt/'
@@ -62,10 +61,11 @@ def create_bk(base_scene, ds_size, noise=0.01):
 
                 car_c += 1
                 bk_file.write(f'has_car(t{train_c},t{train_c}_c{car_c}).' + '\n')
-                bk_file.write(f'car_number(t{train_c}_c{car_c},{car_c}).' + '\n')
-                # behind
-                for i in range(1, car_c):
-                    bk_file.write(f'behind(t{train_c}_c{car_c},t{train_c}_c{i}).' + '\n')
+                position = ['first', 'second', 'third', 'fourth']
+                bk_file.write(f'{position[car_c-1]}_car(t{train_c}_c{car_c}).' + '\n')
+                # # behind
+                # for i in range(1, car_c):
+                #     bk_file.write(f'behind(t{train_c}_c{car_c},t{train_c}_c{i}).' + '\n')
                 # color
                 bk_file.write(f'{color}(t{train_c}_c{car_c}).' + '\n')
                 # length
