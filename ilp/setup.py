@@ -126,7 +126,7 @@ def create_bk(ds_size, noise=0):
                 bk_file.write(f'{payload_n}_load(t{train_c}_c{car_number}).\n')
                 bk2_file.write(f'load_num(t{train_c}_c{car_number},{l_num}).\n')
                 if l_num > 0:
-                    bk2_file.write(f'has_load0(t{train_c}_c{car_number},{l_shape}).\n')
+                    bk2_file.write(f'has_payload(t{train_c}_c{car_number},{l_shape}).\n')
                 for p_c, payload in enumerate([load_obj1, load_obj2, load_obj3]):
                     if payload != 'none':
                         bk_file.write(f'{payload}(t{train_c}_c{car_number}_l{p_c}).\n')

@@ -193,8 +193,12 @@ car_color(C,CC) :- yellow = CC, arg(2,C,rectangle).
 car_color(C,CC) :- blue = CC, arg(2,C,u_shaped).
 car_color(C,CC) :- green = CC, arg(2,C,bucket).
 
-
-load(C,Shape) :- arg(7,C,l(Shape,N)), 1=<N.
+has_payload(C,Shape) :- box = CC, arg(7,C,rectangle).
+has_payload(C,Shape) :- golden_vase = CC, arg(7,C,triangle).
+has_payload(C,Shape) :- barrel = CC, arg(7,C,circle).
+has_payload(C,Shape) :- diamond = CC, arg(7,C,diamond).
+has_payload(C,Shape) :- metal_pot = CC, arg(7,C,hexagon).
+has_payload(C,Shape) :- oval_vase = CC, arg(7,C,u_triangle).
 
 solid_wall(C) :- arg(4,C,double).
 braced_wall(C) :- arg(4,C,not_double).

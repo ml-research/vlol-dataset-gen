@@ -4,7 +4,7 @@
 % general
 :- modeb(*,has_car(+train,-car,#int)).
 % payload
-:- modeb(1,has_load0(+car,#shape)).
+:- modeb(1,has_payload(+car,#shape)).
 :- modeb(1,load_num(+car,#int)).
 %% colors
 :- mode(1,car_color(+car, #color)).
@@ -23,7 +23,7 @@
 :- determination(eastbound/1,has_car/3).
 %% payloads
 :- determination(eastbound/1,has_load0/2).
-:- determination(eastbound/1,load_num/2).
+:- determination(eastbound/1,has_payload/2).
 %% colors
 :- determination(eastbound/1,car_color/2).
 %% lengths
