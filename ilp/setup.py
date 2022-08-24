@@ -16,8 +16,9 @@ def create_bk(ds_size, noise=0):
     X_val = 'gt_attributes'
 
     train_c = 0
-    path = './ilp/popper/gt/'
-    path_dilp = './ilp/dilp/gt/'
+    path = './ilp/popper/gt'
+    path_dilp = './ilp/dilp/gt'
+    path_aleph = './ilp/aleph/trains2'
     os.makedirs(path, exist_ok=True)
     os.makedirs(path_dilp, exist_ok=True)
     try:
@@ -25,12 +26,26 @@ def create_bk(ds_size, noise=0):
     except OSError:
         pass
     try:
+        os.remove(path + '/bk2.pl')
+    except OSError:
+        pass
+    try:
         os.remove(path + '/exs.pl')
     except OSError:
         pass
+    try:
+        os.remove(path_aleph + '/train.n')
+    except OSError:
+        pass
+    try:
+        os.remove(path_aleph + '/train.f')
+    except OSError:
+        pass
     trains = read_trains(f'raw/datasets/{train_raw}.txt', toSimpleObjs=train_vis == 'SimpleObjects')
-    with open(path + '/exs.pl', 'w+') as exs_file, open(path + '/bk.pl', 'w+') as bk_file, open(
-            path_dilp + '/positive.dilp', 'w+') as pos, open(path_dilp + '/negative.dilp', 'w+') as neg:
+    with open(path + '/exs.pl', 'w+') as exs_file, open(path + '/bk.pl', 'w+') as bk_file, open(path + '/bk2.pl',
+                                                                                                'w+') as bk2_file, open(
+            path_dilp + '/positive.dilp', 'w+') as pos, open(path_dilp + '/negative.dilp', 'w+') as neg, open(
+            path_aleph + '/train.f', 'w+') as aleph_pos, open(path_aleph + '/train.n', 'w+') as aleph_neg:
         if len(trains) < ds_size:
             raise AssertionError(f'not enough trains in DS {len(trains)} to create a bk of size {ds_size}')
         for train in trains[:ds_size]:
@@ -38,13 +53,16 @@ def create_bk(ds_size, noise=0):
             label = train.get_label()
             train_c += 1
             bk_file.write(f'train(t{train_c}).\n')
+            bk2_file.write(f'train(t{train_c}).\n')
             label = 'pos' if label == 'east' else 'neg'
             # if train_c < 10:
             exs_file.write(f'{label}(f(t{train_c})).\n')
             if label == 'pos':
                 pos.write(f'target(t{train_c}).\n')
+                aleph_pos.write(f'eastbound(t{train_c}).\n')
             else:
                 neg.write(f'target(t{train_c}).\n')
+                aleph_neg.write(f'eastbound(t{train_c}).\n')
             for car in train.get_cars():
 
                 # add car to bk if car color is not none
@@ -73,7 +91,10 @@ def create_bk(ds_size, noise=0):
                     load_obj1, load_obj2, load_obj3 = [l_shape] * l_num + ['none'] * (3 - l_num)
                     car_number = car.get_car_number()
 
+
                 bk_file.write(f'has_car(t{train_c},t{train_c}_c{car_number}).' + '\n')
+                bk2_file.write(f'car(t{train_c}_c{car_number}).' + '\n')
+                bk2_file.write(f'has_car(t{train_c},t{train_c}_c{car_number},{car_number}).' + '\n')
                 position = ['first', 'second', 'third', 'fourth']
                 bk_file.write(f'{position[car_number - 1]}_car(t{train_c}_c{car_number}).' + '\n')
                 # # behind
@@ -81,6 +102,7 @@ def create_bk(ds_size, noise=0):
                 #     bk_file.write(f'behind(t{train_c}_c{car_c},t{train_c}_c{i}).' + '\n')
                 # color
                 bk_file.write(f'{color}(t{train_c}_c{car_number}).' + '\n')
+                bk2_file.write(f'car_color(t{train_c}_c{car_number},{color}).' + '\n')
                 # length
                 bk_file.write(f'{length}(t{train_c}_c{car_number}).' + '\n')
                 # walls
@@ -91,19 +113,32 @@ def create_bk(ds_size, noise=0):
                     bk_file.write(f'{roofs}(t{train_c}_c{car_number}).' + '\n')
                 else:
                     bk_file.write(f'roof_open(t{train_c}_c{car_number}).' + '\n')
+                bk2_file.write(f'has_roof0(t{train_c}_c{car_number},{roofs}).' + '\n')
+
                 # wheel_count
                 wheel_num = ['two', 'three'][int(wheel_count[0]) - 2]
                 bk_file.write(f'{wheel_num}{wheel_count[1:]}(t{train_c}_c{car_number}).' + '\n')
+                bk2_file.write(f'has_wheel0(t{train_c}_c{car_number},{wheel_count[0]}).' + '\n')
+
                 # payload
                 payload_num = 3 - [load_obj1, load_obj2, load_obj3].count('none')
                 payload_n = ['zero', 'one', 'two', 'three'][payload_num]
                 bk_file.write(f'{payload_n}_load(t{train_c}_c{car_number}).\n')
+                bk2_file.write(f'has_load(t{train_c}_c{l_shape},{payload_n},{l_num}).\n')
                 for p_c, payload in enumerate([load_obj1, load_obj2, load_obj3]):
                     if payload != 'none':
                         bk_file.write(f'{payload}(t{train_c}_c{car_number}_l{p_c}).\n')
                         bk_file.write(f'has_load(t{train_c}_c{car_number},t{train_c}_c{car_number}_l{p_c}).\n')
 
     file = Path(path + '/bk.pl')
+    file.write_text(
+        "\n".join(
+            sorted(
+                file.read_text().split("\n")[:-1]
+            )
+        )
+    )
+    file = Path(path + '/bk2.pl')
     file.write_text(
         "\n".join(
             sorted(
@@ -119,4 +154,13 @@ def create_bk(ds_size, noise=0):
             )
         )
     )
+    try:
+        os.remove(path_aleph + '/train.b')
+    except OSError:
+        pass
+    with open(path_aleph + '/bias2', 'r') as bias, open(path + '/bk2.pl', 'r') as bk, open(path_aleph + '/train.b',
+                                                                                          'w+') as comb:
+        comb.write(bias.read() + '\n')
+        comb.write(bk.read())
+
     shutil.copy(path + '/bk.pl', path_dilp + '/facts.dilp')

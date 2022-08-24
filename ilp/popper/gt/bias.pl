@@ -97,7 +97,7 @@ type(oval_vase,(load,)).
 direction(f,(in,)).
 direction(has_car,(in,out)).
 direction(has_load,(in,out)).
-%%direction(behind,(in,out)).
+%%direction(behind,(in,in)).
 %% car number
 direction(first_car,(in,)).
 direction(second_car,(in,)).

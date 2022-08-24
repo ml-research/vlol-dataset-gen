@@ -137,6 +137,7 @@ mywrite(X) :- write(X), !.
 
 
 has_car(T,C) :- member(C,T).
+has_car(T,C,N) :- member(C,T), car_num(C,N).
 
 infront(T,C1,C2) :- append(_,[C1,C2|_],T).
 
@@ -152,11 +153,13 @@ short(C) :- arg(3,C,short).
 double(C) :- arg(4,C,double).
 
 has_roof(C,r(R,N)) :- arg(1,C,N), arg(5,C,R).
+has_roof0(C,R) :- arg(5,C,R).
 
 open(C) :- arg(5,C,none).
 closed(C) :- not(open(C)).
 
 has_wheel(C,w(NC,W)) :- arg(1,C,NC), arg(6,C,NW), nlist(1,NW,L), member(W,L).
+has_wheel0(C,W) :- arg(6,C,W).
 
 has_load(C,Load) :- arg(7,C,l(_,NLoad)), nlist(1,NLoad,L), member(Load,L).
 has_load0(C,Shape) :- arg(7,C,l(Shape,N)), 1=<N.
@@ -183,3 +186,12 @@ len1([_|T],N) :- len1(T,N1), N is N1+1, !.
 append([],L,L) :- !.
 append([H|L1],L2,[H|L3]) :-
   append(L1,L2,L3), !.
+
+car_color(C,CC) :- grey = CC, arg(2,C,ellipse).
+car_color(C,CC) :- red = CC, arg(2,C,hexagon).
+car_color(C,CC) :- yellow = CC, arg(2,C,rectangle).
+car_color(C,CC) :- blue = CC, arg(2,C,u_shaped).
+car_color(C,CC) :- green = CC, arg(2,C,bucket).
+
+solid_wall(C) :- arg(4,C,double).
+braced_wall(C) :- arg(4,C,not_double).

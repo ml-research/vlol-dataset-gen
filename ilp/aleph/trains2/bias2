@@ -1,0 +1,42 @@
+:- set(i,2).
+
+:- modeh(1,eastbound(+train)).
+:- modeb(*,has_car(+train,-car,#int)).
+:- modeb(1,has_load(+car,#shape,#int)).
+
+%% colors
+:- mode(1,car_color(+car, #color)).
+%% lengths
+:- modeb(1,short(+car)).
+:- modeb(1,long(+car)).
+%% wheels
+:- modeb(1,has_wheel0(+car, #int)).
+%% roofs
+:- mode(1,has_roof0(+car, #roof)).
+%% walls
+:- mode(1,braced_wall(+car)).
+:- mode(1,solid_wall(+car)).
+
+%% general
+:- determination(eastbound/1,has_car/3).
+:- determination(eastbound/1,load/3).
+%% colors
+:- determination(eastbound/1,car_color/2).
+%% lengths
+:- determination(eastbound/1,short/1).
+:- determination(eastbound/1,long/1).
+%% wheels
+:- determination(eastbound/1,has_wheel0/2).
+%% roofs
+:- determination(eastbound/1,has_roof0/2).
+%% walls
+:- determination(eastbound/1,braced_wall/1).
+:- determination(eastbound/1,solid_wall/1).
+
+shape(elipse).  shape(hexagon).  shape(rectangle).  shape(u_shaped).
+shape(triangle). shape(circle). shape(nil).
+
+color(yellow).  color(green).  color(grey).  color(red). color(blue).
+
+roof(none).  roof(roof_foundation).  roof(solid_roof).  roof(braced_roof). roof(peaked_roof).
+

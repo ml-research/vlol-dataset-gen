@@ -1,0 +1,87 @@
+%% general
+:- mode(*,eastbound(+train)).
+:- mode(*,has_car(+train,-car)).
+:- mode(*,has_load(+car,-load)).
+%:- mode(*,behind(+car,+car)).
+%% car number
+:- mode(*,first_car(+car)).
+:- mode(*,second_car(+car)).
+:- mode(*,third_car(+car)).
+:- mode(*,fourth_car(+car)).
+%% colors
+:- mode(*,yellow(+car)).
+:- mode(*,green(+car)).
+:- mode(*,grey(+car)).
+:- mode(*,red(+car)).
+:- mode(*,blue(+car)).
+%% lengths
+:- mode(*,short(+car)).
+:- mode(*,long(+car)).
+%% wheels
+:- mode(*,two_wheels(+car)).
+:- mode(*,three_wheels(+car)).
+%% roofs
+:- mode(*,roof_open(+car)).
+:- mode(*,roof_closed(+car)).
+:- mode(*,roof_foundation(+car)).
+:- mode(*,solid_roof(+car)).
+:- mode(*,braced_roof(+car)).
+:- mode(*,peaked_roof(+car)).
+%% walls
+:- mode(*,braced_wall(+car)).
+:- mode(*,solid_wall(+car)).
+%% payload number
+:- mode(*,zero_load(+car)).
+:- mode(*,one_load(+car)).
+:- mode(*,two_load(+car)).
+:- mode(*,three_load(+car)).
+%% payload shape
+:- mode(*,barrel(+load)).
+:- mode(*,golden_vase(+load)).
+:- mode(*,box(+load)).
+:- mode(*,diamond(+load)).
+:- mode(*,metal_pot(+load)).
+:- mode(*,oval_vase(+load)).
+
+%% general
+:- determination(eastbound/1,has_car/2).
+:- determination(eastbound/1,has_load/2).
+%% car number
+:- determination(eastbound/1,first_car/1).
+:- determination(eastbound/1,second_car/1).
+:- determination(eastbound/1,third_car/1).
+:- determination(eastbound/1,fourth_car/1).
+%% colors
+:- determination(eastbound/1,yellow/1).
+:- determination(eastbound/1,green/1).
+:- determination(eastbound/1,grey/1).
+:- determination(eastbound/1,red/1).
+:- determination(eastbound/1,blue/1).
+%% lengths
+:- determination(eastbound/1,short/1).
+:- determination(eastbound/1,long/1).
+%% wheels
+:- determination(eastbound/1,two_wheels/1).
+:- determination(eastbound/1,three_wheels/1).
+%% roofs
+:- determination(eastbound/1,roof_open/1).
+:- determination(eastbound/1,roof_closed/1).
+:- determination(eastbound/1,roof_foundation/1).
+:- determination(eastbound/1,solid_roof/1).
+:- determination(eastbound/1,braced_roof/1).
+:- determination(eastbound/1,peaked_roof/1).
+%% walls
+:- determination(eastbound/1,braced_wall/1).
+:- determination(eastbound/1,solid_wall/1).
+%% payload number
+:- determination(eastbound/1,zero_load/1).
+:- determination(eastbound/1,one_load/1).
+:- determination(eastbound/1,two_load/1).
+:- determination(eastbound/1,three_load/1).
+%% payload shape
+:- determination(eastbound/1,barrel/1).
+:- determination(eastbound/1,golden_vase/1).
+:- determination(eastbound/1,box/1).
+:- determination(eastbound/1,diamond/1).
+:- determination(eastbound/1,metal_pot/1).
+:- determination(eastbound/1,oval_vase/1).

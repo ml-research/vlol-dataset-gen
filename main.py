@@ -75,15 +75,14 @@ def main():
         from popper.loop import learn_solution
         from popper.util import Settings, print_prog_score
         from ilp.setup import create_bk
-        num_trains = 8000
-        noise = 0.01
+        num_trains = 10
+        noise = 0.0
         create_bk(num_trains, noise)
         path = 'ilp/popper/gt'
-        kb = 'models/popper'
-        prog, score, stats = learn_solution(
-            Settings(path, debug=True, show_stats=True))
-        if prog is not None:
-            print_prog_score(prog, score)
+        # prog, score, stats = learn_solution(
+        #     Settings(path, debug=True, show_stats=True))
+        # if prog is not None:
+        #     print_prog_score(prog, score)
 
 
 def parse():

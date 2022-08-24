@@ -1,0 +1,5 @@
+eastbound(t1).
+eastbound(t3).
+eastbound(t4).
+eastbound(t6).
+eastbound(t7).
