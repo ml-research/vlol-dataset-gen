@@ -1,9 +1,11 @@
-:- set(i,2).
+
 
 :- modeh(1,eastbound(+train)).
+% general
 :- modeb(*,has_car(+train,-car,#int)).
-:- modeb(1,has_load(+car,#shape,#int)).
-
+% payload
+:- modeb(1,has_load0(+car,#shape)).
+:- modeb(1,load_num(+car,#int)).
 %% colors
 :- mode(1,car_color(+car, #color)).
 %% lengths
@@ -19,7 +21,9 @@
 
 %% general
 :- determination(eastbound/1,has_car/3).
-:- determination(eastbound/1,load/3).
+%% payloads
+:- determination(eastbound/1,has_load0/2).
+:- determination(eastbound/1,load_num/2).
 %% colors
 :- determination(eastbound/1,car_color/2).
 %% lengths

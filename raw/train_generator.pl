@@ -193,5 +193,8 @@ car_color(C,CC) :- yellow = CC, arg(2,C,rectangle).
 car_color(C,CC) :- blue = CC, arg(2,C,u_shaped).
 car_color(C,CC) :- green = CC, arg(2,C,bucket).
 
+
+load(C,Shape) :- arg(7,C,l(Shape,N)), 1=<N.
+
 solid_wall(C) :- arg(4,C,double).
 braced_wall(C) :- arg(4,C,not_double).
