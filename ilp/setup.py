@@ -98,8 +98,9 @@ def create_bk(ds_size=None, noise=0):
                 bk2_file.write(f'car(t{train_c}_c{car_number}).' + '\n')
                 bk2_file.write(f'has_car(t{train_c},t{train_c}_c{car_number}).' + '\n')
                 bk2_file.write(f'car_num(t{train_c}_c{car_number},{car_number}).' + '\n')
+                bk_file.write(f'car_num(t{train_c}_c{car_number},{car_number}).' + '\n')
                 position = ['first', 'second', 'third', 'fourth']
-                bk_file.write(f'{position[car_number - 1]}_car(t{train_c}_c{car_number}).' + '\n')
+                # bk_file.write(f'{position[car_number - 1]}_car(t{train_c}_c{car_number}).' + '\n')
                 # # behind
                 # for i in range(1, car_c):
                 #     bk_file.write(f'behind(t{train_c}_c{car_c},t{train_c}_c{i}).' + '\n')
@@ -122,14 +123,16 @@ def create_bk(ds_size=None, noise=0):
 
                 # wheel_count
                 wheel_num = ['two', 'three'][int(wheel_count[0]) - 2]
-                bk_file.write(f'{wheel_num}{wheel_count[1:]}(t{train_c}_c{car_number}).' + '\n')
+                # bk_file.write(f'{wheel_num}{wheel_count[1:]}(t{train_c}_c{car_number}).' + '\n')
                 bk2_file.write(f'has_wheel0(t{train_c}_c{car_number},{wheel_count[0]}).' + '\n')
+                bk_file.write(f'has_wheel0(t{train_c}_c{car_number},{wheel_count[0]}).' + '\n')
 
                 # payload
                 payload_num = 3 - [load_obj1, load_obj2, load_obj3].count('none')
                 payload_n = ['zero', 'one', 'two', 'three'][payload_num]
-                bk_file.write(f'{payload_n}_load(t{train_c}_c{car_number}).\n')
+                # bk_file.write(f'{payload_n}_load(t{train_c}_c{car_number}).\n')
                 bk2_file.write(f'load_num(t{train_c}_c{car_number},{l_num}).\n')
+                bk_file.write(f'load_num(t{train_c}_c{car_number},{l_num}).\n')
                 if l_num > 0:
                     bk2_file.write(f'has_payload(t{train_c}_c{car_number},{l_shape}).\n')
                 for p_c, payload in enumerate([load_obj1, load_obj2, load_obj3]):

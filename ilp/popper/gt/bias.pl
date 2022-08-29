@@ -8,10 +8,7 @@ body_pred(has_car,2).
 body_pred(has_load,2).
 %%body_pred(behind,2).
 %% car number
-body_pred(first_car,1).
-body_pred(second_car,1).
-body_pred(third_car,1).
-body_pred(fourth_car,1).
+body_pred(car_num,2).
 %% colors
 body_pred(yellow,1).
 body_pred(green,1).
@@ -22,8 +19,7 @@ body_pred(blue,1).
 body_pred(short,1).
 body_pred(long,1).
 %% wheels
-body_pred(two_wheels,1).
-body_pred(three_wheels,1).
+body_pred(has_wheel0,2).
 %% roofs
 body_pred(roof_open,1).
 body_pred(roof_closed,1).
@@ -35,10 +31,7 @@ body_pred(peaked_roof,1).
 body_pred(braced_wall,1).
 body_pred(solid_wall,1).
 %% payload number
-body_pred(zero_load,1).
-body_pred(one_load,1).
-body_pred(two_load,1).
-body_pred(three_load,1).
+body_pred(load_num,2).
 %% payload shape
 body_pred(barrel,1).
 body_pred(golden_vase,1).
@@ -54,10 +47,7 @@ type(has_car,(train,car)).
 type(has_load,(car,load)).
 %type(behind,(car,car)).
 %% car number
-type(first_car,(car,)).
-type(second_car,(car,)).
-type(third_car,(car,)).
-type(fourth_car,(car,)).
+type(car_num,(car,integer)).
 %% colors
 type(yellow,(car,)).
 type(green,(car,)).
@@ -68,8 +58,7 @@ type(blue,(car,)).
 type(short,(car,)).
 type(long,(car,)).
 %% wheels
-type(two_wheels,(car,)).
-type(three_wheels,(car,)).
+type(has_wheel0,(car,integer)).
 %% roofs
 type(roof_open,(car,)).
 type(roof_closed,(car,)).
@@ -81,10 +70,7 @@ type(peaked_roof,(car,)).
 type(braced_wall,(car,)).
 type(solid_wall,(car,)).
 %% payload number
-type(zero_load,(car,)).
-type(one_load,(car,)).
-type(two_load,(car,)).
-type(three_load,(car,)).
+type(load_num,(car,integer)).
 %% payload shape
 type(barrel,(load,)).
 type(golden_vase,(load,)).
@@ -99,10 +85,7 @@ direction(has_car,(in,out)).
 direction(has_load,(in,out)).
 %%direction(behind,(in,in)).
 %% car number
-direction(first_car,(in,)).
-direction(second_car,(in,)).
-direction(third_car,(in,)).
-direction(fourth_car,(in,)).
+direction(car_num,(in,out)).
 %% colors
 direction(yellow,(in,)).
 direction(green,(in,)).
@@ -113,8 +96,7 @@ direction(blue,(in,)).
 direction(short,(in,)).
 direction(long,(in,)).
 %% wheels
-direction(two_wheels,(in,)).
-direction(three_wheels,(in,)).
+direction(has_wheel0,(in,out)).
 %% roofs
 direction(roof_open,(in,)).
 direction(roof_closed,(in,)).
@@ -123,10 +105,7 @@ direction(solid_roof,(in,)).
 direction(braced_roof,(in,)).
 direction(peaked_roof,(in,)).
 %% payload number
-direction(zero_load,(in,)).
-direction(one_load,(in,)).
-direction(two_load,(in,)).
-direction(three_load,(in,)).
+direction(load_num,(in,out)).
 %% payload shape
 direction(barrel,(in,)).
 direction(golden_vase,(in,)).
