@@ -200,5 +200,5 @@ has_payload(C,Shape) :- diamond = CC, arg(7,C,diamond).
 has_payload(C,Shape) :- metal_pot = CC, arg(7,C,hexagon).
 has_payload(C,Shape) :- oval_vase = CC, arg(7,C,u_triangle).
 
-solid_wall(C) :- arg(4,C,double).
-braced_wall(C) :- arg(4,C,not_double).
+solid_wall(C) :- arg(4,C,not_double).
+braced_wall(C) :- arg(4,C,double).

@@ -1,8 +1,10 @@
-
+:- set(minscore,2).
+:- set(explore,true).
 
 :- modeh(1,eastbound(+train)).
 % general
-:- modeb(*,has_car(+train,-car,#int)).
+:- modeb(*,has_car(+train,-car)).
+:- modeb(1,car_num(-car,#int)).
 % payload
 :- modeb(1,has_payload(+car,#shape)).
 :- modeb(1,load_num(+car,#int)).
@@ -14,15 +16,16 @@
 %% wheels
 :- modeb(1,has_wheel0(+car, #int)).
 %% roofs
-:- mode(1,has_roof0(+car, #roof)).
+:- modeb(1,has_roof0(+car, #roof)).
 %% walls
-:- mode(1,braced_wall(+car)).
-:- mode(1,solid_wall(+car)).
+:- modeb(1,braced_wall(+car)).
+:- modeb(1,solid_wall(+car)).
 
 %% general
-:- determination(eastbound/1,has_car/3).
+:- determination(eastbound/1,has_car/2).
+:- determination(eastbound/1,car_num/2).
 %% payloads
-:- determination(eastbound/1,has_load0/2).
+:- determination(eastbound/1,load_num/2).
 :- determination(eastbound/1,has_payload/2).
 %% colors
 :- determination(eastbound/1,car_color/2).
@@ -37,8 +40,8 @@
 :- determination(eastbound/1,braced_wall/1).
 :- determination(eastbound/1,solid_wall/1).
 
-shape(elipse).  shape(hexagon).  shape(rectangle).  shape(u_shaped).
-shape(triangle). shape(circle). shape(nil).
+shape(box).  shape(golden_vase).  shape(barrel).  shape(diamond).
+shape(metal_pot). shape(oval_vase). shape(nil).
 
 color(yellow).  color(green).  color(grey).  color(red). color(blue).
 

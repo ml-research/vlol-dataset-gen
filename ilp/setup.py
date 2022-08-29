@@ -9,7 +9,7 @@ import torch
 from raw.gen_raw_trains import read_trains
 
 
-def create_bk(ds_size, noise=0):
+def create_bk(ds_size=None, noise=0):
     train_raw = 'MichalskiTrains'
     train_vis = 'SimpleObjects'
     y_val = 'direction'
@@ -17,6 +17,7 @@ def create_bk(ds_size, noise=0):
 
     train_c = 0
     path = './ilp/popper/gt'
+    path_2 = './ilp/popper/gt2'
     path_dilp = './ilp/dilp/gt'
     path_aleph = './ilp/aleph/trains2'
     os.makedirs(path, exist_ok=True)
@@ -26,7 +27,7 @@ def create_bk(ds_size, noise=0):
     except OSError:
         pass
     try:
-        os.remove(path + '/bk2.pl')
+        os.remove(path_2 + '/bk.pl')
     except OSError:
         pass
     try:
@@ -42,10 +43,11 @@ def create_bk(ds_size, noise=0):
     except OSError:
         pass
     trains = read_trains(f'raw/datasets/{train_raw}.txt', toSimpleObjs=train_vis == 'SimpleObjects')
-    with open(path + '/exs.pl', 'w+') as exs_file, open(path + '/bk.pl', 'w+') as bk_file, open(path + '/bk2.pl',
+    with open(path + '/exs.pl', 'w+') as exs_file, open(path + '/bk.pl', 'w+') as bk_file, open(path_2 + '/bk.pl',
                                                                                                 'w+') as bk2_file, open(
             path_dilp + '/positive.dilp', 'w+') as pos, open(path_dilp + '/negative.dilp', 'w+') as neg, open(
             path_aleph + '/train.f', 'w+') as aleph_pos, open(path_aleph + '/train.n', 'w+') as aleph_neg:
+        ds_size = len(trains) if ds_size is None else ds_size
         if len(trains) < ds_size:
             raise AssertionError(f'not enough trains in DS {len(trains)} to create a bk of size {ds_size}')
         for train in trains[:ds_size]:
@@ -94,7 +96,8 @@ def create_bk(ds_size, noise=0):
 
                 bk_file.write(f'has_car(t{train_c},t{train_c}_c{car_number}).' + '\n')
                 bk2_file.write(f'car(t{train_c}_c{car_number}).' + '\n')
-                bk2_file.write(f'has_car(t{train_c},t{train_c}_c{car_number},{car_number}).' + '\n')
+                bk2_file.write(f'has_car(t{train_c},t{train_c}_c{car_number}).' + '\n')
+                bk2_file.write(f'car_num(t{train_c}_c{car_number},{car_number}).' + '\n')
                 position = ['first', 'second', 'third', 'fourth']
                 bk_file.write(f'{position[car_number - 1]}_car(t{train_c}_c{car_number}).' + '\n')
                 # # behind
@@ -105,8 +108,10 @@ def create_bk(ds_size, noise=0):
                 bk2_file.write(f'car_color(t{train_c}_c{car_number},{color}).' + '\n')
                 # length
                 bk_file.write(f'{length}(t{train_c}_c{car_number}).' + '\n')
+                bk2_file.write(f'{length}(t{train_c}_c{car_number}).' + '\n')
                 # walls
                 bk_file.write(f'{walls}(t{train_c}_c{car_number}).' + '\n')
+                bk2_file.write(f'{walls}(t{train_c}_c{car_number}).' + '\n')
                 # roofs
                 if roofs != 'none':
                     bk_file.write(f'roof_closed(t{train_c}_c{car_number}).' + '\n')
@@ -140,7 +145,7 @@ def create_bk(ds_size, noise=0):
             )
         )
     )
-    file = Path(path + '/bk2.pl')
+    file = Path(path_2 + '/bk.pl')
     file.write_text(
         "\n".join(
             sorted(
@@ -160,9 +165,10 @@ def create_bk(ds_size, noise=0):
         os.remove(path_aleph + '/train.b')
     except OSError:
         pass
-    with open(path_aleph + '/bias2', 'r') as bias, open(path + '/bk2.pl', 'r') as bk, open(path_aleph + '/train.b',
+    with open(path_aleph + '/bias2', 'r') as bias, open(path_2 + '/bk.pl', 'r') as bk, open(path_aleph + '/train.b',
                                                                                           'w+') as comb:
         comb.write(bias.read() + '\n')
         comb.write(bk.read())
 
     shutil.copy(path + '/bk.pl', path_dilp + '/facts.dilp')
+    shutil.copy(path + '/exs.pl', path_2 + '/exs.pl')

@@ -22,6 +22,7 @@ def main():
     base_scene = args.background_scene
 
     if args.command == 'image_generator':
+        from ilp.setup import create_bk
         # settings
         with_occlusion = args.with_occlusion
         save_blender, high_res, gen_depth = args.save_blender, args.high_res, args.gen_depth
@@ -39,6 +40,8 @@ def main():
         # generate raw trains if they do not exist or shall be replaced
         if not os.path.isfile(f'raw/datasets/{raw_trains}.txt') or replace_raw:
             gen_raw_trains(raw_trains, with_occlusion=with_occlusion, num_entries=ds_size)
+            create_bk(ds_size, noise=0)
+
         num_lines = sum(1 for line in open(f'raw/datasets/{raw_trains}.txt'))
         if num_lines != ds_size:
             raise ValueError(
@@ -75,14 +78,14 @@ def main():
         from popper.loop import learn_solution
         from popper.util import Settings, print_prog_score
         from ilp.setup import create_bk
-        num_trains = 10
+        num_trains = None
         noise = 0.0
         create_bk(num_trains, noise)
         path = 'ilp/popper/gt'
-        # prog, score, stats = learn_solution(
-        #     Settings(path, debug=True, show_stats=True))
-        # if prog is not None:
-        #     print_prog_score(prog, score)
+        prog, score, stats = learn_solution(
+            Settings(path, debug=True, show_stats=True))
+        if prog is not None:
+            print_prog_score(prog, score)
 
 
 def parse():

@@ -159,8 +159,6 @@ shape(car_52,rectangle).
 shape(car_53,rectangle).
 double(car_51).
 open_car(car_51).
-closed(car_52).
-closed(car_53).
 load(car_51,triangle,1).
 load(car_52,rectangle,1).
 load(car_53,circle,1).
@@ -256,3 +254,32 @@ load(car_101,rectangle,1).
 load(car_102,rectangle,2).
 wheels(car_101,2).
 wheels(car_102,2).
+
+% westbound train 10
+has_car(west10,car_101).
+has_car(west10,car_102).
+short(car_101).
+long(car_102).
+shape(car_101,u_shaped).
+shape(car_102,rectangle).
+open_car(car_101).
+open_car(car_102).
+load(car_101,rectangle,1).
+load(car_102,rectangle,2).
+wheels(car_101,2).
+wheels(car_102,2).
+
+% westbound train 10
+has_car(west10,car_101).
+has_car(west10,car_102).
+short(car_101).
+long(car_102).
+shape(car_101,u_shaped).
+shape(car_102,rectangle).
+open_car(car_101).
+open_car(car_102).
+load(car_101,rectangle,1).
+load(car_102,rectangle,2).
+wheels(car_101,2).
+wheels(car_102,2).
+
