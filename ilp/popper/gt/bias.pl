@@ -1,12 +1,12 @@
 max_clauses(2).
 max_vars(6).
 max_body(6).
+enable_pi.
 
 %% general
 head_pred(f,1).
 body_pred(has_car,2).
 body_pred(has_load,2).
-%%body_pred(behind,2).
 %% car number
 body_pred(car_num,2).
 %% colors
@@ -22,7 +22,6 @@ body_pred(long,1).
 body_pred(has_wheel0,2).
 %% roofs
 body_pred(roof_open,1).
-body_pred(roof_closed,1).
 body_pred(roof_foundation,1).
 body_pred(solid_roof,1).
 body_pred(braced_roof,1).
@@ -45,7 +44,6 @@ body_pred(oval_vase,1).
 type(f,(train,)).
 type(has_car,(train,car)).
 type(has_load,(car,load)).
-%type(behind,(car,car)).
 %% car number
 type(car_num,(car,integer)).
 %% colors
@@ -61,7 +59,6 @@ type(long,(car,)).
 type(has_wheel0,(car,integer)).
 %% roofs
 type(roof_open,(car,)).
-type(roof_closed,(car,)).
 type(roof_foundation,(car,)).
 type(solid_roof,(car,)).
 type(braced_roof,(car,)).
@@ -99,7 +96,6 @@ direction(long,(in,)).
 direction(has_wheel0,(in,out)).
 %% roofs
 direction(roof_open,(in,)).
-direction(roof_closed,(in,)).
 direction(roof_foundation,(in,)).
 direction(solid_roof,(in,)).
 direction(braced_roof,(in,)).

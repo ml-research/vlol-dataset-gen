@@ -78,10 +78,10 @@ def main():
         from popper.loop import learn_solution
         from popper.util import Settings, print_prog_score
         from ilp.setup import create_bk
-        num_trains = None
+        num_trains = 100
         noise = 0.0
         create_bk(num_trains, noise)
-        path = 'ilp/popper/gt'
+        path = 'ilp/popper/gt3'
         prog, score, stats = learn_solution(
             Settings(path, debug=True, show_stats=True))
         if prog is not None:

@@ -200,5 +200,11 @@ has_payload(C,Shape) :- diamond = CC, arg(7,C,diamond).
 has_payload(C,Shape) :- metal_pot = CC, arg(7,C,hexagon).
 has_payload(C,Shape) :- oval_vase = CC, arg(7,C,u_triangle).
 
+has_roof2(C,Shape) :- none = CC, arg(5,C,none).
+has_roof2(C,Shape) :- roof_foundation = CC, arg(5,C,arc).
+has_roof2(C,Shape) :- solid_roof = CC, arg(5,C,flat).
+has_roof2(C,Shape) :- braced_roof = CC, arg(5,C,jagged).
+has_roof2(C,Shape) :- peaked_roof = CC, arg(5,C,peaked).
+
 solid_wall(C) :- arg(4,C,not_double).
 braced_wall(C) :- arg(4,C,double).
