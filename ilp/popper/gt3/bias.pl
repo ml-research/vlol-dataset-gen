@@ -1,10 +1,12 @@
+%% without ground atoms
 max_clauses(2).
 max_vars(6).
 max_body(6).
 
 %% general
-head_pred(f,1).
+head_pred(eastbound,1).
 body_pred(has_car,2).
+%% car number
 body_pred(car_num,2).
 %% payload
 body_pred(has_payload,2).
@@ -23,9 +25,9 @@ body_pred(braced_wall,1).
 body_pred(solid_wall,1).
 
 %% general
-type(f,(train,)).
+type(eastbound,(train,)).
 type(has_car,(train,car)).
-type(car_num,(car,int)).
+type(car_num,(car,integer)).
 %% payload
 type(has_payload,(car,shape)).
 type(load_num,(car,integer)).
@@ -43,7 +45,7 @@ type(braced_wall,(car,)).
 type(solid_wall,(car,)).
 
 %% general
-direction(f,(in,)).
+direction(eastbound,(in,)).
 direction(has_car,(in,out)).
 direction(car_num,(in,out)).
 %% car number

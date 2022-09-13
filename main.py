@@ -81,9 +81,10 @@ def main():
         num_trains = 100
         noise = 0.0
         create_bk(num_trains, noise)
-        path = 'ilp/popper/gt3'
+        path = 'ilp/popper/gt2'
         prog, score, stats = learn_solution(
             Settings(path, debug=True, show_stats=True))
+        print('asasas')
         if prog is not None:
             print_prog_score(prog, score)
 

@@ -1,14 +1,23 @@
+%% include some ground atoms but not all
 max_clauses(2).
 max_vars(6).
 max_body(6).
-enable_pi.
 
 %% general
-head_pred(f,1).
+head_pred(eastbound,1).
 body_pred(has_car,2).
-body_pred(has_load,2).
 %% car number
 body_pred(car_num,2).
+%% payload number
+body_pred(has_payload,2).
+body_pred(load_num,2).
+%% payload shape
+body_pred(barrel,1).
+body_pred(golden_vase,1).
+body_pred(box,1).
+body_pred(diamond,1).
+body_pred(metal_pot,1).
+body_pred(oval_vase,1).
 %% colors
 body_pred(yellow,1).
 body_pred(green,1).
@@ -29,21 +38,11 @@ body_pred(peaked_roof,1).
 %% walls
 body_pred(braced_wall,1).
 body_pred(solid_wall,1).
-%% payload number
-body_pred(load_num,2).
-%% payload shape
-body_pred(barrel,1).
-body_pred(golden_vase,1).
-body_pred(box,1).
-body_pred(diamond,1).
-body_pred(metal_pot,1).
-body_pred(oval_vase,1).
-
 
 %% general
-type(f,(train,)).
+type(eastbound,(train,)).
 type(has_car,(train,car)).
-type(has_load,(car,load)).
+type(has_payload,(car,load)).
 %% car number
 type(car_num,(car,integer)).
 %% colors
@@ -77,9 +76,9 @@ type(metal_pot,(load,)).
 type(oval_vase,(load,)).
 
 %% general
-direction(f,(in,)).
+direction(eastbound,(in,)).
 direction(has_car,(in,out)).
-direction(has_load,(in,out)).
+direction(has_payload,(in,out)).
 %%direction(behind,(in,in)).
 %% car number
 direction(car_num,(in,out)).

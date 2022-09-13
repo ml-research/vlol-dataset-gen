@@ -1,8 +1,7 @@
 import os
 import shutil
 from pathlib import Path
-from random import random
-
+import random
 import numpy as np
 import torch
 
@@ -48,6 +47,7 @@ def create_bk(ds_size=None, noise=0):
     except OSError:
         pass
     trains = read_trains(f'raw/datasets/{train_raw}.txt', toSimpleObjs=train_vis == 'SimpleObjects')
+    trains = random.sample(trains, ds_size)
     with open(path + '/exs.pl', 'w+') as exs_file, open(path + '/bk.pl', 'w+') as bk_file, \
             open(path_2 + '/bk.pl', 'w+') as bk2_file, open(path_3 + '/bk.pl', 'w+') as bk3_file, open(
         path_dilp + '/positive.dilp', 'w+') as pos, open(path_dilp + '/negative.dilp', 'w+') as neg, open(
@@ -56,7 +56,7 @@ def create_bk(ds_size=None, noise=0):
         if len(trains) < ds_size:
             raise AssertionError(f'not enough trains in DS {len(trains)} to create a bk of size {ds_size}')
         for train in trains[:ds_size]:
-            ns = random()
+            ns = random.random()
             label = train.get_label()
             train_c += 1
             bk_file.write(f'train(t{train_c}).\n')
@@ -64,7 +64,7 @@ def create_bk(ds_size=None, noise=0):
             bk3_file.write(f'train(t{train_c}).\n')
             label = 'pos' if label == 'east' else 'neg'
             # if train_c < 10:
-            exs_file.write(f'{label}(f(t{train_c})).\n')
+            exs_file.write(f'{label}(eastbound(t{train_c})).\n')
             if label == 'pos':
                 pos.write(f'target(t{train_c}).\n')
                 aleph_pos.write(f'eastbound(t{train_c}).\n')
@@ -127,10 +127,11 @@ def create_bk(ds_size=None, noise=0):
                 if roofs != 'none':
                     #     bk_file.write(f'roof_closed(t{train_c}_c{car_number}).' + '\n')
                     bk_file.write(f'{roofs}(t{train_c}_c{car_number}).' + '\n')
+                    bk2_file.write(f'{roofs}(t{train_c}_c{car_number}_roof).' + '\n')
                 else:
                     bk_file.write(f'roof_open(t{train_c}_c{car_number}).' + '\n')
+                    bk2_file.write(f'roof_open(t{train_c}_c{car_number}_roof).' + '\n')
 
-                bk2_file.write(f'{roofs}(t{train_c}_c{car_number}_roof).' + '\n')
                 bk2_file.write(f'has_roof2(t{train_c}_c{car_number},t{train_c}_c{car_number}_roof).' + '\n')
                 bk3_file.write(f'has_roof2(t{train_c}_c{car_number},{roofs}).' + '\n')
 
@@ -156,7 +157,7 @@ def create_bk(ds_size=None, noise=0):
                 for p_c, payload in enumerate([load_obj1, load_obj2, load_obj3]):
                     if payload != 'none':
                         bk_file.write(f'{payload}(t{train_c}_c{car_number}_l{p_c}).\n')
-                        bk_file.write(f'has_load(t{train_c}_c{car_number},t{train_c}_c{car_number}_l{p_c}).\n')
+                        bk_file.write(f'has_payload(t{train_c}_c{car_number},t{train_c}_c{car_number}_l{p_c}).\n')
 
     file = Path(path + '/bk.pl')
     file.write_text(

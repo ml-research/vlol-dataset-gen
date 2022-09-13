@@ -1,9 +1,10 @@
+%% Maximum expressiveness of the predicates
 max_clauses(2).
 max_vars(6).
 max_body(6).
 
 %% general
-head_pred(f,1).
+head_pred(eastbound,1).
 body_pred(has_car,2).
 body_pred(car_num,2).
 %% payload
@@ -30,7 +31,7 @@ body_pred(long,1).
 body_pred(has_wheel0,2).
 %% roofs
 body_pred(has_roof2,2).
-body_pred(none,1).
+body_pred(roof_open,1).
 body_pred(roof_foundation,1).
 body_pred(solid_roof,1).
 body_pred(braced_roof,1).
@@ -40,10 +41,10 @@ body_pred(braced_wall,1).
 body_pred(solid_wall,1).
 
 %% general
-type(f,(train,)).
+type(eastbound,(train,)).
 type(has_car,(train,car)).
 %% car number
-type(car_num,(car,int)).
+type(car_num,(car,integer)).
 %% payload
 type(has_payload,(car,load)).
 type(load_num,(car,integer)).
@@ -69,7 +70,7 @@ type(has_wheel0,(car,integer)).
 %% roofs
 type(has_roof2,(car,roof)).
 %% roofs
-type(none,(roof,)).
+type(roof_open,(roof,)).
 type(roof_foundation,(roof,)).
 type(solid_roof,(roof,)).
 type(braced_roof,(roof,)).
@@ -79,7 +80,7 @@ type(braced_wall,(car,)).
 type(solid_wall,(car,)).
 
 %% general
-direction(f,(in,)).
+direction(eastbound,(in,)).
 direction(has_car,(in,out)).
 %% car number
 direction(car_num,(in,out)).
@@ -107,7 +108,7 @@ direction(long,(in,)).
 direction(has_wheel0,(in,out)).
 %% roofs
 direction(has_roof2,(in,out)).
-direction(none,(in,)).
+direction(roof_open,(in,)).
 direction(roof_foundation,(in,)).
 direction(solid_roof,(in,)).
 direction(braced_roof,(in,)).
