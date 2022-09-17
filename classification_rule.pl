@@ -17,15 +17,15 @@
 %eastbound(Train):- has_car(Train,Car), has_car(Train,Car2), short(Car), long(Car2), car_color(Car, A), car_color(Car2, A).
 
 % complex rule
-%eastbound(Train):- has_car(Train,Car), load_num(Car,N), car_num(Car,N), has_wheel0(Car,N).
-%eastbound(Train):- (has_car(Train,Car), closed(Car), (double(Car); bucket(Car))).
-%eastbound(Train):- has_car(Train,Car), has_car(Train,Car2), has_car(Train,Car3), car_color(Car, A), car_color(Car3, A), car_color(Car2, A).
+eastbound(Train):- has_car(Train,Car), load_num(Car,N), car_num(Car,N), has_wheel0(Car,N).
+eastbound(Train):- (has_car(Train,Car), closed(Car), (double(Car); bucket(Car))).
+eastbound(Train):- has_car(Train,Car), has_car(Train,Car2), has_car(Train,Car3), car_color(Car, A), car_color(Car3, A), car_color(Car2, A), Car \= Car2, Car \=Car3, Car2 \= Car3.
 
 
 % train with braced_wall and 2 loads, load_num 3 and a blue car or a blue car and braced_wall --> popper fails
-eastbound(Train):- has_car(Train,Car), braced_wall(Car), has_car(Train,Car2), load_num(Car2,2).
-eastbound(Train):- has_car(Train,Car), load_num(Car,3), has_car(Train,Car2), car_color(Car2, blue).
-eastbound(Train):- has_car(Train,Car), braced_wall(Car), has_car(Train,Car2), car_color(Car2, blue).
+%eastbound(Train):- has_car(Train,Car), braced_wall(Car), has_car(Train,Car2), load_num(Car2,2).
+%eastbound(Train):- has_car(Train,Car), load_num(Car,3), has_car(Train,Car2), car_color(Car2, blue).
+%eastbound(Train):- has_car(Train,Car), braced_wall(Car), has_car(Train,Car2), car_color(Car2, blue).
 
 
 %eastbound(Train):- has_car(Train,Car2), car_color(Car2, grey).

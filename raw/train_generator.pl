@@ -227,24 +227,24 @@ has_roof2(C,Roof) :- braced_roof = Roof, arg(5,C,jagged).
 has_roof2(C,Roof) :- peaked_roof = Roof, arg(5,C,peaked).
 
 
-car_color(C,grey(R)) :- arg(2,C,ellipse).
-car_color(C,red(R)) :- arg(2,C,hexagon).
-car_color(C,yellow(R)) :- arg(2,C,rectangle).
-car_color(C,blue(R)) :- arg(2,C,u_shaped).
-car_color(C,green(R)) :- arg(2,C,bucket).
-
-has_payload(C,box(R)) :- arg(7,C,rectangle).
-has_payload(C,golden_vase(R)) :- arg(7,C,triangle).
-has_payload(C,barrel(R)) :- arg(7,C,circle).
-has_payload(C,diamond(R)) :- arg(7,C,diamond).
-has_payload(C,metal_pot(R)) :- arg(7,C,hexagon).
-has_payload(C,oval_vase(R)) :- arg(7,C,u_triangle).
-
-has_roof2(C,open_roof(R)) :- arg(5,C,none).
-has_roof2(C,roof_foundation(R)) :- arg(5,C,arc).
-has_roof2(C,solid_roof(R)) :- arg(5,C,flat).
-has_roof2(C,braced_roof(R)) :- arg(5,C,jagged).
-has_roof2(C,peaked_roof(R)) :- arg(5,C,peaked).
+#car_color(C,grey(R)) :- arg(2,C,ellipse).
+#car_color(C,red(R)) :- arg(2,C,hexagon).
+#car_color(C,yellow(R)) :- arg(2,C,rectangle).
+#car_color(C,R) :- arg(2,C,u_shaped), blue(R).
+#car_color(C,green(R)) :- arg(2,C,bucket).
+#
+#has_payload(C,box(R)) :- arg(7,C,rectangle).
+#has_payload(C,golden_vase(R)) :- arg(7,C,triangle).
+#has_payload(C,barrel(R)) :- arg(7,C,circle).
+#has_payload(C,diamond(R)) :- arg(7,C,diamond).
+#has_payload(C,metal_pot(R)) :- arg(7,C,hexagon).
+#has_payload(C,oval_vase(R)) :- arg(7,C,u_triangle).
+#
+#has_roof2(C,open_roof(R)) :- arg(5,C,none).
+#has_roof2(C,roof_foundation(R)) :- arg(5,C,arc).
+#has_roof2(C,solid_roof(R)) :- arg(5,C,flat).
+#has_roof2(C,braced_roof(R)) :- arg(5,C,jagged).
+#has_roof2(C,peaked_roof(R)) :- arg(5,C,peaked).
 
 
 
