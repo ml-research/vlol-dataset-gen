@@ -1,5 +1,4 @@
 %% include some ground atoms but not all
-max_clauses(2).
 max_vars(6).
 max_body(6).
 

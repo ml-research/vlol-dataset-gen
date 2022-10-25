@@ -33,7 +33,6 @@ def eval_rule():
             ind = c * 8
             train += ', ' if c > 0 else ''
             train += f'c({l[ind + 2]}, {l[ind + 3]}, {l[ind + 4]}, {l[ind + 5]}, {l[ind + 6]}, {l[ind + 7]}, l({l[ind + 8]}, {l[ind + 9]}))'
-        print(train)
         q = list(prolog.query(f"eastbound([{train}])."))
         # q = list(prolog.query(f"loves(b, b)."))
         # print(q)

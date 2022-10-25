@@ -30,6 +30,7 @@ def main():
 
         # generate images in range [start_ind:end_ind]
         ds_size = args.dataset_size
+        ds_size = 10000
         start_ind = args.index_start
         end_ind = args.index_end if args.index_end is not None else ds_size
         if start_ind > ds_size or end_ind > ds_size:
@@ -57,12 +58,12 @@ def main():
         trains = trains[start_ind:end_ind]
         rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_vis[0]}',
                     max_iterations=end_ind - start_ind)
-        # rtpt.start()
-        # for t_num, train in enumerate(trains, start=start_ind):
-        #     rtpt.step()
-        #     generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
-        #                    high_res=high_res, gen_depth=gen_depth)
-        # combine_json(base_scene, raw_trains, train_vis, ds_size)
+        rtpt.start()
+        for t_num, train in enumerate(trains, start=start_ind):
+            rtpt.step()
+            generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
+                           high_res=high_res, gen_depth=gen_depth)
+        combine_json(base_scene, raw_trains, train_vis, ds_size)
 
     if args.command == 'vis':
         from visualization.vis import show_masked_im
@@ -78,7 +79,7 @@ def main():
         from popper.loop import learn_solution
         from popper.util import Settings, print_prog_score
         from ilp.setup import create_bk
-        num_trains = 10000
+        num_trains = 100
         noise = 0.0
         create_bk(num_trains, noise)
         path = 'ilp/popper/gt'

@@ -69,8 +69,10 @@ The following settings are available, the corresponding input types and default 
 - `index_end` (int, None) -> Stop rendering images at index (does not render index_end).
   If None the train generator stops rendering at dataset_size.
 
-- `description` (str, MichalskiTrains) -> The train descriptions we want to generate. Either 'MichalskiTrains' or 'RandomTrains'
-- `visualization` (str, MichalskiTrains) -> The way we want to visualize the train descriptions. Either as 'Trains' or 'SimpleObjects'.
+- `description` (str, MichalskiTrains) -> The train descriptions we want to generate. Either 'MichalskiTrains' or 'RandomTrains'.
+The 'RandomTrains' descriptions are generated randomly. 
+The 'MichalskiTrains' descriptions are generated according to specific distributional assumptions defined by Muggleton [[2]](#2).
+- `visualization` (str, Trains) -> The way we want to visualize the train descriptions. Either as 'Trains' or 'SimpleObjects'.
 - `background_scene` (str, base_scene) -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
   or 'fisheye_scene'
 
@@ -189,8 +191,8 @@ An overview of the descriptor's assignable values can be found below:
 |     2      |  bucket   |    long    |  double   |    arc     |        3         |    triangle    |        1        |
 |     3      |  ellipse  |     	      |    		     |    flat    |                  |     circle     |        2        |
 |     4      |  hexagon  |     		     |    			    |   jagged   |                  |    diamond     |        3        |
-|            | u shaped  |     		     |    		     |   peaked   |        		        |    hexagon     |
-|    			     |    		     |     		     |    			    |     		     |                  |   u_triangle   |
+|            | u_shaped  |     		     |    		     |   peaked   |        		        |    hexagon     |
+|    			     |    		     |     		     |    			    |     		     |                  |   utriangle    |
 
 ### Transformation into a three-dimensional train representation
 

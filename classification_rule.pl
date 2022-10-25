@@ -5,38 +5,36 @@
 
 
 
-% numerical rule
-%eastbound(Train):- has_car(Train,Car), load_num(Car,N), car_num(Car,N), has_wheel0(Car,N).
-%eastbound(Train):- has_car(Train,Car), load_num(Car, N), has_car(Train,Car2), has_wheel0(Car2, N), car_color(Car, A), car_color(Car2, A).
+% numerical rule:
+% eastbound(Train):- has_car(Train,Car), load_num(Car,N), car_num(Car,N), has_wheel0(Car,N).
+% eastbound(Train):- has_car(Train,Car, N), load_num(Car, N), has_car(Train,Car2), has_wheel0(Car2, N), car_color(Car, A), car_color(Car2, A).
+% eastbound(Train):- has_car(Train,Car, N), load_num(Car, N), has_car(Train,Car2, N2), has_wheel0(Car2, N), car_color(Car, A), car_color(Car2, A), N<N2.
 
-% easy rule
-% train with 3 different car colors --> popper fails, popper is not able to perform numerical comparison e.g. x,y∈R x<y
+% easy rule:
+% train with a short and a long car which have the same color
+% eastbound(Train):- has_car(Train,Car), has_car(Train,Car2), short(Car), long(Car2), car_color(Car, A), car_color(Car2, A).
+
+% color rule: train with 3 different car colors --> popper fails, popper is not able to perform numerical comparison e.g. x,y∈R x<y
 %eastbound(A):- has_car(A,B), has_car(A,C), has_car(A,D), car_color(D,X), car_color(C,Y), car_color(B,Z), X\=Y, Y\=Z, Z\=X.
 
-% train with a short and a long car which have the same color
-%eastbound(Train):- has_car(Train,Car), has_car(Train,Car2), short(Car), long(Car2), car_color(Car, A), car_color(Car2, A).
 
 % complex rule
-eastbound(Train):- has_car(Train,Car), load_num(Car,N), car_num(Car,N), has_wheel0(Car,N).
-eastbound(Train):- (has_car(Train,Car), closed(Car), (double(Car); bucket(Car))).
-eastbound(Train):- has_car(Train,Car), has_car(Train,Car2), has_car(Train,Car3), car_color(Car, A), car_color(Car3, A), car_color(Car2, A), Car \= Car2, Car \=Car3, Car2 \= Car3.
+eastbound(Train):- has_car(Train,Car), load_num(Car,N1), car_num(Car,N2), has_wheel0(Car,N3), N2 < N1, N2 < N3.
+eastbound(Train):- has_car(Train,Car, N1), has_car(Train,Car2), short(Car), long(Car2), car_color(Car, A), car_color(Car2, A), has_wheel0(Car2,N2), N1 < N2.
+eastbound(Train):- has_car(Train,B), has_car(Train,C), has_car(Train,D), car_color(D,X), car_color(C,Y), car_color(B,Z), X\=Y, Y\=Z, Z\=X.
 
 
-% train with braced_wall and 2 loads, load_num 3 and a blue car or a blue car and braced_wall --> popper fails
-%eastbound(Train):- has_car(Train,Car), braced_wall(Car), has_car(Train,Car2), load_num(Car2,2).
+% multi rule: train with braced_wall and 2 loads, load_num 3 and a blue car or a blue car and braced_wall --> popper fails
+%eastbound(Train):- has_car(Train,Car), braced_wall(Car), has_car(Train,Car2), load_num(Car2, 2).
 %eastbound(Train):- has_car(Train,Car), load_num(Car,3), has_car(Train,Car2), car_color(Car2, blue).
-%eastbound(Train):- has_car(Train,Car), braced_wall(Car), has_car(Train,Car2), car_color(Car2, blue).
+%eastbound(Train):- has_car(Train,Car), short(Car), has_car(Train,Car2), long(Car2), has_load(Car, A), has_load(Car2, A).
 
 
-%eastbound(Train):- has_car(Train,Car2), car_color(Car2, grey).
 
 
 % Default classification rule "Theory X"
 % There is either a short, closed car, or a car with a circular load somewhere behind a car with a triangular load.
-%eastbound([Car|Cars]):-
-%    (short(Car), closed(Car));
-%    (has_load0(Car,triangle), has_load1(Cars,circle));
-%    eastbound(Cars).
+% eastbound([Car|Cars]):- (short(Car), closed(Car)); (has_load0(Car,triangle), has_load1(Cars,circle)); eastbound(Cars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Other example classification rules:

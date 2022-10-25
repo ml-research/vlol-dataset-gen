@@ -195,7 +195,7 @@ def create_bk(ds_size=None, noise=0):
         os.remove(path_aleph + '/train.b')
     except OSError:
         pass
-    with open(path_aleph + '/bias2', 'r') as bias, open(path_2 + '/bk.pl', 'r') as bk, open(path_aleph + '/train.b',
+    with open(path_aleph + '/bias2', 'r') as bias, open(path_3 + '/bk.pl', 'r') as bk, open(path_aleph + '/train.b',
                                                                                             'w+') as comb:
         comb.write(bias.read() + '\n')
         comb.write(bk.read())
