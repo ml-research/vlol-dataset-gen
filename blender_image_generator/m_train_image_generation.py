@@ -28,17 +28,17 @@ def generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender
     """
 
     start = time.time()
-    output_image = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/images/{t_num}_m_train.png'
-    output_blendfile = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/blendfiles/{t_num}_m_train.blend'
-    output_scene = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/scenes/{t_num}_m_train.json'
-    output_depth_map = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/depths/{t_num}_m_train.png'
+    output_image = f'tmp/image_generator/{raw_trains}/{train_vis}/{base_scene}/images/{t_num}_m_train.png'
+    output_blendfile = f'tmp/image_generator/{raw_trains}/{train_vis}/{base_scene}/blendfiles/{t_num}_m_train.blend'
+    output_scene = f'tmp/image_generator/{raw_trains}/{train_vis}/{base_scene}/scenes/{t_num}_m_train.json'
+    output_depth_map = f'tmp/image_generator/{raw_trains}/{train_vis}/{base_scene}/depths/{t_num}_m_train.png'
     if os.path.isfile(output_image) and os.path.isfile(output_scene) and (os.path.isfile(
             output_depth_map) or not gen_depth) and not replace_existing_img:
         return
-    os.makedirs(f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/images', exist_ok=True)
-    os.makedirs(f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/blendfiles', exist_ok=True)
-    os.makedirs(f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/scenes', exist_ok=True)
-    os.makedirs(f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}/depths', exist_ok=True)
+    os.makedirs(f'tmp/image_generator/{raw_trains}/{train_vis}/{base_scene}/images', exist_ok=True)
+    os.makedirs(f'tmp/image_generator/{raw_trains}/{train_vis}/{base_scene}/blendfiles', exist_ok=True)
+    os.makedirs(f'tmp/image_generator/{raw_trains}/{train_vis}/{base_scene}/scenes', exist_ok=True)
+    os.makedirs(f'tmp/image_generator/{raw_trains}/{train_vis}/{base_scene}/depths', exist_ok=True)
 
     # collection = 'base_scene'
     # load_base_scene(filepath, collection)

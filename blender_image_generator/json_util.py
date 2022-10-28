@@ -207,11 +207,17 @@ def merge_json_files(path):
         json.dump(output, f)
 
 
-def combine_json(base_scene, raw_trains, train_vis, ds_size=10000):
-    path_ori = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}'
-    if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
-        im_path = path_ori + '/images'
-        if os.path.isdir(im_path):
-            files = os.listdir(im_path)
-            if len(files) == ds_size:
-                merge_json_files(path_ori)
+def combine_json(base_scene, raw_trains, train_vis, out_dir='output/image_generator', ds_size=10000):
+    path_ori = f'tmp/image_generator/{raw_trains}/{train_vis}/{base_scene}'
+    path_dest = f'{out_dir}/{raw_trains}/{train_vis}/{base_scene}'
+    im_path = path_ori + '/images'
+    if os.path.isdir(im_path):
+        files = os.listdir(im_path)
+        if len(files) == ds_size:
+            merge_json_files(path_ori)
+            shutil.rmtree(path_ori + '/scenes')
+            try:
+                os.remove(path_dest)
+            except:
+                pass
+            shutil.move(path_ori, path_dest)

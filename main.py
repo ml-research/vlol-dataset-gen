@@ -20,9 +20,9 @@ def main():
     raw_trains = args.description
     train_vis = args.visualization
     base_scene = args.background_scene
+    out_path = args.output_path
 
     if args.command == 'image_generator':
-        from ilp.setup import create_bk
         # settings
         with_occlusion = args.with_occlusion
         save_blender, high_res, gen_depth = args.save_blender, args.high_res, args.gen_depth
@@ -30,7 +30,6 @@ def main():
 
         # generate images in range [start_ind:end_ind]
         ds_size = args.dataset_size
-        ds_size = 10000
         start_ind = args.index_start
         end_ind = args.index_end if args.index_end is not None else ds_size
         if start_ind > ds_size or end_ind > ds_size:
@@ -41,7 +40,6 @@ def main():
         # generate raw trains if they do not exist or shall be replaced
         if not os.path.isfile(f'raw/datasets/{raw_trains}.txt') or replace_raw:
             gen_raw_trains(raw_trains, with_occlusion=with_occlusion, num_entries=ds_size)
-            create_bk(ds_size, noise=0)
 
         num_lines = sum(1 for line in open(f'raw/datasets/{raw_trains}.txt'))
         if num_lines != ds_size:
@@ -49,7 +47,7 @@ def main():
                 f'defined dataset size: {ds_size}\n'
                 f'existing train descriptions: {num_lines}\n'
                 f'{num_lines} raw train descriptions were previously generated in raw/datasets/{raw_trains}.txt \n '
-                f'add \'--replace_raw\' True to command line to the replace existing train descriptions and '
+                f'add \'--replace_raw True\' to command line arguments to the replace existing train descriptions and '
                 f'generate the correct number of michalski trains')
         # load trains
         trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=train_vis == 'SimpleObjects')
@@ -63,31 +61,11 @@ def main():
             rtpt.step()
             generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
                            high_res=high_res, gen_depth=gen_depth)
-        combine_json(base_scene, raw_trains, train_vis, ds_size)
-
-    if args.command == 'vis':
-        from visualization.vis import show_masked_im
-        from michalski_trains import m_train_dataset
-        full_ds = m_train_dataset.get_datasets(base_scene, raw_trains, train_vis, 10)
-        show_masked_im(full_ds)
+        combine_json(base_scene, raw_trains, train_vis, out_dir=out_path, ds_size=ds_size)
 
     if args.command == 'ct':
         from concept_tester import eval_rule
         eval_rule()
-
-    if args.command == 'ilp':
-        from popper.loop import learn_solution
-        from popper.util import Settings, print_prog_score
-        from ilp.setup import create_bk
-        num_trains = 100
-        noise = 0.0
-        create_bk(num_trains, noise)
-        path = 'ilp/popper/gt'
-        prog, score, stats = learn_solution(
-            Settings(path, debug=True, show_stats=True))
-        print('asasas')
-        if prog is not None:
-            print_prog_score(prog, score)
 
 
 def parse():
@@ -111,6 +89,7 @@ def parse():
     parser.add_argument('--dataset_size', type=int, default=10000, help='Size of the dataset we want to create')
     parser.add_argument('--index_start', type=int, default=0, help='start rendering images at index')
     parser.add_argument('--index_end', type=int, default=None, help='stop rendering images at index')
+    parser.add_argument('--output_path', type=str, default="output/image_generator", help='path to the output directory')
 
     parser.add_argument('--description', type=str, default='MichalskiTrains',
                         help='whether to generate descriptions of MichalskiTrains, RandomTrains')
@@ -123,8 +102,8 @@ def parse():
     parser.add_argument('--cuda', type=int, default=0,
                         help='Which cuda device to use')
     parser.add_argument('--command', type=str, default='image_generator',
-                        help='whether to generate images (image_generator) or visualize generated images (vis)'
-                             'or concept tester (ct)')
+                        help='whether to generate images (image_generator) or execute the concept tester (ct) to '
+                             'check how many trains are satisfied by a specified rule')
 
     args = parser.parse_args()
 

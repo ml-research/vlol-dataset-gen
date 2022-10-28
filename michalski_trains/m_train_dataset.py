@@ -19,7 +19,7 @@ from blender_image_generator.json_util import merge_json_files, combine_json
 
 
 class MichalskiTrainDataset(Dataset):
-    def __init__(self, base_scene, raw_trains, train_vis, train_count=10000, resize=False,
+    def __init__(self, base_scene, raw_trains, train_vis, train_count=10000, resize=False, ds_path='output/image_generator',
                  ):
         """ MichalskiTrainDataset
             Args:
@@ -43,8 +43,8 @@ class MichalskiTrainDataset(Dataset):
         self.train_count = train_count
         ds_typ = f'{raw_trains}/{train_vis}/{base_scene}/'
         self.base_scene = base_scene
-        self.image_base_path = f'output/image_generator/{ds_typ}/images'
-        self.all_scenes_path = f'output/image_generator/{ds_typ}/all_scenes'
+        self.image_base_path = f'{ds_path}/{ds_typ}/images'
+        self.all_scenes_path = f'{ds_path}/{ds_typ}/all_scenes'
 
         color = ['yellow', 'green', 'grey', 'red', 'blue']
         length = ['short', 'long']
@@ -141,8 +141,8 @@ class MichalskiTrainDataset(Dataset):
         return self.labels
 
 
-def get_datasets(base_scene, raw_trains, train_vis, ds_size, resize=False ):
-    path_ori = f'output/image_generator/{raw_trains}/{train_vis}/{base_scene}'
+def get_datasets(base_scene, raw_trains, train_vis, ds_size, resize=False, ds_path='output/image_generator'):
+    path_ori = f'{ds_path}/{raw_trains}/{train_vis}/{base_scene}'
     if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
         combine_json(base_scene, raw_trains, train_vis, ds_size)
         raise Warning(f'Dataloader did not find JSON ground truth information.'
