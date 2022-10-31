@@ -21,6 +21,7 @@ def main():
     train_vis = args.visualization
     base_scene = args.background_scene
     out_path = args.output_path
+    classification_rule = f'example_rules/{args.classification_rule}_rule.pl'
 
     if args.command == 'image_generator':
         # settings
@@ -39,7 +40,7 @@ def main():
 
         # generate raw trains if they do not exist or shall be replaced
         if not os.path.isfile(f'raw/datasets/{raw_trains}.txt') or replace_raw:
-            gen_raw_trains(raw_trains, with_occlusion=with_occlusion, num_entries=ds_size)
+            gen_raw_trains(raw_trains, classification_rule, with_occlusion=with_occlusion, num_entries=ds_size)
 
         num_lines = sum(1 for line in open(f'raw/datasets/{raw_trains}.txt'))
         if num_lines != ds_size:
@@ -47,7 +48,7 @@ def main():
                 f'defined dataset size: {ds_size}\n'
                 f'existing train descriptions: {num_lines}\n'
                 f'{num_lines} raw train descriptions were previously generated in raw/datasets/{raw_trains}.txt \n '
-                f'add \'--replace_raw True\' to command line arguments to the replace existing train descriptions and '
+                f'add \'--replace_raw\' to command line arguments to the replace existing train descriptions and '
                 f'generate the correct number of michalski trains')
         # load trains
         trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=train_vis == 'SimpleObjects')
@@ -84,13 +85,19 @@ def parse():
     parser.add_argument('--replace_existing_img', type=bool, default=False,
                         help='If there exists already an image for the id shall it be replaced?')
     parser.add_argument('--replace_raw', type=bool, default=False,
-                        help='If the train descriptions are already generated shall they be replaced?')
+                        help='Allows multiple usages of the same train descriptions and the parallel rendering of '
+                             'images of one dataset. By default train descriptions are not replaced. If new train '
+                             'descriptions need to be rendered set to True')
 
     parser.add_argument('--dataset_size', type=int, default=10000, help='Size of the dataset we want to create')
     parser.add_argument('--index_start', type=int, default=0, help='start rendering images at index')
     parser.add_argument('--index_end', type=int, default=None, help='stop rendering images at index')
-    parser.add_argument('--output_path', type=str, default="output/image_generator", help='path to the output directory')
+    parser.add_argument('--output_path', type=str, default="output/image_generator",
+                        help='path to the output directory')
 
+    parser.add_argument('--classification_rule', type=str, default='theoryx',
+                        help='the classification rule used for generating the labels of the dataset, possible options: '
+                             '\'theoryx\', \'easy\', \'color\', \'numerical\', \'multi\', \'complex\', \'custom\'')
     parser.add_argument('--description', type=str, default='MichalskiTrains',
                         help='whether to generate descriptions of MichalskiTrains, RandomTrains')
     parser.add_argument('--visualization', type=str, default='Trains', help='whether to transform the generated train '

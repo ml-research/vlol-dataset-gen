@@ -4,7 +4,6 @@
 !*/tex/tuda_logo.pdf
 !*.png
 /Master title
-/output/*
 /data/*
 /tmp/
 /dataset/
@@ -25,3 +24,4 @@
 /ilp/dilp/gt/
 /ilp/aleph/trains2/train.b
 /ilp/apperception/
+/output/

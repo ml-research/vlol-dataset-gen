@@ -54,7 +54,8 @@ This is a very brief instruction on how the three-dimensional Michalski train da
 At first, we generate train descriptions for the whole dataset resorting to a slightly adapted version of Muggleton's
 train generator [[2]](#2).
 We have extended the code to assign labels to the generated train descriptions according to a specified decision rule.
-A default decision rule is specified in `TrainGenerator/classification_rule.pl` which can be adjusted as desired (see section below).
+Example rules for classification are specified in the `example_rules` folder.
+The `custom_rule.pl` file can be used to define your own personal decision rule (see section below).
 Subsequently, we render images for the individual train descriptions, generate their ground-truth information creating a
 dataset.
 The train generator provides a wide range of settings allowing to adapt to the given requirements.
@@ -68,16 +69,21 @@ The following settings are available, the corresponding input types and default 
 - `index_start` (int, 0) -> Start rendering images at index (index_start)
 - `index_end` (int, None) -> Stop rendering images at index (does not render index_end).
   If None the train generator stops rendering at dataset_size.
+- `output_path` (str, 'output/image_generator') -> path to the output directory where the datasets are generated.
 
-- `description` (str, MichalskiTrains) -> The train descriptions we want to generate. Either 'MichalskiTrains' or 'RandomTrains'.
+- `classification_rule` (str, 'theoryx') -> The classification rule used for generating the labels of the dataset.
+The available rules can be found in the example_rules folder: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom\'.
+Use the custom rule to define your own personal rule.
+- `description` (str, 'MichalskiTrains') -> The train descriptions we want to generate. Either 'MichalskiTrains' or 'RandomTrains'.
 The 'RandomTrains' descriptions are generated randomly. 
 The 'MichalskiTrains' descriptions are generated according to specific distributional assumptions defined by Muggleton [[2]](#2).
-- `visualization` (str, Trains) -> The way we want to visualize the train descriptions. Either as 'Trains' or 'SimpleObjects'.
-- `background_scene` (str, base_scene) -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
+- `visualization` (str, 'Trains') -> The way we want to visualize the train descriptions. Either as 'Trains' or 'SimpleObjects'.
+- `background_scene` (str, 'base_scene') -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
   or 'fisheye_scene'
-
 - `with_occlusion` (bool, False) -> Whether to include train angles which might lead to occlusion of the individual train
   attributes
+
+
 - `save_blender` (bool, False) -> Whether the blender scene is saved.
   Only recommended for small image counts as the blend files are of rather big size.
 - `high_res` (bool, False) -> Whether to render the images in high resolution (1920x1080) or standard resolution (480x270)

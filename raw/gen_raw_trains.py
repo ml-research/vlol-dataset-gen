@@ -6,12 +6,13 @@ from pyswip import Prolog
 from michalski_trains.m_train import BlenderCar, MichalskiCar, MichalskiTrain, SimpleCar
 
 
-def gen_raw_michalski_trains(num_entries=10000, with_occlusion=False):
+def gen_raw_michalski_trains(classification_rule, num_entries=10000, with_occlusion=False):
     """ Generate Michalski trains descriptions using the Prolog train generator
-        classification rule must be defined in classification_rule.pl
+        labels are derived by the classification rule
     Args:
-        num_entries: int number of michalski trains which are generated
-        with_occlusion: boolean whether to include occlusion of the train payloads
+        num_entries: int, number of michalski trains which are generated
+        with_occlusion: boolean, whether to include occlusion of the train payloads
+        classification_rule: str, path to classification rule used to derive the labels
     """
     os.makedirs('raw/tmp/', exist_ok=True)
     generator_tmp = 'raw/tmp/generator_tmp.pl'
@@ -19,7 +20,7 @@ def gen_raw_michalski_trains(num_entries=10000, with_occlusion=False):
         os.remove(generator_tmp)
     except OSError:
         pass
-    with open("raw/train_generator.pl", 'r') as gen, open("classification_rule.pl", 'r') as rule:
+    with open("raw/train_generator.pl", 'r') as gen, open(classification_rule, 'r') as rule:
         with open(generator_tmp, 'w+') as generator:
             generator.write(gen.read())
             generator.write(rule.read())
@@ -96,10 +97,11 @@ def gen_raw_random_trains(num_entries=10000, with_occlusion=False):
             text_file.write(m_cars + '\n')
 
 
-def gen_raw_trains(train_col, num_entries=10000, replace_existing=True, with_occlusion=False):
+def gen_raw_trains(train_col, classification_rule, num_entries=10000, replace_existing=True, with_occlusion=False):
     """ Generate random or Michalski train descriptions
     Args:
         train_col: string type of train which is generated available options: 'RandomTrains' and 'MichalskiTrains'
+        classification_rule: str, path to classification rule used to derive the labels
         num_entries: int number of michalski trains which are generated
         replace_existing: bool whether the existing copy shall be replaced by a new copy
         with_occlusion: boolean whether to include occlusion of the train payloads
@@ -109,7 +111,7 @@ def gen_raw_trains(train_col, num_entries=10000, replace_existing=True, with_occ
         if train_col == 'RandomTrains':
             gen_raw_random_trains(num_entries, with_occlusion)
         elif train_col == 'MichalskiTrains':
-            gen_raw_michalski_trains(num_entries, with_occlusion)
+            gen_raw_michalski_trains(classification_rule, num_entries, with_occlusion)
 
 
 def read_trains(file, toSimpleObjs=False):
