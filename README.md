@@ -65,12 +65,14 @@ The default output location is `TrainGenerator/output/image_generator/`.
 
 The following settings are available, the corresponding input types and default settings are noted in parentheses:
 
+general settings:
 - `dataset_size` (int, 10,000) -> Size of the dataset we want to create
 - `index_start` (int, 0) -> Start rendering images at index (index_start)
 - `index_end` (int, None) -> Stop rendering images at index (does not render index_end).
   If None the train generator stops rendering at dataset_size.
-- `output_path` (str, 'output/image_generator') -> path to the output directory where the datasets are generated.
+- `output_path` (str, 'output/image_generator') -> path to the output directory in which the generated datasets are saved.
 
+train specific settings:
 - `classification_rule` (str, 'theoryx') -> The classification rule used for generating the labels of the dataset.
 The available rules can be found in the example_rules folder: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom\'.
 Use the custom rule to define your own personal rule.
@@ -83,7 +85,7 @@ The 'MichalskiTrains' descriptions are generated according to specific distribut
 - `with_occlusion` (bool, False) -> Whether to include train angles which might lead to occlusion of the individual train
   attributes
 
-
+additional settings:
 - `save_blender` (bool, False) -> Whether the blender scene is saved.
   Only recommended for small image counts as the blend files are of rather big size.
 - `high_res` (bool, False) -> Whether to render the images in high resolution (1920x1080) or standard resolution (480x270)
