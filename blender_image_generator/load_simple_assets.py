@@ -22,7 +22,7 @@ def create_simple_scene(train, train_collection, train_init_cord, alpha):
 
         car_collection = create_platform(car, train_tail_coord, train_collection, alpha)
         load_objects(car_collection, train_tail_coord, car, alpha)
-        load_side_obj(car_collection, train_tail_coord, car, alpha)
+        # load_side_obj(car_collection, train_tail_coord, car, alpha)
 
 
 def create_platform(car, train_tail_coord, train_collection, alpha):
@@ -55,14 +55,48 @@ def create_platform(car, train_tail_coord, train_collection, alpha):
     scale[0] = .75 if platform_length == 'long' else .5
     scale[2] = 1 if pl_shape == 'hemisphere' else .5
 
-    filepath_car = f'data/shapes/simple_objects/platform/{pl_shape}.blend'
+    filepath = f'data/shapes/simple_objects/platform/{pl_shape}.blend'
+    material = car.get_blender_car_color()
+    pass_index_mid = car.get_index('car')
+    pass_index_top = car.get_index('wall')
+    pass_index_bot = car.get_index('wheels')
+    location = train_tail_coord
+    init_obj_scale = tuple(scale)
+    init_obj_rotation = (0, 0, 0)
 
     # load platform / car
-    obj = load_simple_asset(filepath_car, car.get_blender_car_color(), alpha, train_tail_coord, my_collection,
-                            link, pass_index=car.get_index('car'), init_obj_scale=tuple(scale))
-    add_position(car, obj, 'car')
-    add_position(car, obj, 'roof')
+    # append, set to true to keep the link to the original file
+    with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
+        data_to.objects = data_from.objects[:]
+    # link object to current scene
+    objs = []
+    for obj in data_to.objects:
+        if obj is not None:
+            objs.append(obj)
+            my_collection.objects.link(obj)
+            obj.rotation_euler = init_obj_rotation
+            obj.rotation_euler[2] += alpha
+            obj.scale = init_obj_scale
+            obj.location = location
+            bpy.context.view_layer.objects.active = obj
 
+            ms = bpy.data.materials.get(material)
+            b = bpy.data.materials.get('violet')
+            if ms is None or b is None:
+                raise Exception(f'failed to load material {material} or black_metal')
+            if "Top" in obj.name:
+                obj.data.materials.append(b) if car.get_car_wall() == 'double' else obj.data.materials.append(ms)
+                obj.pass_index = pass_index_top
+                add_position(car, [obj], 'wall')
+            elif "Bot" in obj.name:
+                obj.data.materials.append(b) if car.get_wheel_count() == 3 else obj.data.materials.append(ms)
+                obj.pass_index = pass_index_bot
+                add_position(car, [obj], 'wheels')
+            else:
+                obj.data.materials.append(ms)
+                obj.pass_index = pass_index_mid
+                add_position(car, [obj], 'car')
+                add_position(car, [obj], 'roof')
     return my_collection
 
 
@@ -173,7 +207,7 @@ def load_side_obj(collection, train_tail, car, alpha):
 
 
 def load_simple_asset(filepath, material, alpha, location, collection, link, pass_index=0,
-                      init_obj_rotation=(0, 0, 0), init_obj_scale=(1, 1, 1)):
+                      init_obj_rotation=(0, 0, 0), init_obj_scale=(1, 1, 1), wall=False, wheels=False):
     """
     load and add an asset to the blender scene
     :param:  filepath (string)                  : path to the asset which is loaded to the scene
@@ -214,8 +248,8 @@ def load_simple_asset(filepath, material, alpha, location, collection, link, pas
             bpy.context.view_layer.objects.active = obj
 
             if isinstance(material, str):
-                m = bpy.data.materials[material]
-                obj.active_material = m
+                ms = bpy.data.materials.get(material)
+                obj.active_material = ms
 
     return objs
 

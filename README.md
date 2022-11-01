@@ -91,9 +91,9 @@ additional settings:
 - `high_res` (bool, False) -> Whether to render the images in high resolution (1920x1080) or standard resolution (480x270)
 - `gen_depth` (bool, False) -> Whether to generate the depth information of the individual scenes
 - `replace_raw` (bool, False) -> If the train descriptions for the dataset are already generated shall they be replaced?
-- `replace_existing_img` (bool, False) -> Whether to replace existing images. 
-Checks if the image is already rendered for the dataset which is generated.
-If there is already an image generated for a specific index do you want to replace it?
+- `allow_parallel` (bool, True) -> Enables parallel generation of one dataset. Recommended to clear tmp folder before.
+Images generated in tmp folder from previously uncompleted runs are not anymore deleted.
+
 
 The following shows example images of the four background scenes 'base_scene', 'desert_scene', 'sky_scene' and '
 fisheye_scene':

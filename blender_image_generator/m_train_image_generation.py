@@ -59,6 +59,7 @@ def generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender
     render_args.resolution_x, render_args.resolution_y = 1920, 1080
     # render_args.tile_x, render_args.tile_y = 256, 256
     if high_res:
+        print('asas')
         render_args.resolution_percentage = 100
     else:
         render_args.resolution_percentage = 25

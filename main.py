@@ -27,7 +27,7 @@ def main():
         # settings
         with_occlusion = args.with_occlusion
         save_blender, high_res, gen_depth = args.save_blender, args.high_res, args.gen_depth
-        replace_existing_img, replace_raw = args.replace_existing_img, args.replace_raw
+        replace_existing_img, replace_raw = not args.allow_parallel, args.replace_raw
 
         # generate images in range [start_ind:end_ind]
         ds_size = args.dataset_size
@@ -82,8 +82,9 @@ def parse():
                              '(480x270)')
     parser.add_argument('--gen_depth', type=bool, default=False,
                         help='Whether to generate the depth information of the individual scenes')
-    parser.add_argument('--replace_existing_img', type=bool, default=False,
-                        help='If there exists already an image for the id shall it be replaced?')
+    parser.add_argument('--allow_parallel', type=bool, default=True,
+                        help=' Enables parallel generation of one dataset. Recommended to clear tmp folder before. '
+                             'Images generated in tmp folder from previously uncompleted runs are not anymore deleted.')
     parser.add_argument('--replace_raw', type=bool, default=False,
                         help='Allows multiple usages of the same train descriptions and the parallel rendering of '
                              'images of one dataset. By default train descriptions are not replaced. If new train '
