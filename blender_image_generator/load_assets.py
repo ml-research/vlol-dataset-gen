@@ -70,7 +70,7 @@ def load_engine(train_collection, location, alpha, metal_mat=None):
     link = False
     my_collection = bpy.data.collections.new(collection)
     train_collection.children.link(my_collection)
-    load_asset(filepath, [None, None], alpha, location, my_collection, link, metal_mat)
+    load_asset(filepath, alpha, location, my_collection, link, metal_color=metal_mat)
 
 
 def load_rails(train_collection, location, alpha, base_scene, scale=(0.5, 0.5, 0.5)):
@@ -94,17 +94,17 @@ def load_rails(train_collection, location, alpha, base_scene, scale=(0.5, 0.5, 0
     alpha_to_cam = alpha % math.pi
     my_collection = bpy.data.collections.new(collection)
     train_collection.children.link(my_collection)
-    load_asset(filepath, [None, None], alpha, location, my_collection, link)
+    load_asset(filepath, alpha, location, my_collection, link)
     b_box = (1, 1, 1, 1)
     while cur_loc[0] ** 2 + cur_loc[1] ** 2 < radius ** 2 and (b_box != (0, 0, 0, 0) or base_scene == 'fisheye_scene'):
         cur_loc = get_new_pos(cur_loc, rail_length, alpha_to_cam + math.pi)
-        rail = load_asset(filepath, [None, None], alpha, cur_loc, my_collection, link)
+        rail = load_asset(filepath, alpha, cur_loc, my_collection, link)
         b_box = get_b_box(bpy.context, rail)
     cur_loc = location.copy()
     b_box = (1, 1, 1, 1)
     while b_box != (0, 0, 0, 0):
         cur_loc = get_new_pos(cur_loc, rail_length, alpha_to_cam)
-        rail = load_asset(filepath, [None, None], alpha, cur_loc, my_collection, link)
+        rail = load_asset(filepath, alpha, cur_loc, my_collection, link)
         b_box = get_b_box(bpy.context, rail)
 
 
@@ -124,10 +124,10 @@ def load_car(car, train_tail, train_collection, alpha):
     my_collection = bpy.data.collections.new(collection_name)
     train_collection.children.link(my_collection)
 
-    obj = load_asset(filepath_car, car.get_blender_car_color(), alpha, train_tail, my_collection, link,
+    obj = load_asset(filepath_car, alpha, train_tail, my_collection, link, material=car.get_blender_car_color(),
                      pass_index=car.get_index('car'))
     add_position(car, obj, 'car')
-    wheels = load_asset(filepath_wheel, car.get_blender_car_color(), alpha, train_tail, my_collection, link,
+    wheels = load_asset(filepath_wheel, alpha, train_tail, my_collection, link, material=car.get_blender_car_color(),
                         pass_index=car.get_index('wheels'))
     add_position(car, wheels, 'wheels')
 
@@ -148,11 +148,11 @@ def load_roof(car, car_collection, train_tail, alpha):
     # if a car has a roof it has a full wall
     if roof_type != 'none':
         filepath = f'data/shapes/train/roof/assembly/roof_assembly_{car.length}.blend'
-        obj_as = load_asset(filepath, car.get_blender_car_color(), alpha, train_tail, car_collection, link,
-                            pass_index=car.get_index('roof'))
+        obj_as = load_asset(filepath,  alpha, train_tail, car_collection, link,
+                            material=car.get_blender_car_color(), pass_index=car.get_index('roof'))
         filepath = f'data/shapes/train/roof/{car.length}/{roof_type}.blend'
-        obj = load_asset(filepath, car.get_blender_car_color(), alpha, train_tail, car_collection, link,
-                         pass_index=car.get_index('roof'))
+        obj = load_asset(filepath, alpha, train_tail, car_collection, link,
+                         material=car.get_blender_car_color(),pass_index=car.get_index('roof'))
         add_position(car, obj_as + obj, 'roof')
 
 
@@ -168,7 +168,7 @@ def load_wall(car, car_collection, train_tail, alpha, wall_type):
     if wall_type is not None:
         filepath = f'data/shapes/train/walls/{car.length}/{wall_type}.blend'
         link = False
-        objs = load_asset(filepath, car.get_blender_car_color(), alpha, train_tail, car_collection, link,
+        objs = load_asset(filepath, alpha, train_tail, car_collection, link, material=car.get_blender_car_color(),
                           pass_index=car.get_index('wall'))
         add_position(car, objs, 'wall')
 
@@ -238,7 +238,7 @@ def create_train(train, train_collection, train_init_cord, alpha):
         load_payload(car_collection, train_tail_coord, car, alpha)
 
 
-def load_asset(filepath, materials, alpha, location, collection, link, metal_color=None, pass_index=0,
+def load_asset(filepath, alpha, location, collection, link, material=None, metal_color=None, pass_index=0,
                init_obj_rotation=(math.radians(-.125), 0, math.radians(90)), init_obj_scale=(0.5, 0.5, 0.5)):
     """
     load and add an asset to the blender scene
@@ -273,14 +273,15 @@ def load_asset(filepath, materials, alpha, location, collection, link, metal_col
             bpy.context.view_layer.objects.active = obj
             bpy.ops.object.material_slot_remove_unused()
 
-            if isinstance(materials, str):
-                materials = [materials, materials]
-            replace_material(obj, 'WOOD2', materials[0])
-            replace_material(obj, 'WOOD3', materials[1])
-            replace_material(obj, 'Metal Scratches', materials[1])
-            replace_material(obj, 'Wooden Planks V1', materials[1])
-            # available metal colors: 'black_metal', 'black_metal_v2'
-            replace_material(obj, 'Metal05 PBR', metal_color, fit_uv=False)
+
+            if material is not None:
+                replace_material(obj, 'WOOD2', material)
+                replace_material(obj, 'WOOD3', material)
+                replace_material(obj, 'Metal Scratches', material)
+                replace_material(obj, 'Wooden Planks V1', material)
+                # available metal colors: 'black_metal', 'black_metal_v2'
+            if metal_color is not None:
+                replace_material(obj, 'Metal05 PBR', metal_color, fit_uv=False)
 
     return objs
 

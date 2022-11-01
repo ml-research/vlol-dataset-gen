@@ -118,19 +118,19 @@ def replace_material(object, old_material, new_material, fit_uv=True):
     }
     if new_material is not None and new_material != 'yellow':
         ob_mats = object.data.materials
-        om = bpy.data.materials[old_material]
         nm = bpy.data.materials[new_material]
+        # om = bpy.data.materials[old_material]
         # object.data.materials.append(mat)
 
         for i in range(0, len(ob_mats)):
             # test if the old material is in the list of used materials and replace it
-            mat_name = ob_mats[i].name
+            # mat_name = ob_mats[i].name
+            #
+            # # remove material string suffix if existent
+            # if mat_name[-1].isnumeric():
+            #     mat_name = mat_name[0:-4]
 
-            # remove material string suffix if existent
-            if mat_name[-1].isnumeric():
-                mat_name = mat_name[0:-4]
-
-            if mat_name == om.name:
+            if old_material in ob_mats[i].name:
                 ob_mats[i] = nm
 
                 if fit_uv:
@@ -185,7 +185,6 @@ def replace_material(object, old_material, new_material, fit_uv=True):
                     #     # write the new UV's back
                     #     uv_layer.data.foreach_set("uv", uvs.ravel())
                     #     me.update()
-
 
 def get_new_pos(init_cord, distance, alpha):
     """
