@@ -188,17 +188,29 @@ append([H|L1],L2,[H|L3]) :-
   append(L1,L2,L3), !.
 
 
-grey(C) :- car_color(C,grey).
+white(C) :- car_color(C,white).
 red(C) :- car_color(C,red).
 yellow(C) :- car_color(C,yellow).
 blue(C) :- car_color(C,blue).
 green(C) :- car_color(C,green).
+
+white(white).
+red(red).
+yellow(yellow).
+blue(blue).
+green(green).
 
 roof_open(C) :- has_roof2(C,none).
 roof_foundation(C) :- has_roof2(C,roof_foundation).
 solid_roof(C) :- has_roof2(C,solid_roof).
 braced_roof(C) :- has_roof2(C,braced_roof).
 peaked_roof(C) :- has_roof2(C,peaked_roof).
+
+roof_open(none).
+roof_foundation(roof_foundation).
+solid_roof(solid_roof).
+braced_roof(braced_roof).
+peaked_roof(peaked_roof).
 
 /* comment
 box(C) :- has_payload(C,box).
@@ -207,20 +219,8 @@ barrel(C) :- has_payload(C,barrel).
 diamond(C) :- has_payload(C,diamond).
 metal_pot(C) :- has_payload(C,metal_pot).
 oval_vase(C) :- has_payload(C,oval_vase).
-
 */
 
-grey(grey).
-red(red).
-yellow(yellow).
-blue(blue).
-green(green).
-
-roof_open(none).
-roof_foundation(roof_foundation).
-solid_roof(solid_roof).
-braced_roof(braced_roof).
-peaked_roof(peaked_roof).
 
 box(box).
 golden_vase(golden_vase).
@@ -229,8 +229,7 @@ diamond(diamond).
 metal_pot(metal_pot).
 oval_vase(oval_vase).
 
-
-car_color(C,grey) :- arg(2,C,ellipse).
+car_color(C,white) :- arg(2,C,ellipse).
 car_color(C,red) :- arg(2,C,hexagon).
 car_color(C,yellow) :- arg(2,C,rectangle).
 car_color(C,blue) :- arg(2,C,u_shaped).
@@ -250,7 +249,7 @@ has_roof2(C,braced_roof) :- arg(5,C,jagged).
 has_roof2(C,peaked_roof) :- arg(5,C,peaked).
 
 
-%car_color(C,grey(R)) :- arg(2,C,ellipse).
+%car_color(C,white(R)) :- arg(2,C,ellipse).
 %car_color(C,red(R)) :- arg(2,C,hexagon).
 %car_color(C,yellow(R)) :- arg(2,C,rectangle).
 %car_color(C,R) :- arg(2,C,u_shaped), blue(R).

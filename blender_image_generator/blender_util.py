@@ -101,12 +101,12 @@ def clean_up():
 #                      [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
 
 
-def replace_material(object, old_material, new_material, fit_uv=True):
+def replace_material(obj, old_material, new_material, fit_uv=True):
     """
     replace a material in blender.
     params:
         object (bpy object): object for which we are replacing the material
-        old_material (string): The old material name
+        old_material (string): The old material name, if None a new Material is added
         new_material (string): The new material name
         fit_uv (boolean): boolean if the material shall be rescaled
     """
@@ -116,35 +116,31 @@ def replace_material(object, old_material, new_material, fit_uv=True):
         'white_old': 0.6,  # white
         'white_old_3': 0.6,  # white
     }
-    if new_material is not None and new_material != 'yellow':
-        ob_mats = object.data.materials
+    if new_material is not None:
+        ob_mats = obj.data.materials
         nm = bpy.data.materials[new_material]
+        if nm is None:
+            raise Exception(f'failed to load material {new_material}')
         # om = bpy.data.materials[old_material]
         # object.data.materials.append(mat)
+        if old_material is None:
+            ob_mats.append(nm)
+            if fit_uv:
+                fit_uv_layer(nm, obj)
+        elif new_material != 'yellow':
+            for i in range(0, len(ob_mats)):
+                # test if the old material is in the list of used materials and replace it
+                # mat_name = ob_mats[i].name
+                #
+                # # remove material string suffix if existent
+                # if mat_name[-1].isnumeric():
+                #     mat_name = mat_name[0:-4]
 
-        for i in range(0, len(ob_mats)):
-            # test if the old material is in the list of used materials and replace it
-            # mat_name = ob_mats[i].name
-            #
-            # # remove material string suffix if existent
-            # if mat_name[-1].isnumeric():
-            #     mat_name = mat_name[0:-4]
+                if old_material in ob_mats[i].name:
+                    ob_mats[i] = nm
 
-            if old_material in ob_mats[i].name:
-                ob_mats[i] = nm
-
-                if fit_uv:
-                    # fix UV layer of material
-                    scale = material_scale.get(nm.name, 1)
-
-                    for obj in bpy.context.scene.objects:
-                        obj.select_set(False)
-                    bpy.context.view_layer.objects.active = object
-                    bpy.ops.object.editmode_toggle()
-                    bpy.ops.mesh.select_all(action='SELECT')
-                    bpy.ops.uv.cube_project(cube_size=scale)
-                    bpy.ops.mesh.select_all(action='DESELECT')
-                    bpy.ops.object.editmode_toggle()
+                    if fit_uv:
+                        fit_uv_layer(nm, obj)
 
                     # bpy.ops.uv.smart_project()
 
@@ -185,6 +181,32 @@ def replace_material(object, old_material, new_material, fit_uv=True):
                     #     # write the new UV's back
                     #     uv_layer.data.foreach_set("uv", uvs.ravel())
                     #     me.update()
+
+
+def fit_uv_layer(nm, obj):
+    """
+    fix UV layer of material nm on object obj
+    params:
+        obj (bpy object): object for which we fix the material
+        nm (bpy material): material which gets rescaled
+
+    """
+    material_scale = {
+        'white': 4,  # white
+        'white_old': 0.6,  # white
+        'white_old_3': 0.6,  # white
+    }
+    scale = material_scale.get(nm.name, 1)
+
+    for ob in bpy.context.scene.objects:
+        ob.select_set(False)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.editmode_toggle()
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.cube_project(cube_size=scale)
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bpy.ops.object.editmode_toggle()
+
 
 def get_new_pos(init_cord, distance, alpha):
     """
@@ -275,8 +297,6 @@ def set_layer(obj, layer_idx):
     obj.layers[layer_idx] = True
     for i in range(len(obj.layers)):
         obj.layers[i] = (i == layer_idx)
-
-
 
 # def load_materials():
 #     """

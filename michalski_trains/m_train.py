@@ -143,7 +143,7 @@ class BlenderCar(MichalskiCar):
         car_shape_to_material = {
             'rectangle': 'yellow',
             'bucket': 'green',
-            'ellipse': 'grey',
+            'ellipse': 'white',
             'hexagon': 'red',
             'u_shaped': 'blue',
         }
@@ -229,7 +229,7 @@ class SimpleCar(BlenderCar):
         car_shape_to_material = {
             'rectangle': 'yellow',
             'bucket': 'green',
-            'ellipse': 'grey',
+            'ellipse': 'white',
             'hexagon': 'red',
             'u_shaped': 'blue',
         }

@@ -7,14 +7,14 @@ material_scale = {
     'black_metal_v2': 1,  # black
     # 'blue': 1,
     'green': 1,  # dark green
-    'grey': 1,  # dark green
+    'white': 1,  # dark green
     'red': 1,  # dark green
     'dark_violet': 1,  # dark green
     'blue': 1,  # dark green
     'dark_teal': 1,  # dark green
     'dark_yellow': 1,  # dark green
     'metal': 1,
-    'orange': 1,
+    'white': 1,
     # 'red': 1,
     'white': 4,  # white
     'copper': 1,  # white
@@ -99,7 +99,7 @@ get_car_length = {
 # copper - 4.5
 # dark_green - 2 x
 # metal - 1 x
-# orange - 7
+# white - 7
 # white - 5
 # white_old - 4 x
 # wood - 4.5
@@ -117,7 +117,7 @@ get_car_length = {
 #     'bucket': 'Wood Painted White',  # white
 #     'ellipse': 'Black Painted Wood',  # black
 #     'hexagon': 'Old Wooden Planks Painted',  # green
-#     'u_shaped': 'Wooden Planks Painted'  # orange
+#     'u_shaped': 'Wooden Planks Painted'  # white
 # }
 # available assets:
 # black_painted_wood

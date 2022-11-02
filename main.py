@@ -103,14 +103,14 @@ def parse():
                         help='whether to generate descriptions of MichalskiTrains, RandomTrains')
     parser.add_argument('--visualization', type=str, default='Trains', help='whether to transform the generated train '
                                                                             'description and generate 3D images of: '
-                                                                            'Trains or SimpleObjects')
+                                                                            '\'Trains\' or \'SimpleObjects\'')
     parser.add_argument('--background_scene', type=str, default='base_scene',
                         help='Scene in which the trains are set: base_scene, desert_scene, sky_scene or fisheye_scene')
 
     parser.add_argument('--cuda', type=int, default=0,
                         help='Which cuda device to use')
     parser.add_argument('--command', type=str, default='image_generator',
-                        help='whether to generate images (image_generator) or execute the concept tester (ct) to '
+                        help='whether to generate images \'image_generator\' or execute the concept tester \'ct\' to '
                              'check how many trains are satisfied by a specified rule')
 
     args = parser.parse_args()

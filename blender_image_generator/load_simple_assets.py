@@ -1,7 +1,7 @@
 import bpy
 import math
 
-from blender_image_generator.blender_util import get_new_pos
+from blender_image_generator.blender_util import get_new_pos, replace_material
 from blender_image_generator.load_assets import add_position
 
 
@@ -56,7 +56,7 @@ def create_platform(car, train_tail_coord, train_collection, alpha):
     scale[2] = 1 if pl_shape == 'hemisphere' else .5
 
     filepath = f'data/shapes/simple_objects/platform/{pl_shape}.blend'
-    material = car.get_blender_car_color()
+    material = car.get_simple_color()
     pass_index_mid = car.get_index('car')
     pass_index_top = car.get_index('wall')
     pass_index_bot = car.get_index('wheels')
@@ -80,20 +80,18 @@ def create_platform(car, train_tail_coord, train_collection, alpha):
             obj.location = location
             bpy.context.view_layer.objects.active = obj
 
-            ms = bpy.data.materials.get(material)
-            b = bpy.data.materials.get('violet')
-            if ms is None or b is None:
-                raise Exception(f'failed to load material {material} or black_metal')
             if "Top" in obj.name:
-                obj.data.materials.append(b) if car.get_car_wall() == 'double' else obj.data.materials.append(ms)
+                replace_material(obj, None, 'black_metal') if car.get_car_wall() == 'double' else replace_material(obj, None,
+                                                                                                              material)
                 obj.pass_index = pass_index_top
                 add_position(car, [obj], 'wall')
             elif "Bot" in obj.name:
-                obj.data.materials.append(b) if car.get_wheel_count() == 3 else obj.data.materials.append(ms)
+                replace_material(obj, None, 'black_metal') if car.get_wheel_count() == 3 else replace_material(obj, None,
+                                                                                                          material)
                 obj.pass_index = pass_index_bot
                 add_position(car, [obj], 'wheels')
             else:
-                obj.data.materials.append(ms)
+                replace_material(obj, None, material)
                 obj.pass_index = pass_index_mid
                 add_position(car, [obj], 'car')
                 add_position(car, [obj], 'roof')
@@ -226,7 +224,7 @@ def load_simple_asset(filepath, material, alpha, location, collection, link, pas
     color_dict = {
         'yellow': (1, 1, 0, 0.8),
         'green': (0, 1, 0, 0.8),
-        'grey': (1, 1, 1, 0.8),
+        'white': (1, 1, 1, 0.8),
         'red': (1, 0, 0, 0.8),
         'blue': (0, 0, 1, 0.8),
     }

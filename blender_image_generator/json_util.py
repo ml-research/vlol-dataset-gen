@@ -217,7 +217,7 @@ def combine_json(base_scene, raw_trains, train_vis, out_dir='output/image_genera
             merge_json_files(path_ori)
             shutil.rmtree(path_ori + '/scenes')
             try:
-                os.remove(path_dest)
+                shutil.rmtree(path_dest)
             except:
                 pass
             shutil.move(path_ori, path_dest)

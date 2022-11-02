@@ -46,7 +46,7 @@ class MichalskiTrainDataset(Dataset):
         self.image_base_path = f'{ds_path}/{ds_typ}/images'
         self.all_scenes_path = f'{ds_path}/{ds_typ}/all_scenes'
 
-        color = ['yellow', 'green', 'grey', 'red', 'blue']
+        color = ['yellow', 'green', 'white', 'red', 'blue']
         length = ['short', 'long']
         walls = ["braced_wall", 'solid_wall']
         roofs = ["roof_foundation", 'solid_roof', 'braced_roof', 'peaked_roof']

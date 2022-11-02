@@ -74,8 +74,9 @@ general settings:
 
 train specific settings:
 - `classification_rule` (str, 'theoryx') -> The classification rule used for generating the labels of the dataset.
-The available rules can be found in the example_rules folder: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom\'.
-Use the custom rule to define your own personal rule.
+The following rules are available: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom'.
+For more detailed information about the rules refer to the rule section.
+Select custom rule to use your own personal rule. Therefore, define your own rule in \'example_rules/custom_rule.pl\'.
 - `description` (str, 'MichalskiTrains') -> The train descriptions we want to generate. Either 'MichalskiTrains' or 'RandomTrains'.
 The 'RandomTrains' descriptions are generated randomly. 
 The 'MichalskiTrains' descriptions are generated according to specific distributional assumptions defined by Muggleton [[2]](#2).
@@ -111,8 +112,8 @@ Keep in mind to use different docker containers as the blender engine has proble
 
 ### Decision rule
 
-The labels of each generated train are derived from the prolog classification rule noted in `TrainGenerator/classification_rule.pl`.
-The generated trains are subject to a balanced distribution of the individual classes so that we have an equal
+The labels of the generated train are derived from the selected prolog classification rule.
+The generated trains are subject to a balanced class distribution accordingly we have an equal
 number of trains heading eastbound and westbound within our dataset.
 Be aware that defining a very specific decision rules can have a strong influence on the distribution of train
 attributes, which in turn can lead to similar images being generated as it might become difficult to create random variations based on a very specific rule.
@@ -215,7 +216,7 @@ An overview of the three-dimensional Michalski train descriptors and their assig
 |:------------:|:----------:|:----------:|:---------:|:-----------:|:----------------:|:---------------------------------:|:-----------:|
 |      1       |   yellow   |   short    |   full    |    none     |        2         |             blue box              | angle alpha |
 |      2       |   green    |    long    |  braced   | foundation  |        3         |            golden vase            |
-|      3       |    grey    |     	      |    		     | solid roof  |                  |              barrel               |
+|      3       |    white    |     	      |    		     | solid roof  |                  |              barrel               |
 |      4       |    red     |     		     |    			    | braced roof |                  |              diamond              |
 |              |    blue    |     		     |    		     | peaked roof |        		        |             metal pot             |
 |     			      |     		     |     		     |    			    |     		      |                  |             oval vase             |
@@ -237,7 +238,7 @@ This representation is based on the following descriptors:
 |:---------------:|:------:|:---------------:|:-------------------:|:---------------:|:-----------------:|:------------------------------:|:-----------:|
 |        1        | yellow |      short      |   larger side up    |      cube       |       above       |             sphere             | angle alpha |
 |        2        | green  |      long       |  larger side down   |    cylinder     |       below       |            pyramid             |
-|        3        |  grey  |        	        |         		          |   hemisphere    |                   |              cube              |
+|        3        |  white  |        	        |         		          |   hemisphere    |                   |              cube              |
 |        4        |  red   |       		        |         			         |     frustum     |                   |            cylinder            |
 |                 |  blue  |       		        |         		          | hexagonal prism |        		         |              cone              |
 |       			       |   		   |       		        |         			         |       		        |                   |             torus              |
