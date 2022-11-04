@@ -110,12 +110,6 @@ def replace_material(obj, old_material, new_material, fit_uv=True):
         new_material (string): The new material name
         fit_uv (boolean): boolean if the material shall be rescaled
     """
-    # all available materials and their attributes
-    material_scale = {
-        'white': 4,  # white
-        'white_old': 0.6,  # white
-        'white_old_3': 0.6,  # white
-    }
     if new_material is not None:
         ob_mats = obj.data.materials
         nm = bpy.data.materials[new_material]
@@ -189,13 +183,13 @@ def fit_uv_layer(nm, obj):
     params:
         obj (bpy object): object for which we fix the material
         nm (bpy material): material which gets rescaled
-
     """
     material_scale = {
-        'white': 4,  # white
-        'white_old': 0.6,  # white
+        # 'white': 4,  # white
+        'white_old': 4,  # white
         'white_old_3': 0.6,  # white
     }
+
     scale = material_scale.get(nm.name, 1)
 
     for ob in bpy.context.scene.objects:

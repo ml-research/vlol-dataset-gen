@@ -216,7 +216,7 @@ An overview of the three-dimensional Michalski train descriptors and their assig
 |:------------:|:----------:|:----------:|:---------:|:-----------:|:----------------:|:---------------------------------:|:-----------:|
 |      1       |   yellow   |   short    |   full    |    none     |        2         |             blue box              | angle alpha |
 |      2       |   green    |    long    |  braced   | foundation  |        3         |            golden vase            |
-|      3       |    white    |     	      |    		     | solid roof  |                  |              barrel               |
+|      3       |    brown    |     	      |    		     | solid roof  |                  |              barrel               |
 |      4       |    red     |     		     |    			    | braced roof |                  |              diamond              |
 |              |    blue    |     		     |    		     | peaked roof |        		        |             metal pot             |
 |     			      |     		     |     		     |    			    |     		      |                  |             oval vase             |
@@ -238,7 +238,7 @@ This representation is based on the following descriptors:
 |:---------------:|:------:|:---------------:|:-------------------:|:---------------:|:-----------------:|:------------------------------:|:-----------:|
 |        1        | yellow |      short      |   larger side up    |      cube       |       above       |             sphere             | angle alpha |
 |        2        | green  |      long       |  larger side down   |    cylinder     |       below       |            pyramid             |
-|        3        |  white  |        	        |         		          |   hemisphere    |                   |              cube              |
+|        3        |  brown  |        	        |         		          |   hemisphere    |                   |              cube              |
 |        4        |  red   |       		        |         			         |     frustum     |                   |            cylinder            |
 |                 |  blue  |       		        |         		          | hexagonal prism |        		         |              cone              |
 |       			       |   		   |       		        |         			         |       		        |                   |             torus              |

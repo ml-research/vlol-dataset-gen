@@ -273,12 +273,12 @@ def load_asset(filepath, alpha, location, collection, link, material=None, metal
             bpy.context.view_layer.objects.active = obj
             bpy.ops.object.material_slot_remove_unused()
 
-
             if material is not None:
+                material2 = 'white' if material == 'white_old' else material
                 replace_material(obj, 'WOOD2', material)
-                replace_material(obj, 'WOOD3', material)
-                replace_material(obj, 'Metal Scratches', material)
-                replace_material(obj, 'Wooden Planks V1', material)
+                replace_material(obj, 'WOOD3', material2)
+                replace_material(obj, 'Metal Scratches', material2)
+                replace_material(obj, 'Wooden Planks V1', material2)
                 # available metal colors: 'black_metal', 'black_metal_v2'
             if metal_color is not None:
                 replace_material(obj, 'Metal05 PBR', metal_color, fit_uv=False)

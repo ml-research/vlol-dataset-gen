@@ -19,7 +19,8 @@ from blender_image_generator.json_util import merge_json_files, combine_json
 
 
 class MichalskiTrainDataset(Dataset):
-    def __init__(self, base_scene, raw_trains, train_vis, train_count=10000, resize=False, ds_path='output/image_generator',
+    def __init__(self, base_scene, raw_trains, train_vis, train_count=10000, resize=False,
+                 ds_path='output/image_generator',
                  ):
         """ MichalskiTrainDataset
             Args:
@@ -41,33 +42,12 @@ class MichalskiTrainDataset(Dataset):
         self.masks = []
         self.resize = resize
         self.train_count = train_count
-        ds_typ = f'{raw_trains}/{train_vis}/{base_scene}/'
+        ds_typ = f'{raw_trains}/{train_vis}/{base_scene}'
         self.base_scene = base_scene
         self.image_base_path = f'{ds_path}/{ds_typ}/images'
         self.all_scenes_path = f'{ds_path}/{ds_typ}/all_scenes'
 
-        color = ['yellow', 'green', 'white', 'red', 'blue']
-        length = ['short', 'long']
-        walls = ["braced_wall", 'solid_wall']
-        roofs = ["roof_foundation", 'solid_roof', 'braced_roof', 'peaked_roof']
-        wheel_count = ['2_wheels', '3_wheels']
-        load_obj = ["box", "golden_vase", 'barrel', 'diamond', 'metal_pot', 'oval_vase']
-
-        # a total of 22 atributes
-        # load number is not in attributes since the load objects are segmented individually
-        self.attributes = ['color', 'length', 'wall', 'roof', 'wheels', 'load_obj']
-        self.attribute_classes = ['none'] + color + length + walls + roofs + wheel_count + load_obj
-        self.classes_per_attribute = [color, length, walls, roofs, wheel_count, load_obj]
         self.direction_classes = ['west', 'east']
-
-        # 1 label per train
-        # binary label classification
-        self.labels = ['direction']
-        self.label_classes = self.direction_classes
-        self.classes_per_label = [self.label_classes]
-
-        self.class_dim = len(self.label_classes)
-        self.output_dim = len(self.labels)
         # train with class specific labels
         if not os.path.isfile(self.all_scenes_path + '/all_scenes.json'):
             raise AssertionError('json scene file missing. Not all images were generated')
@@ -137,8 +117,6 @@ class MichalskiTrainDataset(Dataset):
     def get_trains(self):
         return self.trains
 
-    def get_ds_labels(self):
-        return self.labels
 
 
 def get_datasets(base_scene, raw_trains, train_vis, ds_size, resize=False, ds_path='output/image_generator'):
@@ -169,5 +147,5 @@ def get_datasets(base_scene, raw_trains, train_vis, ds_size, resize=False, ds_pa
             f'no JSON found')
     # image_count = None for standard image count
     full_ds = MichalskiTrainDataset(base_scene=base_scene, raw_trains=raw_trains, train_vis=train_vis,
-                                    train_count=ds_size, resize=resize)
+                                    train_count=ds_size, resize=resize, ds_path=ds_path)
     return full_ds
