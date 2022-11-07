@@ -3,31 +3,32 @@ import os
 import random
 from pyswip import Prolog
 
-from michalski_trains.m_train import BlenderCar, MichalskiCar, MichalskiTrain, SimpleCar
+from michalski_trains.m_train import BlenderCar, MichalskiTrain, SimpleCar
 
 
-def gen_raw_michalski_trains(classification_rule, num_entries=10000, with_occlusion=False):
+def gen_raw_michalski_trains(class_rule, num_entries=10000, with_occlusion=False):
     """ Generate Michalski trains descriptions using the Prolog train generator
         labels are derived by the classification rule
     Args:
         num_entries: int, number of michalski trains which are generated
         with_occlusion: boolean, whether to include occlusion of the train payloads
-        classification_rule: str, path to classification rule used to derive the labels
+        class_rule: str, classification rule used to derive the labels
     """
+    rule_path = f'example_rules/{class_rule}_rule.pl'
     os.makedirs('raw/tmp/', exist_ok=True)
     generator_tmp = 'raw/tmp/generator_tmp.pl'
     try:
         os.remove(generator_tmp)
     except OSError:
         pass
-    with open("raw/train_generator.pl", 'r') as gen, open(classification_rule, 'r') as rule:
+    with open("raw/train_generator.pl", 'r') as gen, open(rule_path, 'r') as rule:
         with open(generator_tmp, 'w+') as generator:
             generator.write(gen.read())
             generator.write(rule.read())
 
     prolog = Prolog()
     prolog.consult(generator_tmp)
-    all_trains_p = "raw/datasets/MichalskiTrains.txt"
+    all_trains_p = f"raw/datasets/MichalskiTrains_{class_rule}.txt"
     try:
         os.remove(all_trains_p)
     except OSError:
@@ -36,7 +37,7 @@ def gen_raw_michalski_trains(classification_rule, num_entries=10000, with_occlus
         west_counter, east_counter = 0, 0
         while west_counter < num_entries / 2 or east_counter < num_entries / 2:
             try:
-                os.remove('raw/tmp/MichalskiTrains.txt')
+                os.remove(f'raw/tmp/MichalskiTrains.txt')
             except OSError:
                 pass
             for _ in prolog.query(f"loop({1})."):
@@ -56,23 +57,44 @@ def gen_raw_michalski_trains(classification_rule, num_entries=10000, with_occlus
     os.remove(generator_tmp)
 
 
-def gen_raw_random_trains(num_entries=10000, with_occlusion=False):
+def gen_raw_random_trains(class_rule, num_entries=10000, with_occlusion=False):
     """ Generate random trains descriptions
     Args:
+        class_rule: str, classification rule used to derive the labels
         num_entries: int number of michalski trains which are generated
         with_occlusion: boolean whether to include occlusion of the train payloads
     """
+    classifier = 'raw/tmp/concept_tester_tmp.pl'
+    os.makedirs('raw/tmp/', exist_ok=True)
+    rule_path = f'example_rules/{class_rule}_rule.pl'
+
     try:
-        os.remove('raw/datasets/RandomTrains')
+        os.remove(classifier)
     except OSError:
         pass
-    with open('raw/datasets/RandomTrains.txt', 'w+') as text_file:
-        for i in range(num_entries):
+    with open("raw/train_generator.pl", 'r') as gen, open(rule_path, 'r') as rule:
+        with open(classifier, 'w+') as generator:
+            generator.write(gen.read())
+            generator.write(rule.read())
+    prolog = Prolog()
+    prolog.consult(classifier)
+    west_counter = 0
+    east_counter = 0
+
+    try:
+        os.remove(f'raw/datasets/RandomTrains_{class_rule}.txt')
+    except OSError:
+        pass
+    with open(f'raw/datasets/RandomTrains_{class_rule}.txt', 'w+') as text_file:
+        while west_counter < num_entries / 2 or east_counter < num_entries / 2:
             t_angle = get_random_angle(with_occlusion)
-            m_cars = f'none {t_angle} '
+            train = ''
+            m_cars = f''
 
             num_cars = random.randint(3, 4)
             for j in range(num_cars):
+                train += ', ' if len(train) > 0 else ''
+
                 n = j + 1
                 length = random.choice(['short', 'long'])
 
@@ -87,15 +109,28 @@ def gen_raw_random_trains(num_entries=10000, with_occlusion=False):
                 double = random.choice(['not_double', 'double'])
                 roof = random.choice(['none', 'arc', 'flat', 'jagged', 'peaked'])
                 l_shape = random.choice(['rectangle', 'triangle', 'circle', 'diamond', 'hexagon', 'utriangle'])
-                car = str(n) + ' ' + shape + ' ' + length + ' ' + double + ' ' + roof + ' ' + wheels + ' ' + str(
-                    l_num) + ' ' + l_shape
+                car = str(
+                    n) + ' ' + shape + ' ' + length + ' ' + double + ' ' + roof + ' ' + wheels + ' ' + l_shape + ' ' + str(
+                    l_num)
+                train += f'c({str(n)}, {shape}, {length}, {double}, {roof}, {wheels}, l({l_shape}, {str(l_num)}))'
+
                 if j != 0:
                     car = ' ' + car
                 m_cars = m_cars + car
                 # m_cars.append(michalski.MichalskiCar(n, shape, length, double, roof, wheels, l_num, l_shape))
             # m_trains.append(michalski.MichalskiTrain(m_cars, None))
-            text_file.write(m_cars + '\n')
-
+            q = list(prolog.query(f"eastbound([{train}])."))
+            p = 'west' if len(q) == 0 else 'east'
+            if p == 'east' and east_counter < int(num_entries / 2):
+                m_cars = f'{p} {t_angle} ' + m_cars
+                text_file.write(m_cars + '\n')
+                east_counter += 1
+            if p == 'west' and west_counter < int(math.ceil(num_entries / 2)):
+                m_cars = f'{p} {t_angle} ' + m_cars
+                text_file.write(m_cars + '\n')
+                west_counter += 1
+    print(f'generated {west_counter} westbound trains and {east_counter} eastbound trains')
+    os.remove(classifier)
 
 def gen_raw_trains(train_col, classification_rule, num_entries=10000, replace_existing=True, with_occlusion=False):
     """ Generate random or Michalski train descriptions
@@ -109,7 +144,7 @@ def gen_raw_trains(train_col, classification_rule, num_entries=10000, replace_ex
     os.makedirs("raw/datasets/", exist_ok=True)
     if replace_existing:
         if train_col == 'RandomTrains':
-            gen_raw_random_trains(num_entries, with_occlusion)
+            gen_raw_random_trains(classification_rule, num_entries, with_occlusion)
         elif train_col == 'MichalskiTrains':
             gen_raw_michalski_trains(classification_rule, num_entries, with_occlusion)
 
@@ -134,7 +169,7 @@ def read_trains(file, toSimpleObjs=False):
                              l[ind + 9].strip('\n'))
             if toSimpleObjs:
                 car = SimpleCar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6], l[ind + 7], l[ind + 8],
-                             l[ind + 9].strip('\n'))
+                                l[ind + 9].strip('\n'))
 
             m_cars.append(car)
         train = MichalskiTrain(m_cars, dir, t_angle)

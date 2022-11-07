@@ -21,7 +21,8 @@ def main():
     train_vis = args.visualization
     base_scene = args.background_scene
     out_path = args.output_path
-    classification_rule = f'example_rules/{args.classification_rule}_rule.pl'
+    rule = args.classification_rule
+
 
     if args.command == 'image_generator':
         # settings
@@ -33,16 +34,17 @@ def main():
         ds_size = args.dataset_size
         start_ind = args.index_start
         end_ind = args.index_end if args.index_end is not None else ds_size
+        ds_raw_path = f'raw/datasets/{raw_trains}_{rule}.txt'
         if start_ind > ds_size or end_ind > ds_size:
             raise ValueError(f'start index or end index greater than dataset size')
-        print(f'generating {train_vis} images using {raw_trains} descriptions in the {base_scene}')
+        print(f'generating {train_vis} images using {raw_trains} descriptions the labels are derived by {rule}')
         print(f'The images are set in the {base_scene} background')
 
         # generate raw trains if they do not exist or shall be replaced
-        if not os.path.isfile(f'raw/datasets/{raw_trains}.txt') or replace_raw:
-            gen_raw_trains(raw_trains, classification_rule, with_occlusion=with_occlusion, num_entries=ds_size)
+        if not os.path.isfile(ds_raw_path) or replace_raw:
+            gen_raw_trains(raw_trains, rule, with_occlusion=with_occlusion, num_entries=ds_size)
 
-        num_lines = sum(1 for line in open(f'raw/datasets/{raw_trains}.txt'))
+        num_lines = sum(1 for line in open(ds_raw_path))
         if num_lines != ds_size:
             raise ValueError(
                 f'defined dataset size: {ds_size}\n'
@@ -51,7 +53,7 @@ def main():
                 f'add \'--replace_raw\' to command line arguments to the replace existing train descriptions and '
                 f'generate the correct number of michalski trains')
         # load trains
-        trains = read_trains(f'raw/datasets/{raw_trains}.txt', toSimpleObjs=train_vis == 'SimpleObjects')
+        trains = read_trains(ds_raw_path, toSimpleObjs=train_vis == 'SimpleObjects')
 
         # render trains
         trains = trains[start_ind:end_ind]
@@ -100,7 +102,7 @@ def parse():
                         help='the classification rule used for generating the labels of the dataset, possible options: '
                              '\'theoryx\', \'easy\', \'color\', \'numerical\', \'multi\', \'complex\', \'custom\'')
     parser.add_argument('--description', type=str, default='MichalskiTrains',
-                        help='whether to generate descriptions of MichalskiTrains, RandomTrains')
+                        help='whether to generate descriptions of \'MichalskiTrains\', \'RandomTrains\'')
     parser.add_argument('--visualization', type=str, default='Trains', help='whether to transform the generated train '
                                                                             'description and generate 3D images of: '
                                                                             '\'Trains\' or \'SimpleObjects\'')

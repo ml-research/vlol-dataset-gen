@@ -47,7 +47,10 @@ class MichalskiTrainDataset(Dataset):
         self.image_base_path = f'{ds_path}/{ds_typ}/images'
         self.all_scenes_path = f'{ds_path}/{ds_typ}/all_scenes'
 
-        self.direction_classes = ['west', 'east']
+        self.labels = ['direction']
+        self.label_classes = ['west', 'east']
+        self.class_dim = len(self.label_classes)
+        self.output_dim = len(self.labels)
         # train with class specific labels
         if not os.path.isfile(self.all_scenes_path + '/all_scenes.json'):
             raise AssertionError('json scene file missing. Not all images were generated')
@@ -94,7 +97,7 @@ class MichalskiTrainDataset(Dataset):
         if lab == 'none':
             # return torch.tensor(0).unsqueeze(dim=0)
             raise AssertionError(f'There is no direction label for a RandomTrains. Use MichalskiTrain DS.')
-        label_binary = self.direction_classes.index(lab)
+        label_binary = self.label_classes.index(lab)
         label = torch.tensor(label_binary).unsqueeze(dim=0)
         return label
 
@@ -116,6 +119,9 @@ class MichalskiTrainDataset(Dataset):
 
     def get_trains(self):
         return self.trains
+
+    def get_ds_labels(self):
+        return self.labels
 
 
 
