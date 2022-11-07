@@ -132,6 +132,7 @@ def gen_raw_random_trains(class_rule, num_entries=10000, with_occlusion=False):
     print(f'generated {west_counter} westbound trains and {east_counter} eastbound trains')
     os.remove(classifier)
 
+
 def gen_raw_trains(train_col, classification_rule, num_entries=10000, replace_existing=True, with_occlusion=False):
     """ Generate random or Michalski train descriptions
     Args:

@@ -23,7 +23,6 @@ def main():
     out_path = args.output_path
     rule = args.classification_rule
 
-
     if args.command == 'image_generator':
         # settings
         with_occlusion = args.with_occlusion
@@ -62,9 +61,9 @@ def main():
         rtpt.start()
         for t_num, train in enumerate(trains, start=start_ind):
             rtpt.step()
-            generate_image(base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
+            generate_image(rule, base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
                            high_res=high_res, gen_depth=gen_depth)
-        combine_json(base_scene, raw_trains, train_vis, out_dir=out_path, ds_size=ds_size)
+        combine_json(base_scene, raw_trains, train_vis, rule, out_dir=out_path, ds_size=ds_size)
 
     if args.command == 'ct':
         from concept_tester import eval_rule

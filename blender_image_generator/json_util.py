@@ -207,9 +207,9 @@ def merge_json_files(path):
         json.dump(output, f, indent=2)
 
 
-def combine_json(base_scene, raw_trains, train_vis, out_dir='output/image_generator', ds_size=10000):
-    path_ori = f'tmp/image_generator/{raw_trains}/{train_vis}/{base_scene}'
-    path_dest = f'{out_dir}/{raw_trains}/{train_vis}/{base_scene}'
+def combine_json(base_scene, raw_trains, train_vis, class_rule, out_dir='output/image_generator', ds_size=10000):
+    path_ori = f'tmp/image_generator/{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
+    path_dest = f'{out_dir}/{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
     im_path = path_ori + '/images'
     if os.path.isdir(im_path):
         files = os.listdir(im_path)
