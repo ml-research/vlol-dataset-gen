@@ -46,11 +46,13 @@ For easier handling we recommend to create a screen: `screen -S train_generator`
 
 Then:
 
-1. `cd to TrainGenerator folder`
-2. `docker build -t blender_train_generator -f Dockerfile.`
-3. `docker run --gpus device=0 -v $(pwd):/home/workdir blender_train_generator python3 main.py`
+```bash
+cd TrainGenerator
+docker build -t blender_train_generator .
+docker run --gpus device=0 -v $(pwd):/home/workdir blender_train_generator python3 main.py
+```
 
-## Generating images
+## Overview
 
 This is a very brief instruction on how the three-dimensional Michalski train dataset is generated.
 At first, we generate train descriptions for the whole dataset resorting to a slightly adapted version of Muggleton's
@@ -64,7 +66,7 @@ dataset.
 The train generator provides a wide range of settings allowing to adapt to the given requirements.
 The default output location is `TrainGenerator/output/image_generator/`.
 
-### Script parameters
+## Script parameters
 
 The following settings are available, the corresponding input types and default settings are noted in parentheses:
 
@@ -102,7 +104,8 @@ Additional settings:
 - `high_res` (bool, False) -> Whether to render the images in high resolution (1920x1080) or standard resolution (
   480x270)
 - `gen_depth` (bool, False) -> Whether to save depth information of the individual scenes.
-- `replace_descriptions` (bool, False) -> If the train descriptions for the dataset are already generated shall they be replaced?
+- `replace_descriptions` (bool, False) -> If the train descriptions for the dataset are already generated shall they be
+  replaced?
 - `allow_parallel` (bool, True) -> Enables parallel generation of one dataset. Recommended to clear tmp folder before.
   Images generated in tmp folder from previously uncompleted runs (of the same settings) are not deleted.
 
@@ -124,16 +127,24 @@ The start and stop indices parameters allow for parallelization if large dataset
 Therefore, you need to start multiple docker containers each generation images at different indices at the dataset.
 Keep in mind to use different docker containers as the blender engine has problems to render parallel.
 
-### Decision rule
+## Decision rule
 
-The labels of the generated train are derived from the selected prolog classification rule.
-The generated trains are subject to a balanced class distribution accordingly we have an equal
-number of trains heading eastbound and westbound within our dataset.
+The labels of the generated train are derived from the selected classification rule. The generated trains are subject to
+a balanced class distribution.
+Accordingly, we have an equal number of trains heading eastbound and westbound within our dataset.
+The different rules allow us to increase or decrease the complexity of the rule-based problem which is incorporated
+into our dataset.
+
+In the `example_rules` folder we provide a selection of predefined rules with varying degrees of complexity.
+The rules are expressed in the Prolog description language. In the case you want to define your own personal rules
+select and adjust the `example_rules/custom_rule.pl` according to your requirements. 
+For this you can either rely on the predefined set of predicates described in the section below or create your own
+descriptors.
 Be aware that defining a very specific decision rules can have a strong influence on the distribution of train
 attributes, which in turn can lead to similar images being generated as it might become difficult to create random
 variations based on a very specific rule.
 
-By default, we resort to the classification rule known as 'Theory X' which is defined as follows:
+By default, we resort to the classification rule known as **'Theory X'** which is defined as follows:
 
     There is either a short, closed car, or a car with a circular load somewhere behind a car with a triangular load.
 
@@ -144,21 +155,49 @@ In Prolog the rule can be expressed as follows:
     (has_load0(Car,triangle), has_load1(Cars,circle));
     eastbound(Cars).
 
-In FOL it can be noted as follows:
+[//]: # (In FOL it can be noted as follows:)
 
-eastbound(Train) &vDash;
-&exist; Car_1, Car_2 has-car(Train, Car_1) &and; has-car(Train, Car_2) &and;
-((short(Car_1) &and; closed(Car_1)) &or;
-(has-load(Car_1,golden-vase) &and; has-load(Car_2,barrel) &and;
-somewhere-behind(Train, Car_2, Car_1)))
+[//]: # ()
 
-The classification rule noted in classification_rule.pl can be adjusted according to the requirements.
-This allows us to increase or decrease the complexity of the rule-based problem incorporated into the generated dataset.
-Herby the classification rule must be expressed in the Prolog description language using the provided descriptors
-predicates.
-However, by resorting the defined predicates, it is also possible to define and apply new predicates.
+[//]: # (  eastbound&#40;Train&#41; &vDash;)
 
-At default the train descriptors are expressed by the following predicates.
+[//]: # (  &exist; Car_1, Car_2 has-car&#40;Train, Car_1&#41; &and; has-car&#40;Train, Car_2&#41; &and;)
+
+[//]: # (  &#40;&#40;short&#40;Car_1&#41; &and; closed&#40;Car_1&#41;&#41; &or;)
+
+[//]: # (  &#40;has-load&#40;Car_1,golden-vase&#41; &and; has-load&#40;Car_2,barrel&#41; &and;)
+
+[//]: # (  somewhere-behind&#40;Train, Car_2, Car_1&#41;&#41;&#41;)
+
+The other classification are denoted as follows:
+
+- **easy rule:** The train has a short and a long car with the same colour.
+- **colour rule:** The train has three differently coloured cars.
+- **easy rule:** The train has a short and a long car with the same colour.
+- **multi case rule:** The train has either a car with braced walls and 2 loads, or a blue car with 3 loads or a blue
+  car with brace walls.
+- **numerical rule:** The train has a car where its car position equals its number of payloads which equals its number
+  of wheel axis.
+- **complex rule:** Either there is a car with a car number which is smaller as its wheel count and smaller as the
+  number of loads, or there is a short and a long car with the same colour where the position number of the short car is
+  smaller as the wheel count of the long car, or the train has three differently coloured cars.
+
+
+
+## Michalski train representation
+
+The representation of the original Michalski trains heavily relies on their two-dimensional delineation and does not
+meet the requirements of a vivid three-dimensional visualization.
+Accordingly, we had to transform the original train representation to use more appropriate descriptors for our
+visualizations (see tables below).
+Since the respective descriptions are replaced one-to-one, it is not necessary to define new decision rules for the
+different visualizations, i.e. for SimpleObjects and Trains.
+Rather, you can define your own personal decision rules referring to the predicates of the original Michalski train
+representation. However, if you want to resort to further predicates,
+you may define new ones or have a look at our additionally defined descriptors at `raw/train_generator.pl`.
+
+Below you will find an overview of the original Michalski train representation
+which is expressed by the following Prolog predicates.
 While T refers to the whole train as an input, C, C1, C2 refer to a single car.
 
 - Car descriptors
@@ -192,23 +231,9 @@ While T refers to the whole train as an input, C, C1, C2 refer to a single car.
     - has_load0(C,Shape)
     - has_load1(T,Shape)
 
-[//]: # (The defined descriptors can be allocated the following descriptor values:)
+You can use these values defined below for the predicates defined above:
 
-[//]: # ()
-
-[//]: # (    car_shape&#40;1,ellipse&#41;. car_shape&#40;2,hexagon&#41;. car_shape&#40;3,rectangle&#41;. car_shape&#40;4,u_shaped&#41;. car_shape&#40;5,bucket&#41;.)
-
-[//]: # (    car_length&#40;1,short&#41;. car_length&#40;2,long&#41;.)
-
-[//]: # (    car_open&#40;1,open&#41;. car_open&#40;2,closed&#41;.)
-
-[//]: # (    car_double&#40;1,not_double&#41;. car_double&#40;2,double&#41;.)
-
-[//]: # (    roof_shape&#40;1,none&#41;. roof_shape&#40;2,flat&#41;. roof_shape&#40;3,jagged&#41;. roof_shape&#40;4,peaked&#41;. roof_shape&#40;5,arc&#41;.)
-
-[//]: # (    load_shape&#40;1,circle&#41;. load_shape&#40;2,diamond&#41;. load_shape&#40;3,hexagon&#41;. load_shape&#40;4,rectangle&#41;. load_shape&#40;5,triangle&#41;. load_shape&#40;6,utriangle&#41;.)
-
-An overview of the descriptor's assignable values can be found below:
+#### Original Michalski train representation
 
 | Car number | Car shape | Car length | Wall type | Roof shape | Number of wheels | Shape of loads | Number of loads |
 |:----------:|:---------:|:----------:|:---------:|:----------:|:----------------:|:--------------:|:---------------:|
@@ -219,14 +244,7 @@ An overview of the descriptor's assignable values can be found below:
 |            | u_shaped  |     		     |    		     |   peaked   |        		        |    hexagon     |
 |    			     |    		     |     		     |    			    |     		     |                  |   utriangle    |
 
-### Transformation into a three-dimensional train representation
-
-Some of the above listed descriptors which were used in the original Michalski train representation heavily rely on
-their
-two-dimensional delineation and do not meet the requirements of a vivid three-dimensional visualization.
-Accordingly, we have transformed the original train representation relying on more appropriate descriptors and
-descriptor values. For detailed information on the transformation see ###paper.
-An overview of the three-dimensional Michalski train descriptors and their assignable values can be found below:
+#### Three-dimensional train representation
 
 | Car position | Car colour | Car length | Wall type | Roof shape  | Number of wheels | Payload 1 & Payload 2 & Payload 3 | Orientation |
 |:------------:|:----------:|:----------:|:---------:|:-----------:|:----------------:|:---------------------------------:|:-----------:|
@@ -238,16 +256,14 @@ An overview of the three-dimensional Michalski train descriptors and their assig
 |     			      |     		     |     		     |    			    |     		      |                  |             oval vase             |
 |      		      |     		     |     		     |    			    |     		      |                  |               none                |
 
+Overview of our three-dimensional train representation.
 The following image illustrates the above described descriptors.
 
 <div align="center">
   <img src="example_images/descriptor_overview/overview.png" height="350px"  alt="">
 </div>
 
-### Transformation into a three-dimensional simple representation
-
-The Train generator also allows for a simpler visualization relying on less complex objects.
-This representation is based on the following descriptors:
+#### Three-dimensional simple representation
 
 | Object position | Color  | Platform length | Side object frustum | Platform shape  | Side object torus | Object 1 & Object 2 & Object 3 | Orientation |
 |:---------------:|:------:|:---------------:|:-------------------:|:---------------:|:-----------------:|:------------------------------:|:-----------:|
@@ -259,6 +275,7 @@ This representation is based on the following descriptors:
 |       			       |   		   |       		        |         			         |       		        |                   |             torus              |
 |       		        |   		   |       		        |         			         |       		        |                   |              none              |
 
+The Train generator also allows for a simpler visualization relying on less complex objects.
 The following image illustrates the above described descriptors.
 
 <div align="center">
@@ -271,7 +288,6 @@ For each image the ground truth information of the scene is saved as a Json file
 For each car we save the binary mask in form of an encoded RLE file.
 The binary masks of the car wall, car wheels and the individual payloads are also saved inside the Json.
 For each scene the Json file contains the following information:
-output
 
 ```
 m_train.json
