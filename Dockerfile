@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y git subversion cmake libx11-dev libxxf8
 # install prolog dependencies
 RUN apt-get update && apt-get install -y gringo swi-prolog
 RUN apt-get upgrade -y
-#RUN cp /usr/lib/python3.9/lib-dynload/_bz2.cpython-38-x86_64-linux-gnu.so  /usr/local/lib/python3.9/
+
 # install python and required packages
 RUN mkdir /home/python
 WORKDIR /home/python
@@ -24,12 +24,11 @@ RUN make install
 
 COPY modules/requirements.txt /home/python/requirements.txt
 RUN pip3 install --upgrade pip
-#RUN pip3 install git+https://github.com/yuce/pyswip@master#egg=pyswip
 RUN pip3 install -r /home/python/requirements.txt
 RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 RUN ln -s /usr/local/bin/python3.10 /usr/bin/python & ln -s /usr/local/bin/pip3.10 /usr/bin/pip
 
-# get blender
+# set up blender as a python module
 RUN mkdir /home/blender-git
 WORKDIR /home/blender-git
 RUN git clone -b blender-v3.3-release --single-branch https://git.blender.org/blender.git
@@ -41,6 +40,7 @@ RUN svn checkout https://svn.blender.org/svnroot/bf-blender/tags/blender-3.3-rel
 WORKDIR /home/blender-git/blender
 RUN make update
 
+# use for installation of blender 2.9
 # install dependencies
 #RUN /home/blender-git/blender/build_files/build_environment/install_deps.sh
 
@@ -68,30 +68,10 @@ COPY modules/CMakeLists.txt ./CMakeLists.txt
 RUN make
 RUN cp -a /home/blender-git/build_linux/bin/. /usr/local/lib/python3.10/site-packages/
 
-#SHELL ["/bin/bash", "-c"]
-#RUN echo 'alias python='python3'' >> ~/.bashrc
-#RUN . ~/.bashrc
-
-
-# install detectron
-#RUN mkdir /home/detectron
-#WORKDIR /home/detectron
-#RUN git clone https://github.com/facebookresearch/detectron
-#WORKDIR /home/detectron/detectron
-#RUN make
-#RUN export PYTHONPATH=$PYTHONPATH:/home/detectron/detectron/detectron
-#RUN . ~/.bashrc
-
 EXPOSE 8282
 # create workdir
 RUN mkdir /home/workdir
 WORKDIR /home/workdir
-
-#RUN mkdir /home/workdir/blenderdata
-#RUN cp -a /home/blender-git/build_linux/bin/. /home/workdir/blenderdata/
-
-# copy and extract precompiled blender module
-#RUN tar xvfz /home/Master_thesis/modules/blender_module.tar.gz -C /usr/local/lib/python3.9/site-packages
 
 
 ENV PYTHONPATH "${PYTHONPATH}:./"

@@ -1,4 +1,3 @@
-import logging
 from rtpt import RTPT
 
 from blender_image_generator.json_util import combine_json
@@ -14,7 +13,6 @@ def main():
     args = parse()
 
     device = torch.device(f"cuda:{args.cuda}" if torch.cuda.is_available() else "cpu")
-    # device = torch.device("cpu" if torch.cuda.is_available() else "cpu")
 
     # michalski train dataset settings
     raw_trains = args.description
@@ -27,29 +25,29 @@ def main():
         # settings
         with_occlusion = args.with_occlusion
         save_blender, high_res, gen_depth = args.save_blender, args.high_res, args.gen_depth
-        replace_existing_img, replace_raw = not args.allow_parallel, args.replace_raw
+        replace_existing_img, replace_descriptions = not args.allow_parallel, args.replace_descriptions
 
         # generate images in range [start_ind:end_ind]
         ds_size = args.dataset_size
         start_ind = args.index_start
         end_ind = args.index_end if args.index_end is not None else ds_size
-        ds_raw_path = f'output/dataset_descriptions/{raw_trains}_{rule}.txt'
+        ds_raw_path = f'{out_path}/dataset_descriptions/{raw_trains}_{rule}.txt'
         if start_ind > ds_size or end_ind > ds_size:
             raise ValueError(f'start index or end index greater than dataset size')
         print(f'generating {train_vis} images using {raw_trains} descriptions the labels are derived by {rule}')
         print(f'The images are set in the {base_scene} background')
 
         # generate raw trains if they do not exist or shall be replaced
-        if not os.path.isfile(ds_raw_path) or replace_raw:
+        if not os.path.isfile(ds_raw_path) or replace_descriptions:
             gen_raw_trains(raw_trains, rule, with_occlusion=with_occlusion, num_entries=ds_size, out_path=ds_raw_path)
 
-        num_lines = sum(1 for line in open(ds_raw_path))
+        num_lines = sum(1 for _ in open(ds_raw_path))
         if num_lines != ds_size:
             raise ValueError(
                 f'defined dataset size: {ds_size}\n'
                 f'existing train descriptions: {num_lines}\n'
                 f'{num_lines} raw train descriptions were previously generated in raw/datasets/{raw_trains}.txt \n '
-                f'add \'--replace_raw\' to command line arguments to the replace existing train descriptions and '
+                f'add \'--replace_descriptions\' to command line arguments to the replace existing train descriptions and '
                 f'generate the correct number of michalski trains')
         # load trains
         trains = read_trains(ds_raw_path, toSimpleObjs=train_vis == 'SimpleObjects')
@@ -84,9 +82,10 @@ def parse():
     parser.add_argument('--gen_depth', type=bool, default=False,
                         help='Whether to generate the depth information of the individual scenes')
     parser.add_argument('--allow_parallel', type=bool, default=True,
-                        help=' Enables parallel generation of one dataset. Recommended to clear tmp folder before. '
-                             'Images generated in tmp folder from previously uncompleted runs are not anymore deleted.')
-    parser.add_argument('--replace_raw', type=bool, default=False,
+                        help='Enables parallel generation of one dataset. Recommended to clear tmp folder before. '
+                             'Images generated in tmp folder from previously uncompleted runs (of the same settings) '
+                             'are not deleted.')
+    parser.add_argument('--replace_descriptions', type=bool, default=False,
                         help='Allows multiple usages of the same train descriptions and the parallel rendering of '
                              'images of one dataset. By default train descriptions are not replaced. If new train '
                              'descriptions need to be rendered set to True')

@@ -29,10 +29,12 @@ capabilities of rule-based learning.
   <img src="example_images/simple_scene.png" width="400"  alt="">
 </div>
 
-In the top image you can see the original Michalski trains, in the bottom images you can see example images from our novel 3D Michalski train generator.
+In the top image you can see the original Michalski trains, in the bottom images you can see example images from our
+novel 3D Michalski train generator.
 
 You can use the code of this repository to generate Michalski train descriptions, render their corresponding images and
-create a three-dimensional Michalski train dataset. Below we provide detailed descriptions and explanations of the necessary steps to create the datasets.
+create a three-dimensional Michalski train dataset. Below we provide detailed descriptions and explanations of the
+necessary steps to create the datasets.
 
 ## Instructions for setting up the docker container
 
@@ -54,8 +56,9 @@ This is a very brief instruction on how the three-dimensional Michalski train da
 At first, we generate train descriptions for the whole dataset resorting to a slightly adapted version of Muggleton's
 train generator [[2]](#2).
 We have extended the code to assign labels to the generated train descriptions according to a specified decision rule.
-Example rules for classification are specified in the `example_rules` folder.
-The `custom_rule.pl` file can be used to define your own personal decision rule (see section below).
+For this purpose you can choose one of the decision rules specified in the `example_rules` folder.
+The `custom_rule.pl` file can be used to define your own personal decision rule. For a more in depth description on the
+individual rules see section below.
 Subsequently, we render images for the individual train descriptions, generate their ground-truth information creating a
 dataset.
 The train generator provides a wide range of settings allowing to adapt to the given requirements.
@@ -65,36 +68,47 @@ The default output location is `TrainGenerator/output/image_generator/`.
 
 The following settings are available, the corresponding input types and default settings are noted in parentheses:
 
-general settings:
-- `dataset_size` (int, 10,000) -> Size of the dataset we want to create
-- `index_start` (int, 0) -> Start rendering images at index (index_start)
-- `index_end` (int, None) -> Stop rendering images at index (does not render index_end).
+General settings:
+
+- `dataset_size` (int, 10,000) -> Size of the dataset we want to create.
+- `index_start` (int, 0) -> Start rendering images at index (index_start).
+- `index_end` (int, None) -> Stop rendering images at index (does not include rendering image index_end).
   If None the train generator stops rendering at dataset_size.
-- `output_path` (str, 'output/image_generator') -> path to the output directory in which the generated datasets are saved.
+- `output_path` (str, 'output/image_generator') -> path to the output directory in which the generated datasets are
+  saved.
 
-train specific settings:
+Classification & Visualization settings:
+
 - `classification_rule` (str, 'theoryx') -> The classification rule used for generating the labels of the dataset.
-The following rules are available: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom'.
-For more detailed information about the rules refer to the rule section.
-Select custom rule to use your own personal rule. Therefore, define your own rule in \'example_rules/custom_rule.pl\'.
-- `description` (str, 'MichalskiTrains') -> The train descriptions we want to generate. Either 'MichalskiTrains' or 'RandomTrains'.
-The 'RandomTrains' descriptions are generated randomly. 
-The 'MichalskiTrains' descriptions are generated according to specific distributional assumptions defined by Muggleton [[2]](#2).
-- `visualization` (str, 'Trains') -> The way we want to visualize the train descriptions. Either as 'Trains' or 'SimpleObjects'.
+  The following rules are available: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom'.
+  For more detailed information about the rules refer to the rule section.
+  Select custom rule to use your own personal rule. Therefore, define your own rule in \'example_rules/custom_rule.pl\'.
+- `description` (str, 'MichalskiTrains') -> The train descriptions we want to generate. Either 'MichalskiTrains' or '
+  RandomTrains'.
+  The 'RandomTrains' descriptions are generated randomly.
+  The 'MichalskiTrains' descriptions are generated according to distributional assumptions defined by
+  Muggleton [[2]](#2).
+- `visualization` (str, 'Trains') -> The way we want to visualize the descriptions. Either as 'Trains' or '
+  SimpleObjects'. For comparison see images above.
 - `background_scene` (str, 'base_scene') -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
-  or 'fisheye_scene'
-- `with_occlusion` (bool, False) -> Whether to include train angles which might lead to occlusion of the individual train
-  attributes
+  or 'fisheye_scene'.
+- `with_occlusion` (bool, False) -> Whether to include train angles which might lead to occlusion individual parts of
+  the train.
 
-additional settings:
+Additional settings:
+
 - `save_blender` (bool, False) -> Whether the blender scene is saved.
-  Only recommended for small image counts as the blend files are of rather big size.
-- `high_res` (bool, False) -> Whether to render the images in high resolution (1920x1080) or standard resolution (480x270)
-- `gen_depth` (bool, False) -> Whether to generate the depth information of the individual scenes
-- `replace_raw` (bool, False) -> If the train descriptions for the dataset are already generated shall they be replaced?
+  Only recommended for small image counts as the blend files can be quite large.
+- `high_res` (bool, False) -> Whether to render the images in high resolution (1920x1080) or standard resolution (
+  480x270)
+- `gen_depth` (bool, False) -> Whether to save depth information of the individual scenes.
+- `replace_descriptions` (bool, False) -> If the train descriptions for the dataset are already generated shall they be replaced?
 - `allow_parallel` (bool, True) -> Enables parallel generation of one dataset. Recommended to clear tmp folder before.
-Images generated in tmp folder from previously uncompleted runs are not anymore deleted.
+  Images generated in tmp folder from previously uncompleted runs (of the same settings) are not deleted.
 
+Enables parallel generation of one dataset. Recommended to clear tmp folder before. '
+'Images generated in tmp folder from previously uncompleted runs (of the same settings) '
+'are not deleted.
 
 The following shows example images of the four background scenes 'base_scene', 'desert_scene', 'sky_scene' and '
 fisheye_scene':
@@ -106,7 +120,7 @@ fisheye_scene':
   <img src="example_images/background/fisheye_scene.png" width="400"  alt="">
 </div>
 
-The start and stop indices parameters allow for parallelization when one dataset is established.
+The start and stop indices parameters allow for parallelization if large datasets need to be generated.
 Therefore, you need to start multiple docker containers each generation images at different indices at the dataset.
 Keep in mind to use different docker containers as the blender engine has problems to render parallel.
 
@@ -116,7 +130,8 @@ The labels of the generated train are derived from the selected prolog classific
 The generated trains are subject to a balanced class distribution accordingly we have an equal
 number of trains heading eastbound and westbound within our dataset.
 Be aware that defining a very specific decision rules can have a strong influence on the distribution of train
-attributes, which in turn can lead to similar images being generated as it might become difficult to create random variations based on a very specific rule.
+attributes, which in turn can lead to similar images being generated as it might become difficult to create random
+variations based on a very specific rule.
 
 By default, we resort to the classification rule known as 'Theory X' which is defined as follows:
 
@@ -180,6 +195,7 @@ While T refers to the whole train as an input, C, C1, C2 refer to a single car.
 [//]: # (The defined descriptors can be allocated the following descriptor values:)
 
 [//]: # ()
+
 [//]: # (    car_shape&#40;1,ellipse&#41;. car_shape&#40;2,hexagon&#41;. car_shape&#40;3,rectangle&#41;. car_shape&#40;4,u_shaped&#41;. car_shape&#40;5,bucket&#41;.)
 
 [//]: # (    car_length&#40;1,short&#41;. car_length&#40;2,long&#41;.)
@@ -233,7 +249,6 @@ The following image illustrates the above described descriptors.
 The Train generator also allows for a simpler visualization relying on less complex objects.
 This representation is based on the following descriptors:
 
-
 | Object position | Color  | Platform length | Side object frustum | Platform shape  | Side object torus | Object 1 & Object 2 & Object 3 | Orientation |
 |:---------------:|:------:|:---------------:|:-------------------:|:---------------:|:-----------------:|:------------------------------:|:-----------:|
 |        1        | yellow |      short      |   larger side up    |      cube       |       above       |             sphere             | angle alpha |
@@ -243,7 +258,6 @@ This representation is based on the following descriptors:
 |                 |  blue  |       		        |         		          | hexagonal prism |        		         |              cone              |
 |       			       |   		   |       		        |         			         |       		        |                   |             torus              |
 |       		        |   		   |       		        |         			         |       		        |                   |              none              |
-
 
 The following image illustrates the above described descriptors.
 
