@@ -1,19 +1,12 @@
 import json
 import os
-import shutil
-from distutils.dir_util import copy_tree
-from pycocotools import mask as maskUtils
 
 import jsonpickle
-import numpy as np
 import torch
-from sklearn.metrics import accuracy_score
 from torch.utils.data import Dataset
 from PIL import Image
 from torchvision import transforms
-from timm.data.parsers.parser import Parser
 from torchvision.transforms import InterpolationMode
-from tqdm.contrib import tenumerate
 
 from blender_image_generator.json_util import merge_json_files, combine_json
 

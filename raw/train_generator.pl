@@ -188,13 +188,13 @@ append([H|L1],L2,[H|L3]) :-
   append(L1,L2,L3), !.
 
 
-brown(C) :- car_color(C,brown).
+grey(C) :- car_color(C,grey).
 red(C) :- car_color(C,red).
 yellow(C) :- car_color(C,yellow).
 blue(C) :- car_color(C,blue).
 green(C) :- car_color(C,green).
 
-brown(brown).
+grey(grey).
 red(red).
 yellow(yellow).
 blue(blue).
@@ -229,7 +229,7 @@ diamond(diamond).
 metal_pot(metal_pot).
 oval_vase(oval_vase).
 
-car_color(C,brown) :- arg(2,C,ellipse).
+car_color(C,grey) :- arg(2,C,ellipse).
 car_color(C,red) :- arg(2,C,hexagon).
 car_color(C,yellow) :- arg(2,C,rectangle).
 car_color(C,blue) :- arg(2,C,u_shaped).
@@ -249,7 +249,7 @@ has_roof2(C,braced_roof) :- arg(5,C,jagged).
 has_roof2(C,peaked_roof) :- arg(5,C,peaked).
 
 
-%car_color(C,brown(R)) :- arg(2,C,ellipse).
+%car_color(C,grey(R)) :- arg(2,C,ellipse).
 %car_color(C,red(R)) :- arg(2,C,hexagon).
 %car_color(C,yellow(R)) :- arg(2,C,rectangle).
 %car_color(C,R) :- arg(2,C,u_shaped), blue(R).

@@ -62,7 +62,7 @@ class MichalskiTrain(object):
     def get_init_rotation(self):
         return self.blender_init_rotation
 
-    def update_pass_indicies(self):
+    def update_pass_indices(self):
         index = 1
         for car in self.m_cars:
             indicies = {"car": index, "roof": index}
@@ -143,7 +143,7 @@ class BlenderCar(MichalskiCar):
         car_shape_to_material = {
             'rectangle': 'yellow',
             'bucket': 'green',
-            'ellipse': 'brown',
+            'ellipse': 'grey',
             'hexagon': 'red',
             'u_shaped': 'blue',
         }
@@ -229,7 +229,7 @@ class SimpleCar(BlenderCar):
         car_shape_to_material = {
             'rectangle': 'yellow',
             'bucket': 'green',
-            'ellipse': 'brown',
+            'ellipse': 'grey',
             'hexagon': 'red',
             'u_shaped': 'blue',
         }

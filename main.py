@@ -33,7 +33,7 @@ def main():
         ds_size = args.dataset_size
         start_ind = args.index_start
         end_ind = args.index_end if args.index_end is not None else ds_size
-        ds_raw_path = f'raw/datasets/{raw_trains}_{rule}.txt'
+        ds_raw_path = f'output/dataset_descriptions/{raw_trains}_{rule}.txt'
         if start_ind > ds_size or end_ind > ds_size:
             raise ValueError(f'start index or end index greater than dataset size')
         print(f'generating {train_vis} images using {raw_trains} descriptions the labels are derived by {rule}')
@@ -41,7 +41,7 @@ def main():
 
         # generate raw trains if they do not exist or shall be replaced
         if not os.path.isfile(ds_raw_path) or replace_raw:
-            gen_raw_trains(raw_trains, rule, with_occlusion=with_occlusion, num_entries=ds_size)
+            gen_raw_trains(raw_trains, rule, with_occlusion=with_occlusion, num_entries=ds_size, out_path=ds_raw_path)
 
         num_lines = sum(1 for line in open(ds_raw_path))
         if num_lines != ds_size:

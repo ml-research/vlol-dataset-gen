@@ -16,27 +16,27 @@ RUN apt-get upgrade -y
 # install python and required packages
 RUN mkdir /home/python
 WORKDIR /home/python
-RUN wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz
-RUN tar xzf Python-3.9.7.tgz
-WORKDIR /home/python/Python-3.9.7
+RUN wget https://www.python.org/ftp/python/3.10.2/Python-3.10.2.tgz
+RUN tar xzf Python-3.10.2.tgz
+WORKDIR /home/python/Python-3.10.2
 RUN ./configure --enable-optimizations
 RUN make install
 
-COPY ./modules/requirements.txt /home/python/requirements.txt
+COPY modules/requirements.txt /home/python/requirements.txt
 RUN pip3 install --upgrade pip
-RUN pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 #RUN pip3 install git+https://github.com/yuce/pyswip@master#egg=pyswip
 RUN pip3 install -r /home/python/requirements.txt
-RUN ln -s /usr/local/bin/python3.9 /usr/bin/python & ln -s /usr/local/bin/pip3.9 /usr/bin/pip
+RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
+RUN ln -s /usr/local/bin/python3.10 /usr/bin/python & ln -s /usr/local/bin/pip3.10 /usr/bin/pip
 
 # get blender
 RUN mkdir /home/blender-git
 WORKDIR /home/blender-git
-RUN git clone -b blender-v3.0-release --single-branch https://git.blender.org/blender.git
+RUN git clone -b blender-v3.3-release --single-branch https://git.blender.org/blender.git
 
 RUN mkdir /home/blender-git/lib
 WORKDIR /home/blender-git/lib
-RUN svn checkout https://svn.blender.org/svnroot/bf-blender/tags/blender-3.0-release/lib/linux_centos7_x86_64
+RUN svn checkout https://svn.blender.org/svnroot/bf-blender/tags/blender-3.3-release/lib/linux_centos7_x86_64
 
 WORKDIR /home/blender-git/blender
 RUN make update
@@ -64,9 +64,9 @@ RUN make update
 
 WORKDIR /home/blender-git/blender
 RUN rm ./CMakeLists.txt
-COPY ./modules/CMakeLists.txt ./CMakeLists.txt
+COPY modules/CMakeLists.txt ./CMakeLists.txt
 RUN make
-RUN cp -a /home/blender-git/build_linux/bin/. /usr/local/lib/python3.9/site-packages/
+RUN cp -a /home/blender-git/build_linux/bin/. /usr/local/lib/python3.10/site-packages/
 
 #SHELL ["/bin/bash", "-c"]
 #RUN echo 'alias python='python3'' >> ~/.bashrc

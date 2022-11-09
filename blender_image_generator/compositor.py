@@ -1,7 +1,7 @@
 import bpy
 
 
-def create_tree(train, t_num, raw_trains, train_vis, base_scene, gen_depth):
+def create_tree(train, t_num, raw_trains, train_vis, base_scene, gen_depth, class_rule):
     """
     create a tree inside the compositor of blender for the given train, the tree creats of objects masks
      and depth information of the individual trains
@@ -22,7 +22,8 @@ def create_tree(train, t_num, raw_trains, train_vis, base_scene, gen_depth):
     links = tree.links
     margin = 200
     pos_x, pos_y = 300, 0
-    base_path = f'tmp/tmp_graph_output/{raw_trains}/{train_vis}/{base_scene}/'
+    path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
+    base_path = f'tmp/tmp_graph_output/{path_settings}/'
 
     # clear default nodes
     for node in nodes:
@@ -99,7 +100,7 @@ def create_tree(train, t_num, raw_trains, train_vis, base_scene, gen_depth):
 
     if gen_depth:
         depth_map_out = nodes.new("CompositorNodeOutputFile")
-        depth_map_out.base_path = f'tmp/depth/{raw_trains}/{train_vis}/{base_scene}/t_{t_num}_depth'
+        depth_map_out.base_path = f'tmp/depth/{path_settings}/t_{t_num}_depth'
         depth_map_out.location = pos_x, 0
         depth_map_out.format.file_format = 'OPEN_EXR'
         links.new(
