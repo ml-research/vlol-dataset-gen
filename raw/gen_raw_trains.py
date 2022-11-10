@@ -32,6 +32,7 @@ def gen_raw_michalski_trains(class_rule, out_path, num_entries=10000, with_occlu
     try:
         os.remove(out_path)
     except OSError:
+        os.makedirs(out_path.rsplit('/', 1)[0], exist_ok=True)
         pass
     with open(out_path, 'w+') as all_trains:
         west_counter, east_counter = 0, 0
