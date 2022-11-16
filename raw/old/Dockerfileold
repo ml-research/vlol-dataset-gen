@@ -22,7 +22,7 @@ WORKDIR /home/python/Python-3.9.7
 RUN ./configure --enable-optimizations
 RUN make install
 
-COPY ./modules/requirements.txt /home/python/requirements.txt
+COPY ../../modules/requirements.txt /home/python/requirements.txt
 RUN pip3 install --upgrade pip
 RUN pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 #RUN pip3 install git+https://github.com/yuce/pyswip@master#egg=pyswip
@@ -64,7 +64,7 @@ RUN make update
 
 WORKDIR /home/blender-git/blender
 RUN rm ./CMakeLists.txt
-COPY ./modules/CMakeLists.txt ./CMakeLists.txt
+COPY ../../modules/CMakeLists.txt ./CMakeLists.txt
 RUN make
 RUN cp -a /home/blender-git/build_linux/bin/. /usr/local/lib/python3.9/site-packages/
 

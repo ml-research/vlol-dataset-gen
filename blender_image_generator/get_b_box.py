@@ -1,5 +1,3 @@
-import bpy
-from mathutils import Vector
 """
 Copied from StackOverflow
 https://blender.stackexchange.com/questions/7198/save-the-2d-bounding-box-of-an-object-in-rendered-image-to-a-text-file
@@ -64,6 +62,7 @@ def camera_view_bounds_2d(scene, cam_ob, me_ob):
     """
 
     mat = cam_ob.matrix_world.normalized().inverted()
+    import bpy
     depsgraph = bpy.context.evaluated_depsgraph_get()
     mesh_eval = me_ob.evaluated_get(depsgraph)
     me = mesh_eval.to_mesh()
@@ -176,6 +175,7 @@ def clamp(x, minimum, maximum):
 def write_bounds_2d_return(scene, cam_ob, me_ob, frame_start, frame_end):
     curbox = None
     for frame in range(frame_start, frame_start + 1):
+        import bpy
         bpy.context.scene.frame_set(frame)
         min_x, min_y, max_x, max_y, dim_x, dim_y = camera_view_bounds_2d(scene, cam_ob, me_ob[0])
         for one_me_ob in me_ob[1:]:

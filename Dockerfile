@@ -2,7 +2,7 @@
 #FROM nvcr.io/nvidia/pytorch:21.12-py3
 #FROM python:3.9.7-slim
 #FROM nvidia/cuda:11.4.0-runtime-ubuntu20.04
-FROM nvidia/cuda:11.4.2-devel-ubuntu20.04
+FROM nvidia/cuda:11.4.3-devel-ubuntu20.04
 #FROM nvidia/cuda:11.6.2-runtime-ubuntu20.04
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 # installations for python

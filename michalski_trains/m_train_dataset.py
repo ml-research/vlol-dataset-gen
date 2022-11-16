@@ -67,6 +67,7 @@ class MichalskiTrainDataset(Dataset):
                                  std=[0.229, 0.224, 0.225]),
         ]
         if resize:
+            print('resize true')
             trans.append(transforms.Resize((224, 224), interpolation=InterpolationMode.BICUBIC))
         self.norm = transforms.Compose(trans)
         self.normalize_mask = transforms.Compose([
@@ -117,8 +118,7 @@ class MichalskiTrainDataset(Dataset):
         return self.labels
 
 
-def get_datasets(base_scene, raw_trains, train_vis, ds_size, class_rule='theoryx', resize=False,
-                 ds_path='output/image_generator'):
+def get_datasets(base_scene, raw_trains, train_vis, ds_size, ds_path, class_rule='theoryx', resize=False):
     path_ori = f'{ds_path}/{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
     if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
         combine_json(base_scene, raw_trains, train_vis, class_rule, ds_size=ds_size)
@@ -145,6 +145,7 @@ def get_datasets(base_scene, raw_trains, train_vis, ds_size, class_rule='theoryx
         raise AssertionError(
             f'no JSON found')
     # image_count = None for standard image count
-    full_ds = MichalskiTrainDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains, train_vis=train_vis,
+    full_ds = MichalskiTrainDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
+                                    train_vis=train_vis,
                                     train_count=ds_size, resize=resize, ds_path=ds_path)
     return full_ds

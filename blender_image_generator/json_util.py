@@ -2,7 +2,6 @@ import glob
 import shutil
 from datetime import datetime
 
-import bpy
 import cv2
 import sys
 import os
@@ -65,6 +64,7 @@ def restore_img(m_train, t_num, raw_trains, train_vis, base_scene, class_rule):
     :return: obj_mask (dictionary)  : Michalski train object masks
     """
     blender_objects = {}
+    import bpy
     for obj in bpy.data.objects:
         if obj.pass_index in blender_objects:
             blender_objects[obj.pass_index].append(obj)
