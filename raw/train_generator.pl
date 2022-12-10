@@ -226,7 +226,6 @@ has_roof2(C,solid_roof) :- arg(5,C,flat).
 has_roof2(C,braced_roof) :- arg(5,C,jagged).
 has_roof2(C,peaked_roof) :- arg(5,C,peaked).
 
-
 roof_open3(none).
 roof_foundation3(roof_foundation).
 solid_roof3(solid_roof).
