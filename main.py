@@ -64,7 +64,7 @@ def main():
         combine_json(base_scene, raw_trains, train_vis, rule, out_dir=out_path, ds_size=ds_size)
 
     if args.command == 'ct':
-        from concept_tester import eval_rule
+        from raw.concept_tester import eval_rule
         eval_rule()
 
 

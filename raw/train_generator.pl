@@ -189,16 +189,10 @@ append([H|L1],L2,[H|L3]) :-
 
 
 grey(C) :- car_color(C,grey).
-red(C) :- car_color(C,red).
 yellow(C) :- car_color(C,yellow).
+red(C) :- car_color(C,red).
 blue(C) :- car_color(C,blue).
 green(C) :- car_color(C,green).
-
-grey(grey).
-red(red).
-yellow(yellow).
-blue(blue).
-green(green).
 
 roof_open(C) :- has_roof2(C,none).
 roof_foundation(C) :- has_roof2(C,roof_foundation).
@@ -206,28 +200,12 @@ solid_roof(C) :- has_roof2(C,solid_roof).
 braced_roof(C) :- has_roof2(C,braced_roof).
 peaked_roof(C) :- has_roof2(C,peaked_roof).
 
-roof_open(none).
-roof_foundation(roof_foundation).
-solid_roof(solid_roof).
-braced_roof(braced_roof).
-peaked_roof(peaked_roof).
-
-/* comment
 box(C) :- has_payload(C,box).
 golden_vase(C) :- has_payload(C,golden_vase).
 barrel(C) :- has_payload(C,barrel).
 diamond(C) :- has_payload(C,diamond).
 metal_pot(C) :- has_payload(C,metal_pot).
 oval_vase(C) :- has_payload(C,oval_vase).
-*/
-
-
-box(box).
-golden_vase(golden_vase).
-barrel(barrel).
-diamond(diamond).
-metal_pot(metal_pot).
-oval_vase(oval_vase).
 
 car_color(C,grey) :- arg(2,C,ellipse).
 car_color(C,red) :- arg(2,C,hexagon).
@@ -249,26 +227,58 @@ has_roof2(C,braced_roof) :- arg(5,C,jagged).
 has_roof2(C,peaked_roof) :- arg(5,C,peaked).
 
 
-%car_color(C,grey(R)) :- arg(2,C,ellipse).
-%car_color(C,red(R)) :- arg(2,C,hexagon).
-%car_color(C,yellow(R)) :- arg(2,C,rectangle).
-%car_color(C,R) :- arg(2,C,u_shaped), blue(R).
-%car_color(C,green(R)) :- arg(2,C,bucket).
+roof_open3(none).
+roof_foundation3(roof_foundation).
+solid_roof3(solid_roof).
+braced_roof3(braced_roof).
+peaked_roof3(peaked_roof).
 
-%has_payload(C,box(R)) :- arg(7,C,rectangle).
-%has_payload(C,golden_vase(R)) :- arg(7,C,triangle).
-%has_payload(C,barrel(R)) :- arg(7,C,circle).
-%has_payload(C,diamond(R)) :- arg(7,C,diamond).
-%has_payload(C,metal_pot(R)) :- arg(7,C,hexagon).
-%has_payload(C,oval_vase(R)) :- arg(7,C,utriangle).
+grey3(grey).
+yellow3(yellow).
+red3(red).
+blue3(blue).
+green3(green).
 
-%has_roof2(C,open_roof(R)) :- arg(5,C,none).
-%has_roof2(C,roof_foundation(R)) :- arg(5,C,arc).
-%has_roof2(C,solid_roof(R)) :- arg(5,C,flat).
-%has_roof2(C,braced_roof(R)) :- arg(5,C,jagged).
-%has_roof2(C,peaked_roof(R)) :- arg(5,C,peaked).
+box3(box).
+golden_vase3(golden_vase).
+barrel3(barrel).
+diamond3(diamond).
+metal_pot3(metal_pot).
+oval_vase3(oval_vase).
 
+car_color3(C,grey(_R)) :- arg(2,C,ellipse).
+car_color3(C,red(_R)) :- arg(2,C,hexagon).
+car_color3(C,yellow(_R)) :- arg(2,C,rectangle).
+car_color3(C,blue(_R)) :- arg(2,C,u_shaped).
+car_color3(C,green(_R)) :- arg(2,C,bucket).
 
+has_payload3(C,box(_R)) :- arg(7,C,rectangle).
+has_payload3(C,golden_vase(_R)) :- arg(7,C,triangle).
+has_payload3(C,barrel(_R)) :- arg(7,C,circle).
+has_payload3(C,diamond(_R)) :- arg(7,C,diamond).
+has_payload3(C,metal_pot(_R)) :- arg(7,C,hexagon).
+has_payload3(C,oval_vase(_R)) :- arg(7,C,utriangle).
+
+has_roof3(C,open_roof(_R)) :- arg(5,C,none).
+has_roof3(C,roof_foundation(_R)) :- arg(5,C,arc).
+has_roof3(C,solid_roof(_R)) :- arg(5,C,flat).
+has_roof3(C,braced_roof(_R)) :- arg(5,C,jagged).
+has_roof3(C,peaked_roof(_R)) :- arg(5,C,peaked).
 
 solid_wall(C) :- arg(4,C,not_double).
 braced_wall(C) :- arg(4,C,double).
+
+unload_last_source:-
+  findall(Source, source_file(Source), LSource),
+  reverse(LSource, [Source|_]),
+  unload_source(Source).
+
+unload_source(Source):-
+  ground(Source),
+  source_file(Pred, Source),
+  functor(Pred, Functor, Arity),
+  abolish(Functor/Arity),
+  fail.
+
+unload_source(_).
+
