@@ -6,7 +6,7 @@ import pyswip
 from pyswip import newModule, Prolog
 
 
-def eval_rule(theory: str = None, ds_val: str = None, ds_train: str = None, dir='', print_stats=True, clean_up=True):
+def eval_rule(theory: str = None, ds_val: str = None, ds_train: str = None, dir='TrainGenerator/', print_stats=True, clean_up=True):
     name = f'tmp_{random.randint(1, 1000)}'
     # test1 = newModule(name)
 
@@ -26,11 +26,9 @@ def eval_rule(theory: str = None, ds_val: str = None, ds_train: str = None, dir=
                 generator.write(theory)
 
     prolog = Prolog()
-    if bool(list(prolog.query(f'source_file(\'{os.path.abspath(concept_tester_tmp)}\').'))):
-        raise EnvironmentError('previous source file loaded')
     # prolog._init_prolog_thread()
     prolog.consult(os.path.abspath(concept_tester_tmp))
-    # prolog.query(f'load_files([library(\'{os.path.abspath(concept_tester_tmp)})\']).')
+    # prolog.query(f'consult({os.path.abspath(concept_tester_tmp)}).')
     ds_val = f'output/image_generator/dataset_descriptions/MichalskiTrains_theoryx.txt' if ds_val is None else ds_val
     datasets = [ds_train, ds_val]
     TP, FN, TN, FP, TP_train, FN_train, TN_train, FP_train = [0] * 8

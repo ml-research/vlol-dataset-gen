@@ -266,18 +266,3 @@ has_roof3(C,peaked_roof(_R)) :- arg(5,C,peaked).
 
 solid_wall(C) :- arg(4,C,not_double).
 braced_wall(C) :- arg(4,C,double).
-
-unload_last_source:-
-  findall(Source, source_file(Source), LSource),
-  reverse(LSource, [Source|_]),
-  unload_source(Source).
-
-unload_source(Source):-
-  ground(Source),
-  source_file(Pred, Source),
-  functor(Pred, Functor, Arity),
-  abolish(Functor/Arity),
-  fail.
-
-unload_source(_).
-
