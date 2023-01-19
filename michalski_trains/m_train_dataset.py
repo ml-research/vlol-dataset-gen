@@ -1,5 +1,6 @@
 import json
 import os
+import random
 
 import jsonpickle
 import torch
@@ -12,7 +13,7 @@ from blender_image_generator.json_util import merge_json_files, combine_json
 
 
 class MichalskiTrainDataset(Dataset):
-    def __init__(self, class_rule, base_scene, raw_trains, train_vis, train_count=10000, resize=False,
+    def __init__(self, class_rule, base_scene, raw_trains, train_vis, train_count=10000, resize=False, label_noise=0,
                  ds_path='output/image_generator',
                  ):
         """ MichalskiTrainDataset
@@ -76,6 +77,21 @@ class MichalskiTrainDataset(Dataset):
                                  std=[0.5, 0.5, 0.5]),
         ])
 
+        if label_noise > 0:
+            print(f'applying noise of {label_noise} to dataset labels')
+            for train in self.trains:
+                n = random.random()
+                if n < label_noise:
+                    lab = train.get_label()
+                    if lab == 'east':
+                        train.set_label('west')
+                    elif lab == 'west':
+                        train.set_label('east')
+                    else:
+                        raise ValueError(f'unexpected label value {lab}, expected value east or west')
+
+
+
     def __getitem__(self, item):
 
         image = self.get_pil_image(item)
@@ -118,7 +134,7 @@ class MichalskiTrainDataset(Dataset):
         return self.labels
 
 
-def get_datasets(base_scene, raw_trains, train_vis, ds_size, ds_path, class_rule='theoryx', resize=False):
+def get_datasets(base_scene, raw_trains, train_vis, ds_size, ds_path, class_rule='theoryx', resize=False, noise=0):
     path_ori = f'{ds_path}/{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
     if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
         combine_json(base_scene, raw_trains, train_vis, class_rule, ds_size=ds_size)
@@ -146,6 +162,6 @@ def get_datasets(base_scene, raw_trains, train_vis, ds_size, ds_path, class_rule
             f'no JSON found')
     # image_count = None for standard image count
     full_ds = MichalskiTrainDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
-                                    train_vis=train_vis,
+                                    train_vis=train_vis, label_noise=noise,
                                     train_count=ds_size, resize=resize, ds_path=ds_path)
     return full_ds

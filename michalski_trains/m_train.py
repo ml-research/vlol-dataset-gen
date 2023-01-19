@@ -41,6 +41,9 @@ class MichalskiTrain(object):
     def get_label(self):
         return self.direction
 
+    def set_label(self, label):
+        self.direction = label
+
     def get_angle(self):
         return self.angle
 
