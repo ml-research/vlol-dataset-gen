@@ -1,11 +1,20 @@
-import json
 import math
-
 import jsonpickle
 
 
 class MichalskiTrain(object):
+    '''
+    A Michalski train object that contains the train data (either a list of Blendercar objects or a list of SimpleCar objects)
+    i.e. a list of MichalskiCar objects and the train label and angle of rotation as well as its scale.
+    '''
+
     def __init__(self, m_cars, direction, angle, scale=(0.5, 0.5, 0.5)):
+        '''
+        @param m_cars: list of MichalskiCar objects
+        @param direction: direction of train
+        @param angle: angle of train rotation
+        @param scale: scale of train
+        '''
         self.m_cars = m_cars
         self.direction = direction
         self.angle = int(angle)
@@ -81,7 +90,22 @@ class MichalskiTrain(object):
 
 
 class MichalskiCar(object):
+    '''
+    original Michalski car object that contains the original attributes and values
+    car number, shape, length, wall, roof, wall, wheels, payload number, and payload shape
+    '''
+
     def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num):
+        '''
+        @param n: car number
+        @param shape: car shape
+        @param length: car length
+        @param double: car wall
+        @param roof: car roof
+        @param wheels: car wheels
+        @param l_shape: payload shape
+        @param l_num: payload number
+        '''
         self.index = None
         self.blender_cords = {}
         self.n, self.shape, self.length, self.double, self.roof, self.wheels, self.l_num, self.l_shape = int(
@@ -118,6 +142,17 @@ class MichalskiCar(object):
 
 class BlenderCar(MichalskiCar):
     def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num, scale=(0.5, 0.5, 0.5)):
+        '''
+        Blender car object that inherits from MichalskiCar and contains the blender attributes and values
+        @param n: car number
+        @param shape: car shape
+        @param length: car length
+        @param double: car wall
+        @param roof: car roof
+        @param wheels: car wheels
+        @param l_shape: payload shape
+        @param l_num: payload number
+        '''
         super().__init__(n, shape, length, double, roof, wheels, l_shape, l_num)
         self.scale = scale
         self.car_length_scalar = {
@@ -193,7 +228,7 @@ class BlenderCar(MichalskiCar):
 
     def get_all_blender_att(self):
         return self.get_blender_car_color(), self.get_car_length(), self.get_blender_wall(), self.get_blender_roof(), \
-               self.get_car_wheels(), self.get_load_number(), self.get_blender_payload()
+            self.get_car_wheels(), self.get_load_number(), self.get_blender_payload()
 
     # attribute index used for blender segmentation
     def set_index(self, index):
@@ -225,6 +260,18 @@ class BlenderCar(MichalskiCar):
 
 
 class SimpleCar(BlenderCar):
+    '''
+    Simple car object that inherits from Blendercar and contains the simple attributes and values
+    @param n: car number
+    @param shape: car shape
+    @param length: car length
+    @param double: car wall
+    @param roof: car roof
+    @param wheels: car wheels
+    @param l_shape: payload shape
+    @param l_num: payload number
+    '''
+
     def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num, scale=(0.5, 0.5, 0.5)):
         super().__init__(n, shape, length, double, roof, wheels, l_shape, l_num, scale)
 

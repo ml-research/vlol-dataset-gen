@@ -3,10 +3,10 @@ import os
 import random
 from pyswip import Prolog
 
-from michalski_trains.m_train import BlenderCar, MichalskiTrain, SimpleCar
+from michalski_trains.m_train import Blendercar, MichalskiTrain, SimpleCar
 
 
-def gen_raw_michalski_trains(class_rule, out_path, num_entries=10000, with_occlusion=False):
+def gen_raw_michalski_trains(class_rule, out_path, num_entries=10000, with_occlusion=False, min_cars=2, max_cars=4):
     """ Generate Michalski trains descriptions using the Prolog train generator
         labels are derived by the classification rule
     Args:
@@ -58,13 +58,15 @@ def gen_raw_michalski_trains(class_rule, out_path, num_entries=10000, with_occlu
     os.remove(generator_tmp)
 
 
-def gen_raw_random_trains(class_rule, out_path, num_entries=10000, with_occlusion=False):
+def gen_raw_random_trains(class_rule, out_path, num_entries=10000, with_occlusion=False, min_cars=2, max_cars=4):
     """ Generate random trains descriptions
     Args:
         out_path: string path to save the generated train descriptions
         class_rule: str, classification rule used to derive the labels
         num_entries: int number of michalski trains which are generated
         with_occlusion: boolean whether to include occlusion of the train payloads
+        max_cars: int maximum number of cars in a train
+        min_cars: int minimum number of cars in a train
     """
     classifier = 'raw/tmp/concept_tester_tmp.pl'
     os.makedirs('raw/tmp/', exist_ok=True)
@@ -93,7 +95,7 @@ def gen_raw_random_trains(class_rule, out_path, num_entries=10000, with_occlusio
             train = ''
             m_cars = f''
 
-            num_cars = random.randint(3, 4)
+            num_cars = random.randint(min_cars, max_cars)
             for j in range(num_cars):
                 train += ', ' if len(train) > 0 else ''
 
@@ -135,7 +137,8 @@ def gen_raw_random_trains(class_rule, out_path, num_entries=10000, with_occlusio
     os.remove(classifier)
 
 
-def gen_raw_trains(train_col, classification_rule, out_path, num_entries=10000, replace_existing=True, with_occlusion=False):
+def gen_raw_trains(train_col, classification_rule, out_path, num_entries=10000, replace_existing=True,
+                   with_occlusion=False, min_cars=2, max_cars=4):
     """ Generate random or Michalski train descriptions
     Args:
         train_col: string type of train which is generated available options: 'RandomTrains' and 'MichalskiTrains'
@@ -148,9 +151,9 @@ def gen_raw_trains(train_col, classification_rule, out_path, num_entries=10000, 
     os.makedirs("raw/datasets/", exist_ok=True)
     if replace_existing:
         if train_col == 'RandomTrains':
-            gen_raw_random_trains(classification_rule, out_path, num_entries, with_occlusion)
+            gen_raw_random_trains(classification_rule, out_path, num_entries, with_occlusion, min_cars, max_cars)
         elif train_col == 'MichalskiTrains':
-            gen_raw_michalski_trains(classification_rule, out_path, num_entries, with_occlusion)
+            gen_raw_michalski_trains(classification_rule, out_path, num_entries, with_occlusion, min_cars, max_cars)
 
 
 def read_trains(file, toSimpleObjs=False):
@@ -173,7 +176,7 @@ def read_trains(file, toSimpleObjs=False):
         for c in range(len(l) // 8):
             ind = c * 8
             # a = (l[ind+i] for i in range(8))
-            car = BlenderCar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6], l[ind + 7], l[ind + 8],
+            car = Blendercar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6], l[ind + 7], l[ind + 8],
                              l[ind + 9].strip('\n'))
             if toSimpleObjs:
                 car = SimpleCar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6], l[ind + 7], l[ind + 8],

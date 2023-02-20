@@ -1,7 +1,7 @@
 from rtpt import RTPT
 
-from blender_image_generator.json_util import combine_json
 from blender_image_generator.m_train_image_generation import generate_image
+from michalski_trains.michalskitraindataset import combine_json
 from raw.gen_raw_trains import gen_raw_trains, read_trains
 from util import *
 import argparse
@@ -30,16 +30,19 @@ def main():
         # generate images in range [start_ind:end_ind]
         ds_size = args.dataset_size
         start_ind = args.index_start
+        min_cars, max_cars = args.min_cars, args.max_cars
         end_ind = args.index_end if args.index_end is not None else ds_size
-        ds_raw_path = f'{out_path}/dataset_descriptions/{raw_trains}_{rule}.txt'
+        ds_raw_path = f'{out_path}/dataset_descriptions/{raw_trains}/{rule}_car_length_{min_cars}_{max_cars}.txt'
         if start_ind > ds_size or end_ind > ds_size:
             raise ValueError(f'start index or end index greater than dataset size')
-        print(f'generating {train_vis} images using {raw_trains} descriptions the labels are derived by {rule}')
-        print(f'The images are set in the {base_scene} background')
+        print(f'generating {train_vis} images using {raw_trains} descriptions with {min_cars} to {max_cars} cars, '
+              f'the labels are derived frome the {rule} classification rule, '
+              f'the images are set in the {base_scene} background')
 
         # generate raw trains if they do not exist or shall be replaced
         if not os.path.isfile(ds_raw_path) or replace_descriptions:
-            gen_raw_trains(raw_trains, rule, with_occlusion=with_occlusion, num_entries=ds_size, out_path=ds_raw_path)
+            gen_raw_trains(raw_trains, rule, min_cars=min_cars, max_cars=max_cars,
+                           with_occlusion=with_occlusion, num_entries=ds_size, out_path=ds_raw_path)
 
         num_lines = sum(1 for _ in open(ds_raw_path))
         if num_lines != ds_size:
@@ -106,6 +109,8 @@ def parse():
                                                                             '\'Trains\' or \'SimpleObjects\'')
     parser.add_argument('--background_scene', type=str, default='base_scene',
                         help='Scene in which the trains are set: base_scene, desert_scene, sky_scene or fisheye_scene')
+    parser.add_argument('--max_cars', type=int, default=4, help='max number of cars a train can have')
+    parser.add_argument('--min_cars', type=int, default=2, help='min number of cars a train can have')
 
     parser.add_argument('--cuda', type=int, default=0,
                         help='Which cuda device to use')

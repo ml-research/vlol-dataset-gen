@@ -1,35 +1,32 @@
+import glob
+from datetime import datetime
 import json
 import os
 import random
-
+import shutil
 import jsonpickle
 import torch
 from torch.utils.data import Dataset
 from PIL import Image
 from torchvision import transforms
-from torchvision.transforms import InterpolationMode
 
-from blender_image_generator.json_util import merge_json_files, combine_json
+from michalski_trains.m_train import *
 
 
 class MichalskiTrainDataset(Dataset):
     def __init__(self, class_rule, base_scene, raw_trains, train_vis, train_count=10000, resize=False, label_noise=0,
-                 ds_path='output/image_generator',
-                 ):
+                 ds_path='output/image_generator'):
         """ MichalskiTrainDataset
-            Args:
-                val: bool if model is used for vaildation
-                resize: bool if true images are resized to 224x224
-                :param:  raw_trains (string): typ of train descriptions 'RandomTrains' or 'MichalskiTrains'
-                :param:  train_vis (string): visualization of the train description either 'MichalskiTrains' or
-                'SimpleObjects'
-            @return:
-                X_val: X value output for training data returned in __getitem__()
-                ['image', 'predicted_attributes', 'gt_attributes', 'gt_attributes_individual_class', 'predicted_mask', gt_mask]
-                        image (torch): image of michalski train
-
-                y_val: ['direction','attribute','mask'] y label output for training data returned in __getitem__()
-
+            @param class_rule (string): classification rule
+            @param base_scene (string): background scene
+            @param raw_trains (string): typ of train descriptions 'RandomTrains' or 'MichalskiTrains'
+            @param train_vis (string): visualization of the train description either 'MichalskiTrains' or 'SimpleObjects'
+            @param train_count (int): number of train images
+            @param resize: bool if true images are resized to 224x224
+            @param label_noise: float between 0 and 1. If > 0, labels are flipped with the given probability
+            @param ds_path: path to the dataset
+            @return X_val: image data
+            @return y_val: label data
             """
         self.images = []
         self.trains = []
@@ -58,8 +55,10 @@ class MichalskiTrainDataset(Dataset):
             for scene in all_scenes['scenes'][:train_count]:
                 self.images.append(scene['image_filename'])
                 # self.depths.append(scene['depth_map_filename'])
-                train = jsonpickle.decode(scene['m_train'])
-                self.trains.append(train)
+                train = scene['m_train']
+                # self.trains.append(
+                #     train.replace('michalski_trains.m_train.', 'm_train.'))
+                self.trains.append(jsonpickle.decode(train))
                 self.masks.append(scene['car_masks'])
 
         trans = [
@@ -69,7 +68,7 @@ class MichalskiTrainDataset(Dataset):
         ]
         if resize:
             print('resize true')
-            trans.append(transforms.Resize((224, 224), interpolation=InterpolationMode.BICUBIC))
+            trans.append(transforms.Resize((224, 224), interpolation=transforms.InterpolationMode.BICUBIC))
         self.norm = transforms.Compose(trans)
         self.normalize_mask = transforms.Compose([
             # transforms.ToTensor(),
@@ -89,8 +88,6 @@ class MichalskiTrainDataset(Dataset):
                         train.set_label('east')
                     else:
                         raise ValueError(f'unexpected label value {lab}, expected value east or west')
-
-
 
     def __getitem__(self, item):
 
@@ -134,7 +131,21 @@ class MichalskiTrainDataset(Dataset):
         return self.labels
 
 
-def get_datasets(base_scene, raw_trains, train_vis, ds_size, ds_path, class_rule='theoryx', resize=False, noise=0):
+def get_datasets(base_scene='base_scene', raw_trains='MichalskiTrains', train_vis='Trains', ds_size=12000,
+                 ds_path='output/image_generator', class_rule='theoryx', resize=False, noise=0):
+    """
+    Returns the train and validation dataset for the given parameters
+    Args:
+        @param base_scene: string scene to be used for the dataset
+        @param raw_trains: train description to be used for the dataset
+        @param train_vis: train visualization to be used for the dataset
+        @param ds_size: dataset size
+        @param ds_path: path to the dataset
+        @param class_rule: class rule to be used for the dataset
+        @param resize: whether to resize the images to 224x224
+        @param noise: whether to apply noise to the labels
+    @return: michalski train dataset
+    """
     path_ori = f'{ds_path}/{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
     if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
         combine_json(base_scene, raw_trains, train_vis, class_rule, ds_size=ds_size)
@@ -165,3 +176,44 @@ def get_datasets(base_scene, raw_trains, train_vis, ds_size, ds_path, class_rule
                                     train_vis=train_vis, label_noise=noise,
                                     train_count=ds_size, resize=resize, ds_path=ds_path)
     return full_ds
+
+
+def combine_json(base_scene, raw_trains, train_vis, class_rule, out_dir='output/image_generator', ds_size=10000):
+    path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
+    path_ori = f'tmp/image_generator/{path_settings}'
+    path_dest = f'{out_dir}/{path_settings}'
+    im_path = path_ori + '/images'
+    if os.path.isdir(im_path):
+        files = os.listdir(im_path)
+        if len(files) == ds_size:
+            merge_json_files(path_ori)
+            shutil.rmtree(path_ori + '/scenes')
+            try:
+                shutil.rmtree(path_dest)
+            except:
+                pass
+            shutil.move(path_ori, path_dest)
+
+
+def merge_json_files(path):
+    """
+    merging all ground truth json files of the dataset
+    :param:  path (string)        : path to the dataset information
+    """
+    all_scenes = []
+    for p in glob.glob(path + '/scenes/*_m_train.json'):
+        with open(p, 'r') as f:
+            all_scenes.append(json.load(f))
+    output = {
+        'info': {
+            'date': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+            'version': '0.1',
+            'license': None,
+        },
+        'scenes': all_scenes
+    }
+    json_pth = path + '/all_scenes/all_scenes.json'
+    os.makedirs(path + '/all_scenes/', exist_ok=True)
+    # args.output_scene_file.split('.json')[0]+'_classid_'+str(args.img_class_id)+'.json'
+    with open(json_pth, 'w+') as f:
+        json.dump(output, f, indent=2)

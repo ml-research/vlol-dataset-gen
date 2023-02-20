@@ -112,3 +112,5 @@ fabric.properties
 /output/
 *.blend1
 /raw/tmp/
+
+.DS_Store
