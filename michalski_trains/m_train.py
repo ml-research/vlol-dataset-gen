@@ -4,7 +4,7 @@ import jsonpickle
 
 class MichalskiTrain(object):
     '''
-    A Michalski train object that contains the train data (either a list of Blendercar objects or a list of SimpleCar objects)
+    A Michalski train object that contains the train data (either a list of BlenderCar objects or a list of SimpleCar objects)
     i.e. a list of MichalskiCar objects and the train label and angle of rotation as well as its scale.
     '''
 
@@ -261,7 +261,7 @@ class BlenderCar(MichalskiCar):
 
 class SimpleCar(BlenderCar):
     '''
-    Simple car object that inherits from Blendercar and contains the simple attributes and values
+    Simple car object that inherits from BlenderCar and contains the simple attributes and values
     @param n: car number
     @param shape: car shape
     @param length: car length

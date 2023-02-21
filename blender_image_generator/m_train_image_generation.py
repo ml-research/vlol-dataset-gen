@@ -10,7 +10,7 @@ import time
 
 
 def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, save_blender=False, replace_existing_img=True,
-                   high_res=False, gen_depth=False):
+                   high_res=False, gen_depth=False, min_cars=2, max_cars=4):
     """ assemble a michalski train, render its corresponding image and generate ground truth information
     Args:
     :param:  base_scene (string)            : background scene of the train ('base_scene', 'desert_scene', 'sky_scene',
@@ -28,7 +28,7 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
     """
 
     start = time.time()
-    path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
+    path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_cars}-{max_cars}'
     output_image = f'tmp/image_generator/{path_settings}/images/{t_num}_m_train.png'
     output_blendfile = f'tmp/image_generator/{path_settings}/blendfiles/{t_num}_m_train.blend'
     output_scene = f'tmp/image_generator/{path_settings}/scenes/{t_num}_m_train.json'
@@ -88,6 +88,8 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
         'train_description': raw_trains,
         'classification_rule': class_rule,
         'visualization': train_vis,
+        'min_cars': min_cars,
+        'max_cars': max_cars,
         'image_index': t_num,
         'image_filename': os.path.basename(output_image),
         'blender_filename': os.path.basename(output_blendfile),
@@ -156,7 +158,7 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
     assets_time = time.time()
     # print('time needed load assets: ' + str(assets_time - load_obj_time))
 
-    create_tree(train, t_num, raw_trains, train_vis, base_scene, gen_depth, class_rule)
+    create_tree(train, t_num, gen_depth, path_settings)
     tree_time = time.time()
 
     # print('time needed tree: ' + str(tree_time - asset_time))
@@ -170,12 +172,12 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
 
     # print('time needed for render: ' + str(render_time - tree_time))
 
-    obj_mask = restore_img(train, t_num, raw_trains, train_vis, base_scene, class_rule)
+    obj_mask = restore_img(train, t_num, path_settings)
 
     scene_struct['car_masks'] = obj_mask
 
     if gen_depth:
-        restore_depth_map(t_num, output_depth_map, raw_trains, train_vis, base_scene, class_rule)
+        restore_depth_map(t_num, output_depth_map, path_settings)
 
     if save_blender:
         bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(output_blendfile))

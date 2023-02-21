@@ -2,8 +2,7 @@ import math
 import os
 import random
 from pyswip import Prolog
-
-from michalski_trains.m_train import Blendercar, MichalskiTrain, SimpleCar
+from michalski_trains.m_train import BlenderCar, MichalskiTrain, SimpleCar
 
 
 def gen_raw_michalski_trains(class_rule, out_path, num_entries=10000, with_occlusion=False, min_cars=2, max_cars=4):
@@ -22,7 +21,7 @@ def gen_raw_michalski_trains(class_rule, out_path, num_entries=10000, with_occlu
         os.remove(generator_tmp)
     except OSError:
         pass
-    with open("raw/train_generator.pl", 'r') as gen, open(rule_path, 'r') as rule:
+    with open("raw/train_generator_long_cars.pl", 'r') as gen, open(rule_path, 'r') as rule:
         with open(generator_tmp, 'w+') as generator:
             generator.write(gen.read())
             generator.write(rule.read())
@@ -41,7 +40,8 @@ def gen_raw_michalski_trains(class_rule, out_path, num_entries=10000, with_occlu
                 os.remove(f'raw/tmp/MichalskiTrains.txt')
             except OSError:
                 pass
-            for _ in prolog.query(f"loop({1})."):
+            n_cars = random.randint(min_cars, max_cars)
+            for _ in prolog.query(f"loop({1},{n_cars})."):
                 continue
             train = open('raw/tmp/MichalskiTrains.txt', 'r').read()
             t_angle = get_random_angle(with_occlusion)
@@ -176,7 +176,7 @@ def read_trains(file, toSimpleObjs=False):
         for c in range(len(l) // 8):
             ind = c * 8
             # a = (l[ind+i] for i in range(8))
-            car = Blendercar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6], l[ind + 7], l[ind + 8],
+            car = BlenderCar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6], l[ind + 7], l[ind + 8],
                              l[ind + 9].strip('\n'))
             if toSimpleObjs:
                 car = SimpleCar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6], l[ind + 7], l[ind + 8],

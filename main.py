@@ -32,7 +32,7 @@ def main():
         start_ind = args.index_start
         min_cars, max_cars = args.min_cars, args.max_cars
         end_ind = args.index_end if args.index_end is not None else ds_size
-        ds_raw_path = f'{out_path}/dataset_descriptions/{raw_trains}/{rule}_car_length_{min_cars}_{max_cars}.txt'
+        ds_raw_path = f'{out_path}/dataset_descriptions/{rule}/{raw_trains}_car_length_{min_cars}-{max_cars}.txt'
         if start_ind > ds_size or end_ind > ds_size:
             raise ValueError(f'start index or end index greater than dataset size')
         print(f'generating {train_vis} images using {raw_trains} descriptions with {min_cars} to {max_cars} cars, '
@@ -63,7 +63,7 @@ def main():
         for t_num, train in enumerate(trains, start=start_ind):
             rtpt.step()
             generate_image(rule, base_scene, raw_trains, train_vis, t_num, train, save_blender, replace_existing_img,
-                           high_res=high_res, gen_depth=gen_depth)
+                           high_res=high_res, gen_depth=gen_depth, min_cars=min_cars, max_cars=max_cars)
         combine_json(base_scene, raw_trains, train_vis, rule, out_dir=out_path, ds_size=ds_size)
 
     if args.command == 'ct':
