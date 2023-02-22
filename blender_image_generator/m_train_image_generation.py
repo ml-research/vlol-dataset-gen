@@ -129,22 +129,21 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
         # determine engine spawn position (which is located at the end of the engine)
         offset = train.get_car_length('engine') - 0.675 * train.get_blender_scale()[0]
         engine_pos = r + offset
-
+        # load train at scale 1, z = -0.307
+        off_z = -0.307 * train.get_blender_scale()[0]
         # move rotation point away from camera
-        offset = [0, -0.1]
-        xd = engine_pos * math.cos(alpha) + offset[0]
-        yd = engine_pos * math.sin(alpha) + offset[1]
-        # load train engine, use mat='black_metal' for black engine metal
-        mat = None
-        # load rails at scale 0.6, z = -0.176
-        off_z = -0.176 * train.get_blender_scale()[0] / 0.6
-        train_init_cord = [xd, yd, off_z]
+        pos = [0, -0.1, off_z]
+        train_init_cord = get_new_pos(pos, engine_pos, alpha)
+        # xd = engine_pos * math.cos(alpha) + offset[0]
+        # yd = engine_pos * math.sin(alpha) + offset[1]
+        # train_init_cord = [xd, yd, off_z]
+
         # load engine
+        # use mat='black_metal' for black engine metal
+        mat = None
         load_engine(train_collection, train_init_cord, alpha, mat, scale=train.get_blender_scale())
-        # load rails at scale 0.6, z = -0.155
-        off_z = -0.155 * train.get_blender_scale()[0] / 0.6
-        rail_cord = offset + [off_z]
-        # load rails
+        # load rails at z = 0
+        rail_cord = [0, -0.1, 0]
         load_rails(train_collection, rail_cord, alpha, base_scene, scale=train.get_blender_scale())
         # create and load trains into blender
         create_train(train, train_collection, train_init_cord, alpha)
