@@ -53,7 +53,8 @@ def main():
                 f'add \'--replace_descriptions\' to command line arguments to the replace existing train descriptions and '
                 f'generate the correct number of michalski trains')
         # load trains
-        trains = read_trains(ds_raw_path, toSimpleObjs=train_vis == 'SimpleObjects')
+        scale = (2.5/(max_cars + 1), 2.5/(max_cars + 1), 2.5/(max_cars + 1))
+        trains = read_trains(ds_raw_path, toSimpleObjs=train_vis == 'SimpleObjects', scale=scale)
 
         # render trains
         trains = trains[start_ind:end_ind]

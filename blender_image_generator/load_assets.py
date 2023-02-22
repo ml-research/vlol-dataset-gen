@@ -55,7 +55,7 @@ def load_base_scene(filepath, collection):
                 bpy.context.scene.camera = obj
 
 
-def load_engine(train_collection, location, alpha, metal_mat=None):
+def load_engine(train_collection, location, alpha, metal_mat=None, scale=(0.5, 0.5, 0.5)):
     """
     load the train engine to the scene
     :param:  train_collection (object)      : collection in which the train is added
@@ -70,7 +70,7 @@ def load_engine(train_collection, location, alpha, metal_mat=None):
     link = False
     my_collection = bpy.data.collections.new(collection)
     train_collection.children.link(my_collection)
-    load_asset(filepath, alpha, location, my_collection, link, metal_color=metal_mat)
+    load_asset(filepath, alpha, location, my_collection, link, metal_color=metal_mat, init_obj_scale=scale)
 
 
 def load_rails(train_collection, location, alpha, base_scene, scale=(0.5, 0.5, 0.5)):
@@ -87,24 +87,24 @@ def load_rails(train_collection, location, alpha, base_scene, scale=(0.5, 0.5, 0
     collection = 'rails'
     # append, set to true to keep the link to the original file
     # link all objects
-    radius = 100
+    radius = 50 * 1/scale[0]
     rail_length = 9.015 * scale[0]
     cur_loc = location.copy()
     link = False
     alpha_to_cam = alpha % math.pi
     my_collection = bpy.data.collections.new(collection)
     train_collection.children.link(my_collection)
-    load_asset(filepath, alpha, location, my_collection, link)
+    load_asset(filepath, alpha, location, my_collection, link, init_obj_scale=scale)
     b_box = (1, 1, 1, 1)
     while cur_loc[0] ** 2 + cur_loc[1] ** 2 < radius ** 2 and (b_box != (0, 0, 0, 0) or base_scene == 'fisheye_scene'):
         cur_loc = get_new_pos(cur_loc, rail_length, alpha_to_cam + math.pi)
-        rail = load_asset(filepath, alpha, cur_loc, my_collection, link)
+        rail = load_asset(filepath, alpha, cur_loc, my_collection, link, init_obj_scale=scale)
         b_box = get_b_box(bpy.context, rail)
     cur_loc = location.copy()
     b_box = (1, 1, 1, 1)
     while b_box != (0, 0, 0, 0):
         cur_loc = get_new_pos(cur_loc, rail_length, alpha_to_cam)
-        rail = load_asset(filepath, alpha, cur_loc, my_collection, link)
+        rail = load_asset(filepath, alpha, cur_loc, my_collection, link, init_obj_scale=scale)
         b_box = get_b_box(bpy.context, rail)
 
 
@@ -125,10 +125,10 @@ def load_car(car, train_tail, train_collection, alpha):
     train_collection.children.link(my_collection)
 
     obj = load_asset(filepath_car, alpha, train_tail, my_collection, link, material=car.get_blender_car_color(),
-                     pass_index=car.get_index('car'))
+                     pass_index=car.get_index('car'), init_obj_scale=car.get_blender_scale())
     add_position(car, obj, 'car')
     wheels = load_asset(filepath_wheel, alpha, train_tail, my_collection, link, material=car.get_blender_car_color(),
-                        pass_index=car.get_index('wheels'))
+                        pass_index=car.get_index('wheels'), init_obj_scale=car.get_blender_scale())
     add_position(car, wheels, 'wheels')
 
     return my_collection
@@ -148,11 +148,13 @@ def load_roof(car, car_collection, train_tail, alpha):
     # if a car has a roof it has a full wall
     if roof_type != 'none':
         filepath = f'data/shapes/train/roof/assembly/roof_assembly_{car.length}.blend'
-        obj_as = load_asset(filepath,  alpha, train_tail, car_collection, link,
-                            material=car.get_blender_car_color(), pass_index=car.get_index('roof'))
+        obj_as = load_asset(filepath, alpha, train_tail, car_collection, link,
+                            material=car.get_blender_car_color(), pass_index=car.get_index('roof'),
+                            init_obj_scale=car.get_blender_scale())
         filepath = f'data/shapes/train/roof/{car.length}/{roof_type}.blend'
         obj = load_asset(filepath, alpha, train_tail, car_collection, link,
-                         material=car.get_blender_car_color(),pass_index=car.get_index('roof'))
+                         material=car.get_blender_car_color(), pass_index=car.get_index('roof'),
+                         init_obj_scale=car.get_blender_scale())
         add_position(car, obj_as + obj, 'roof')
 
 
@@ -169,7 +171,7 @@ def load_wall(car, car_collection, train_tail, alpha, wall_type):
         filepath = f'data/shapes/train/walls/{car.length}/{wall_type}.blend'
         link = False
         objs = load_asset(filepath, alpha, train_tail, car_collection, link, material=car.get_blender_car_color(),
-                          pass_index=car.get_index('wall'))
+                          pass_index=car.get_index('wall'), init_obj_scale=car.get_blender_scale())
         add_position(car, objs, 'wall')
 
 
@@ -186,11 +188,11 @@ def load_payload(car_collection, train_tail, car, alpha):
         payload = car.get_blender_payload()
         filepath = f'data/shapes/train/load/{payload}.blend'
         # xy-distance between tail and payload
-        tail_to_payload = 0.15 * car.get_scale()[0]
+        tail_to_payload = 0.15 * car.get_blender_scale()[0]
         # distance between payloads
-        d_payloads = 1 * car.get_scale()[0]
+        d_payloads = 1 * car.get_blender_scale()[0]
         # z-distance between tail and payload (height difference)
-        height_payload = 1.52 * car.get_scale()[0]
+        height_payload = 1.52 * car.get_blender_scale()[0]
 
         payload_pos = [train_tail[0], train_tail[1], train_tail[2] + height_payload]
         payload_pos = get_new_pos(payload_pos, -tail_to_payload, alpha)
@@ -228,6 +230,7 @@ def create_train(train, train_collection, train_init_cord, alpha):
     # train is points in x direction -> thus cars need to be added in -x direction
     # the engine is located at 2.9, first car is point at the same coordinates
     train_tail_coord = train_init_cord
+    scale = train.get_blender_scale()
 
     for car in train.m_cars:
         car_collection = load_car(car, train_tail_coord, train_collection, alpha)

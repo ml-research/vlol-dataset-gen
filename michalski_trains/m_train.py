@@ -163,12 +163,19 @@ class BlenderCar(MichalskiCar):
             # engine length (2,9 - 0.067029) = 2,832971 along x axis
             "engine": 3.75 * self.scale[0]
         }[self.length]
+        # self.payload_scale = {
+        #     "golden_vase": (0.015, 0.015, 0.05),
+        #     "barrel": (0.4, 0.4, 0.4),
+        #     "diamond": (40, 40, 40),
+        #     "metal_pot": (1.2, 1.2, 1.2),
+        #     "oval_vase": (2.5, 2.5, 2.5),
+        # }
         self.payload_scale = {
-            "golden_vase": (0.015, 0.015, 0.05),
-            "barrel": (0.4, 0.4, 0.4),
-            "diamond": (40, 40, 40),
-            "metal_pot": (1.2, 1.2, 1.2),
-            "oval_vase": (2.5, 2.5, 2.5),
+            "golden_vase": (0.03, 0.03, 0.1),
+            "barrel": (0.8, 0.8, 0.8),
+            "diamond": (80, 80, 80),
+            "metal_pot": (2.4, 2.4, 2.4),
+            "oval_vase": (5, 5, 5),
         }
         self.init_rotation = {
             "barrel": (0, 0, math.radians(90)),
@@ -238,11 +245,14 @@ class BlenderCar(MichalskiCar):
         return self.index[at]
 
     # scale of car
-    def get_scale(self):
+    def get_blender_scale(self):
         return self.scale
 
     def get_payload_scale(self):
-        return self.payload_scale.get(self.get_blender_payload(), (1, 1, 1))
+        scale = self.get_blender_scale()
+        payload_init_scale = self.payload_scale.get(self.get_blender_payload(), (2, 2, 2))
+        return scale[0] * payload_init_scale[0], scale[1] * payload_init_scale[1], scale[2] * payload_init_scale[2]
+        # return self.payload_scale.get(self.get_blender_payload(), (1, 1, 1))
 
     def get_payload_rotation(self):
         return self.init_rotation.get(self.get_blender_payload(), (0, 0, 0))
@@ -274,6 +284,14 @@ class SimpleCar(BlenderCar):
 
     def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num, scale=(0.5, 0.5, 0.5)):
         super().__init__(n, shape, length, double, roof, wheels, l_shape, l_num, scale)
+        self.car_length_scalar = {
+            # short train length (2,9 - 0,909) = 1,991 along x axis
+            "long": 3.5 * self.scale[0],
+            # long train length (2,9 - 0.067029) = 2,832971 along x axis
+            "short": 3 * self.scale[0],
+            # engine length (2,9 - 0.067029) = 2,832971 along x axis
+            "engine": 3.5 * self.scale[0]
+        }[self.length]
 
     def get_simple_color(self):
         car_shape_to_material = {

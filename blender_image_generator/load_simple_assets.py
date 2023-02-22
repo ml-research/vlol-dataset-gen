@@ -9,14 +9,12 @@ def create_simple_scene(train, train_collection, train_init_cord, alpha):
     train_tail_coord = train_init_cord
 
     prev_car_long = True
-    length_dict = {
-        'long': 1.75,
-        'short': 1.5,
-    }
+    scale = train.get_blender_scale()
+
 
     for car in train.m_cars:
-        distance = length_dict[car.get_car_length()]
-        distance += .25 if prev_car_long else 0
+        distance = car.get_car_length_scalar() * .9
+        distance += .5 * scale[0] if prev_car_long else 0
         train_tail_coord = get_new_pos(train_tail_coord, distance, alpha)
         prev_car_long = True if car.get_car_length() == 'long' else False
 
@@ -51,9 +49,9 @@ def create_platform(car, train_tail_coord, train_collection, alpha):
         'peaked_roof': 'hexagonal_prism',
     }
     pl_shape = platform_shape_dict[car.get_blender_roof()]
-    scale = [.5, .5, .5]
-    scale[0] = .75 if platform_length == 'long' else .5
-    scale[2] = 1 if pl_shape == 'hemisphere' else .5
+    scale = list(car.get_blender_scale())
+    scale[0] *= 1.5 if platform_length == 'long' else 1
+    scale[2] *= 2 if pl_shape == 'hemisphere' else 1
 
     filepath = f'data/shapes/simple_objects/platform/{pl_shape}.blend'
     material = car.get_simple_color()
@@ -81,13 +79,15 @@ def create_platform(car, train_tail_coord, train_collection, alpha):
             bpy.context.view_layer.objects.active = obj
 
             if "Top" in obj.name:
-                replace_material(obj, None, 'black_metal') if car.get_car_wall() == 'double' else replace_material(obj, None,
-                                                                                                              material)
+                replace_material(obj, None, 'black_metal') if car.get_car_wall() == 'double' else replace_material(obj,
+                                                                                                                   None,
+                                                                                                                   material)
                 obj.pass_index = pass_index_top
                 add_position(car, [obj], 'wall')
             elif "Bot" in obj.name:
-                replace_material(obj, None, 'black_metal') if car.get_wheel_count() == 3 else replace_material(obj, None,
-                                                                                                          material)
+                replace_material(obj, None, 'black_metal') if car.get_wheel_count() == 3 else replace_material(obj,
+                                                                                                               None,
+                                                                                                               material)
                 obj.pass_index = pass_index_bot
                 add_position(car, [obj], 'wheels')
             else:
@@ -114,6 +114,7 @@ def load_objects(car_collection, train_tail, car, alpha):
         'metal_pot': 'cone',
         'oval_vase': 'torus',
     }
+    scale = car.get_blender_scale()
     payload_num = car.get_load_number()
     # platform_height = 1 if car.get_car_length() == 'short' else 2
     if payload_num > 0:
@@ -121,11 +122,13 @@ def load_objects(car_collection, train_tail, car, alpha):
         filepath = f'data/shapes/simple_objects/objects/{obj_shape_dict[payload]}.blend'
 
         # distance between beginning of platform and the object
-        tail_to_payload = 0.4 if payload_num == 3 else 0.2
+        tail_to_payload = 0.8 * scale[0] if payload_num == 3 else 0.4 * scale[0]
         # distance between payloads
-        d_payloads = 0.4
+        d_payloads = 0.8 * scale[0]
 
-        payload_pos = [train_tail[0], train_tail[1], train_tail[2] + 1]
+        # position of the first payload, elevate z cord by 1 to place it on the platform
+        z_cord = train_tail[2] + 2 * scale[2]
+        payload_pos = [train_tail[0], train_tail[1], z_cord]
         payload_pos = get_new_pos(payload_pos, -tail_to_payload, alpha)
 
         # append, set to true to keep the link to the original file
@@ -146,7 +149,7 @@ def load_objects(car_collection, train_tail, car, alpha):
                     ob.rotation_euler[2] += alpha
                     ob.location = payload_pos
                     ob.pass_index = pass_index
-                    ob.scale = (.15, .15, .15)
+                    ob.scale = (.3 * scale[0], .3 * scale[1], .3 * scale[2])
                     ob.active_material = m
                     payload_pos = get_new_pos(payload_pos, d_payloads, alpha)
                     bpy.context.view_layer.update()
@@ -252,11 +255,12 @@ def load_simple_asset(filepath, material, alpha, location, collection, link, pas
     return objs
 
 
-def load_simple_engine(train_collection, train_init_cord, alpha):
+def load_simple_engine(train_collection, train_init_cord, alpha, scale=(0.5, 0.5, 0.5)):
     filepath = 'data/shapes/simple_objects/train/trainv1.blend'
     collection = 'train'
     # append, set to true to keep the link to the original file
     link = False
+    init_obj_scale = (1.6 * scale[0], .8 * scale[0], .8 * scale[0])
     my_collection = bpy.data.collections.new(collection)
     train_collection.children.link(my_collection)
-    load_simple_asset(filepath, None, alpha, train_init_cord, my_collection, link, init_obj_scale=(.8, .4, .4))
+    load_simple_asset(filepath, None, alpha, train_init_cord, my_collection, link, init_obj_scale=init_obj_scale)

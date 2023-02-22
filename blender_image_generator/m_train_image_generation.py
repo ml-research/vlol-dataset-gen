@@ -9,7 +9,8 @@ from util import *
 import time
 
 
-def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, save_blender=False, replace_existing_img=True,
+def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, save_blender=False,
+                   replace_existing_img=True,
                    high_res=False, gen_depth=False, min_cars=2, max_cars=4):
     """ assemble a michalski train, render its corresponding image and generate ground truth information
     Args:
@@ -51,7 +52,6 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
 
     enable_gpus("CUDA")
 
-
     # render settings
     rn_scene = bpy.context.scene
     rn_scene.render.image_settings.file_format = 'PNG'
@@ -82,6 +82,9 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
     train_dir = train.get_angle()
     alpha = math.radians(train_dir)
 
+    # set scale of the train
+    # train.set_scale(0.5)
+
     # This will give ground-truth information about the scene and its objects
     scene_struct = {
         'base_scene': base_scene,
@@ -111,45 +114,45 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
     for car in train.m_cars:
         loc_length += car.get_car_length_scalar()
     r = - loc_length / 2
-    # determine engine spawn position (which is located at the end of the engine)
-    offset = (train.get_car_length('engine') + 1.2) * train.get_blender_scale()[0]
-    engine_pos = r + offset
 
-    # move rotation point away from camera
-    offset = [0, -0.1]
-    xd = engine_pos * math.cos(alpha) + offset[0]
-    yd = engine_pos * math.sin(alpha) + offset[1]
-    # load rails at scale 0.6, z = -0.176
-    off_z = -0.176 * train.get_blender_scale()[0] / 0.6
-    train_init_cord = [xd, yd, off_z]
-
-    # load train engine, use mat='black_metal' for black engine metal
-    mat = None
     if train_vis == 'SimpleObjects':
-        train_init_cord[2] = 0
-        train_init_cord = get_new_pos(train_init_cord, -1, alpha)
+        # move rotation point away from camera
+        simple_init_cord = [0, -0.1, 0]
+        # initialize train position
+        simple_init_cord = get_new_pos(simple_init_cord, r * .9, alpha)
 
-        load_simple_engine(train_collection, train_init_cord, alpha)
-        train_init_cord[2] = 0
+        load_simple_engine(train_collection, simple_init_cord, alpha, train.get_blender_scale())
+        simple_init_cord[2] = 0
         # create and load trains into blender
-        create_simple_scene(train, train_collection, train_init_cord, alpha)
+        create_simple_scene(train, train_collection, simple_init_cord, alpha)
     else:
-        load_engine(train_collection, train_init_cord, alpha, mat)
+        # determine engine spawn position (which is located at the end of the engine)
+        offset = train.get_car_length('engine') - 0.675 * train.get_blender_scale()[0]
+        engine_pos = r + offset
+
+        # move rotation point away from camera
+        offset = [0, -0.1]
+        xd = engine_pos * math.cos(alpha) + offset[0]
+        yd = engine_pos * math.sin(alpha) + offset[1]
+        # load train engine, use mat='black_metal' for black engine metal
+        mat = None
+        # load rails at scale 0.6, z = -0.176
+        off_z = -0.176 * train.get_blender_scale()[0] / 0.6
+        train_init_cord = [xd, yd, off_z]
+        # load engine
+        load_engine(train_collection, train_init_cord, alpha, mat, scale=train.get_blender_scale())
         # load rails at scale 0.6, z = -0.155
         off_z = -0.155 * train.get_blender_scale()[0] / 0.6
         rail_cord = offset + [off_z]
         # load rails
-        load_rails(train_collection, rail_cord, alpha, base_scene)
+        load_rails(train_collection, rail_cord, alpha, base_scene, scale=train.get_blender_scale())
         # create and load trains into blender
         create_train(train, train_collection, train_init_cord, alpha)
-
-
 
     load_obj_time = time.time()
     # print('time needed pre set up: ' + str(load_obj_time - start))
     rail_time = time.time()
     # print('time needed rails: ' + str(rail_time - load_obj_time))
-
 
     asset_time = time.time()
     # print('time needed asset: ' + str(asset_time - rail_time))
@@ -187,7 +190,5 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
     fin_time = time.time()
-
-
 
     # print('finish it time: ' + str(fin_time - render_time))
