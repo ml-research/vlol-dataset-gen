@@ -117,9 +117,9 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
     if train_vis == 'SimpleObjects':
         displacement = .4 * train.get_blender_scale()[0]
         # add engine length and car displacements to the radius
-        r = (loc_length + train.get_car_length('simple_engine') + displacement * len(train.m_cars))/2
+        r = (loc_length + train.get_car_length('simple_engine') + displacement * len(train.m_cars)) / 2
         # determine engine spawn position (which is located in the middle of the engine)
-        offset = train.get_car_length('simple_engine')/2 # - 0.675 * train.get_blender_scale()[0]
+        offset = train.get_car_length('simple_engine') / 2  # - 0.675 * train.get_blender_scale()[0]
         engine_pos = - r + offset
         # move rotation point away from camera
         simple_init_cord = [0, -0.1, 0]
@@ -131,7 +131,7 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
         create_simple_scene(train, train_collection, engine_pos, alpha)
     else:
         # add engine length to radius
-        r = (loc_length + train.get_car_length('engine'))/2
+        r = (loc_length + train.get_car_length('engine')) / 2
         # determine offset to engine spawn position (which is located at the end of the engine)
         offset = train.get_car_length('engine') - 0.675 * train.get_blender_scale()[0]
         engine_pos = - r + offset
