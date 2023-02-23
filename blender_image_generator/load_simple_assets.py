@@ -6,20 +6,18 @@ from blender_image_generator.load_assets import add_position
 
 
 def create_simple_scene(train, train_collection, train_init_cord, alpha):
-    train_tail_coord = train_init_cord
-
-    prev_car_long = True
-    scale = train.get_blender_scale()
-
+    displacement = .4 * train.get_blender_scale()[0]
+    train_tail_coord = get_new_pos(train_init_cord, train.get_car_length('simple_engine')/2, alpha)
 
     for car in train.m_cars:
-        distance = car.get_car_length_scalar() * .9
-        distance += .5 * scale[0] if prev_car_long else 0
-        train_tail_coord = get_new_pos(train_tail_coord, distance, alpha)
-        prev_car_long = True if car.get_car_length() == 'long' else False
+        distance = car.get_car_length_scalar()
+        train_tail_coord = get_new_pos(train_tail_coord, distance/2 + displacement, alpha)
 
         car_collection = create_platform(car, train_tail_coord, train_collection, alpha)
+
         load_objects(car_collection, train_tail_coord, car, alpha)
+        train_tail_coord = get_new_pos(train_tail_coord, distance/2, alpha)
+
         # load_side_obj(car_collection, train_tail_coord, car, alpha)
 
 

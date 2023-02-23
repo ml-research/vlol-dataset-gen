@@ -110,25 +110,31 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
     layer_collection.exclude = False
 
     # determine train length and the starting point as a radius distance r for the engine
-    loc_length = train.get_car_length('engine')
+    loc_length = 0
     for car in train.m_cars:
         loc_length += car.get_car_length_scalar()
-    r = - loc_length / 2
 
     if train_vis == 'SimpleObjects':
+        displacement = .4 * train.get_blender_scale()[0]
+        # add engine length and car displacements to the radius
+        r = (loc_length + train.get_car_length('simple_engine') + displacement * len(train.m_cars))/2
+        # determine engine spawn position (which is located in the middle of the engine)
+        offset = train.get_car_length('simple_engine')/2 # - 0.675 * train.get_blender_scale()[0]
+        engine_pos = - r + offset
         # move rotation point away from camera
         simple_init_cord = [0, -0.1, 0]
         # initialize train position
-        simple_init_cord = get_new_pos(simple_init_cord, r * .9, alpha)
+        engine_pos = get_new_pos(simple_init_cord, engine_pos, alpha)
 
-        load_simple_engine(train_collection, simple_init_cord, alpha, train.get_blender_scale())
-        simple_init_cord[2] = 0
+        load_simple_engine(train_collection, engine_pos, alpha, train.get_blender_scale())
         # create and load trains into blender
-        create_simple_scene(train, train_collection, simple_init_cord, alpha)
+        create_simple_scene(train, train_collection, engine_pos, alpha)
     else:
-        # determine engine spawn position (which is located at the end of the engine)
+        # add engine length to radius
+        r = (loc_length + train.get_car_length('engine'))/2
+        # determine offset to engine spawn position (which is located at the end of the engine)
         offset = train.get_car_length('engine') - 0.675 * train.get_blender_scale()[0]
-        engine_pos = r + offset
+        engine_pos = - r + offset
         # load train at scale 1, z = -0.307
         off_z = -0.307 * train.get_blender_scale()[0]
         # move rotation point away from camera

@@ -67,7 +67,13 @@ class MichalskiTrain(object):
             # long train length (2,9 - 0.067029) = 2,832971 along x axis
             "short": 2.48875 * self.scale[0],
             # engine length (2,9 - 0.067029) = 2,832971 along x axis
-            "engine": 3.75 * self.scale[0]
+            "engine": 3.75 * self.scale[0],
+            # short train length
+            "simple_long": 3 * self.scale[0],
+            # long train length
+            "simple_short": 2 * self.scale[0],
+            # engine length
+            "simple_engine": 3.2 * self.scale[0]
         }
         return car_length_scalar.get(car_part)
 
@@ -285,12 +291,12 @@ class SimpleCar(BlenderCar):
     def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num, scale=(0.5, 0.5, 0.5)):
         super().__init__(n, shape, length, double, roof, wheels, l_shape, l_num, scale)
         self.car_length_scalar = {
-            # short train length (2,9 - 0,909) = 1,991 along x axis
-            "long": 3.5 * self.scale[0],
-            # long train length (2,9 - 0.067029) = 2,832971 along x axis
-            "short": 3 * self.scale[0],
-            # engine length (2,9 - 0.067029) = 2,832971 along x axis
-            "engine": 3.5 * self.scale[0]
+            # long train length 3
+            "long": 3 * self.scale[0],
+            # short train length 2
+            "short": 2 * self.scale[0],
+            # engine length 3.2
+            "engine": 3.2 * self.scale[0]
         }[self.length]
 
     def get_simple_color(self):
