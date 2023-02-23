@@ -14,8 +14,8 @@ from michalski_trains.m_train import *
 
 
 class MichalskiTrainDataset(Dataset):
-    def __init__(self, class_rule, base_scene, raw_trains, train_vis, train_count=10000, resize=False, label_noise=0,
-                 ds_path='output/image_generator'):
+    def __init__(self, class_rule, base_scene, raw_trains, train_vis, min_car=2, max_car=4,
+                 train_count=10000, resize=False, label_noise=0, ds_path='output/image_generator'):
         """ MichalskiTrainDataset
             @param class_rule (string): classification rule
             @param base_scene (string): background scene
@@ -33,7 +33,7 @@ class MichalskiTrainDataset(Dataset):
         self.masks = []
         self.resize = resize
         self.train_count = train_count
-        ds_typ = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
+        ds_typ = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_car}-{max_car}'
         self.base_scene = base_scene
         self.image_base_path = f'{ds_path}/{ds_typ}/images'
         self.all_scenes_path = f'{ds_path}/{ds_typ}/all_scenes'
@@ -44,7 +44,7 @@ class MichalskiTrainDataset(Dataset):
         self.output_dim = len(self.labels)
         # train with class specific labels
         if not os.path.isfile(self.all_scenes_path + '/all_scenes.json'):
-            raise AssertionError('json scene file missing. Not all images were generated')
+            raise AssertionError(f'json scene file missing {self.all_scenes_path}. Not all images were generated')
         if len(os.listdir(self.image_base_path)) < self.train_count:
             raise AssertionError(f'Missing images in dataset. Expected size {self.train_count}.'
                                  f'Available images: {len(os.listdir(self.image_base_path))}')
@@ -131,14 +131,16 @@ class MichalskiTrainDataset(Dataset):
         return self.labels
 
 
-def get_datasets(base_scene='base_scene', raw_trains='MichalskiTrains', train_vis='Trains', ds_size=12000,
-                 ds_path='output/image_generator', class_rule='theoryx', resize=False, noise=0):
+def get_datasets(base_scene='base_scene', raw_trains='MichalskiTrains', train_vis='Trains', min_car=2, max_car=4,
+                 ds_size=12000, ds_path='output/image_generator', class_rule='theoryx', resize=False, noise=0):
     """
     Returns the train and validation dataset for the given parameters
     Args:
         @param base_scene: string scene to be used for the dataset
         @param raw_trains: train description to be used for the dataset
         @param train_vis: train visualization to be used for the dataset
+        @param min_car: minimum number of cars in the scene
+        @param max_car: maximum number of cars in the scene
         @param ds_size: dataset size
         @param ds_path: path to the dataset
         @param class_rule: class rule to be used for the dataset
@@ -146,7 +148,7 @@ def get_datasets(base_scene='base_scene', raw_trains='MichalskiTrains', train_vi
         @param noise: whether to apply noise to the labels
     @return: michalski train dataset
     """
-    path_ori = f'{ds_path}/{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
+    path_ori = f'{ds_path}/{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_2-4'
     if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
         combine_json(base_scene, raw_trains, train_vis, class_rule, ds_size=ds_size)
         raise Warning(f'Dataloader did not find JSON ground truth information.'
@@ -173,13 +175,12 @@ def get_datasets(base_scene='base_scene', raw_trains='MichalskiTrains', train_vi
             f'no JSON found')
     # image_count = None for standard image count
     full_ds = MichalskiTrainDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
-                                    train_vis=train_vis, label_noise=noise,
-                                    train_count=ds_size, resize=resize, ds_path=ds_path)
+                                    train_vis=train_vis, min_car=min_car, max_car=max_car,
+                                    label_noise=noise, train_count=ds_size, resize=resize, ds_path=ds_path)
     return full_ds
 
 
-def combine_json(base_scene, raw_trains, train_vis, class_rule, out_dir='output/image_generator', ds_size=10000):
-    path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}'
+def combine_json(path_settings, out_dir='output/image_generator', ds_size=10000):
     path_ori = f'tmp/image_generator/{path_settings}'
     path_dest = f'{out_dir}/{path_settings}'
     im_path = path_ori + '/images'
