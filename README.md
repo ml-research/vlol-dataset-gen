@@ -71,12 +71,18 @@ The default output location is `TrainGenerator/output/image_generator/`.
 The following settings are available, the corresponding input types and default settings are noted in parentheses:
 
 General:
+
 - `dataset_size` (int, 10,000) -> Size of the dataset we want to create.
 - `output_path` (str, 'output/image_generator') -> path to the output directory in which the generated datasets are
   saved.
 - `cuda` (int, 0) -> Which GPU to use for rendering. If -1, CPU is used.
 
 Background knowledge:
+
+- `classification` (str, 'theoryx') -> The classification rule used for generating the labels of the dataset.
+  The following rules are available: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom'.
+  For more detailed information about the rules refer to the rule section.
+  Select custom rule to use your own personal rule. Therefore, define your own rule in \'example_rules/custom_rule.pl\'.
 - `bk` (str, 'MichalskiTrains') -> The train descriptions we want to generate. Either 'MichalskiTrains' or '
   RandomTrains'.
   The 'RandomTrains' descriptions are generated randomly.
@@ -84,14 +90,11 @@ Background knowledge:
   Muggleton [[2]](#2).
 - `replace_bk` (bool, False) -> If the bk for the dataset is already generated shall it be replaced?
   If false, it allows to use same bk for different visualizations.
-- `classification` (str, 'theoryx') -> The classification rule used for generating the labels of the dataset.
-  The following rules are available: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom'.
-  For more detailed information about the rules refer to the rule section.
-  Select custom rule to use your own personal rule. Therefore, define your own rule in \'example_rules/custom_rule.pl\'.
 - `max_train_length` (int, 4) -> The maximum number of cars a train can have.
 - `min_train_length` (int, 2) -> The minimum number of cars a train can have.
 
 Visualization:
+
 - `visualization` (str, 'Trains') -> The way we want to visualize the descriptions. Either as 'Trains' or '
   SimpleObjects'. For comparison see images above.
 - `background` (str, 'base_scene') -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
@@ -100,6 +103,7 @@ Visualization:
   the train.
 
 Parallelization:
+
 - `index_start` (int, 0) -> Start rendering images at index (index_start).
 - `index_end` (int, None) -> Stop rendering images at index (does not include rendering image index_end).
   If None the train generator stops rendering at dataset_size.
@@ -107,12 +111,12 @@ Parallelization:
   Images generated in tmp folder from previously uncompleted runs (of the same settings) are not deleted.
 
 rendering settings:
+
 - `save_blender` (bool, False) -> Whether the blender scene is saved.
   Only recommended for small image counts as the blend files can be quite large.
 - `high_res` (bool, False) -> Whether to render the images in high resolution (1920x1080) or standard resolution (
   480x270)
 - `depth` (bool, False) -> Whether to save depth information of the individual scenes.
-
 
 The following shows example images of the four background scenes 'base_scene', 'desert_scene', 'sky_scene' and '
 fisheye_scene':
@@ -138,7 +142,7 @@ into our dataset.
 
 In the `example_rules` folder we provide a selection of predefined rules with varying degrees of complexity.
 The rules are expressed in the Prolog description language. In the case you want to define your own personal rules
-select and adjust the `example_rules/custom_rule.pl` according to your requirements. 
+select and adjust the `example_rules/custom_rule.pl` according to your requirements.
 For this you can either rely on the predefined set of predicates described in the section below or create your own
 descriptors.
 Be aware that defining a very specific decision rules can have a strong influence on the distribution of train
@@ -183,19 +187,19 @@ The other classification are denoted as follows:
   number of loads, or there is a short and a long car with the same colour where the position number of the short car is
   smaller as the wheel count of the long car, or the train has three differently coloured cars.
 
+## Background Knowledge
 
-
-## Michalski train representation
-
-The representation of the original Michalski trains heavily relies on their two-dimensional delineation and does not
+The definition of the original Michalski trains heavily relies on their two-dimensional delineation and does not
 meet the requirements of a vivid three-dimensional visualization.
-Accordingly, we had to transform the original train representation to use more appropriate descriptors for our
-visualizations (see tables below).
-Since the respective descriptions are replaced one-to-one, it is not necessary to define new decision rules for the
-different visualizations, i.e. for SimpleObjects and Trains.
-Rather, you can define your own personal decision rules referring to the predicates of the original Michalski train
-representation. However, if you want to resort to further predicates,
-you may define new ones or have a look at our additionally defined descriptors at `raw/train_generator.pl`.
+Accordingly, we have transformed the original train representation to use more appropriate predicates for our
+visualizations (see tables below). In this context, we have exchanged the original predicates in a one-to-one manner.
+This facilitates the definition of new classification rules as we can refer to the predicates interchangeably, i.e.
+we can resort to the predicates of the original Michalski trains and/or the new predicates for the different
+visualizations.
+Furthermore, it is not necessary to define new classification rules for the classification of trains depicted in the
+different visualizations. However, if you want to resort to further predicates, you can have a look at our predicate
+definitions in
+`raw/train_generator.pl` and define new predicates accordingly.
 
 Below you will find an overview of the original Michalski train representation
 which is expressed by the following Prolog predicates.
@@ -236,29 +240,29 @@ You can use these values defined below for the predicates defined above:
 
 #### Original Michalski train representation
 
-| Car number | Car shape | Car length | Wall type | Roof shape | Number of wheels | Shape of loads | Number of loads |
-|:----------:|:---------:|:----------:|:---------:|:----------:|:----------------:|:--------------:|:---------------:|
-|     1      | rectangle |   short    |  single   |    none    |        2         |   rectangle    |        0        |
-|     2      |  bucket   |    long    |  double   |    arc     |        3         |    triangle    |        1        |
-|     3      |  ellipse  |     	      |    		     |    flat    |                  |     circle     |        2        |
-|     4      |  hexagon  |     		     |    			    |   jagged   |                  |    diamond     |        3        |
-|            | u_shaped  |     		     |    		     |   peaked   |        		        |    hexagon     |
-|    			     |    		     |     		     |    			    |     		     |                  |   utriangle    |
+| Car Number | Car Shape | Car Length | Car Wall | Car Roof | Wheels Num. | Load Shape | Number of loads |
+|:----------:|:---------:|:----------:|:--------:|:--------:|:-----------:|:----------:|:---------------:|
+|     1      | rectangle |   short    |  single  |   none   |      2      | rectangle  |        0        |
+|     2      |  bucket   |    long    |  double  |   arc    |      3      |  triangle  |        1        |
+|     3      |  ellipse  |     	      |    		    |   flat   |             |   circle   |        2        |
+|     4      |  hexagon  |     		     |   			    |  jagged  |             |  diamond   |        3        |
+|            | u_shaped  |     		     |    		    |  peaked  |     		      |  hexagon   |
+|    			     |    		     |     		     |   			    |    		    |             | utriangle  |
 
-#### Three-dimensional train representation
+#### Michalski-3D
 
-| Car position | Car colour | Car length | Wall type | Roof shape  | Number of wheels | Payload 1 & Payload 2 & Payload 3 | Orientation |
-|:------------:|:----------:|:----------:|:---------:|:-----------:|:----------------:|:---------------------------------:|:-----------:|
-|      1       |   yellow   |   short    |   full    |    none     |        2         |             blue box              | angle alpha |
-|      2       |   green    |    long    |  braced   | foundation  |        3         |            golden vase            |
-|      3       |    grey    |     	      |    		     | solid roof  |                  |              barrel               |
-|      4       |    red     |     		     |    			    | braced roof |                  |              diamond              |
-|              |    blue    |     		     |    		     | peaked roof |        		        |             metal pot             |
-|     			      |     		     |     		     |    			    |     		      |                  |             oval vase             |
-|      		      |     		     |     		     |    			    |     		      |                  |               none                |
+| Car Position | Car Colour | Car Length | Car Wall | Car Roof | Axles | Payload 1 & Payload 2 & Payload 3 |
+|:------------:|:----------:|:----------:|:--------:|:--------:|:-----:|:---------------------------------:|
+|      1       |   Yellow   |   Short    |   Full   |   None   |   2   |             Blue Box              |
+|      2       |   Green    |    Long    | Railing  |  Frame   |   3   |            Golden Vase            |
+|      3       |    Grey    |     	      |    		    |   Flat   |       |              Barrel               |
+|      4       |    Red     |     		     |   			    |   Bars   |       |              Diamond              |
+|              |    Blue    |     		     |    		    |  Peaked  |  		   |             Metal Pot             |
+|     			      |     		     |     		     |   			    |    		    |       |             Cval Vase             |
+|      		      |     		     |     		     |   			    |    		    |       |               None                |
 
 Overview of our three-dimensional train representation.
-The following image illustrates the above described descriptors.
+The following image illustrates the above described predicates.
 
 <div align="center">
   <img src="example_images/descriptor_overview/overview.png" height="350px"  alt="">
@@ -266,18 +270,18 @@ The following image illustrates the above described descriptors.
 
 #### Three-dimensional simple representation
 
-| Object position | Color  | Platform length | Side object frustum | Platform shape  | Side object torus | Object 1 & Object 2 & Object 3 | Orientation |
-|:---------------:|:------:|:---------------:|:-------------------:|:---------------:|:-----------------:|:------------------------------:|:-----------:|
-|        1        | yellow |      short      |   larger side up    |      cube       |       above       |             sphere             | angle alpha |
-|        2        | green  |      long       |  larger side down   |    cylinder     |       below       |            pyramid             |
-|        3        |  grey  |        	        |         		          |   hemisphere    |                   |              cube              |
-|        4        |  red   |       		        |         			         |     frustum     |                   |            cylinder            |
-|                 |  blue  |       		        |         		          | hexagonal prism |        		         |              cone              |
-|       			       |   		   |       		        |         			         |       		        |                   |             torus              |
-|       		        |   		   |       		        |         			         |       		        |                   |              none              |
+| Car Position | Car Color | Car length | Black Top |    Car Shape    | Black Bottom | Load 1 & Load 2 & Load 3 |
+|:------------:|:---------:|:----------:|:---------:|:---------------:|:------------:|:------------------------:|
+|      1       |  Yellow   |   Short    |   True    |      Cube       |     True     |          Sphere          |
+|      2       |   Green   |    Long    |   False   |    Cylinder     |    False     |         Pyramid          |
+|      3       |   Grey    |     	      |    		     |   Hemisphere    |              |           Cube           |
+|      4       |    Red    |     		     |    			    |     Frustum     |              |         Cylinder         |
+|              |   Blue    |     		     |    		     | hexagonal Prism |      		      |           Cone           |
+|     			      |    		     |     		     |    			    |       		        |              |          Torus           |
+|      		      |    		     |     		     |    			    |       		        |              |           None           |
 
 The Train generator also allows for a simpler visualization relying on less complex objects.
-The following image illustrates the above described descriptors.
+The following image illustrates the above described predicates.
 
 <div align="center">
   <img src="example_images/descriptor_overview/overview_simple_objs.png" height="350px"  alt="">
