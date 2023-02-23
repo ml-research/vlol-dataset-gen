@@ -1,4 +1,5 @@
 import glob
+import warnings
 from datetime import datetime
 import json
 import os
@@ -13,9 +14,9 @@ from torchvision import transforms
 from michalski_trains.m_train import *
 
 
-class MichalskiTrainDataset(Dataset):
+class MichalskiDataset(Dataset):
     def __init__(self, class_rule, base_scene, raw_trains, train_vis, min_car=2, max_car=4,
-                 train_count=10000, resize=False, label_noise=0, ds_path='output/image_generator'):
+                 ds_size=10000, resize=False, label_noise=0, ds_path='output/image_generator'):
         """ MichalskiTrainDataset
             @param class_rule (string): classification rule
             @param base_scene (string): background scene
@@ -28,20 +29,30 @@ class MichalskiTrainDataset(Dataset):
             @return X_val: image data
             @return y_val: label data
             """
-        self.images = []
-        self.trains = []
-        self.masks = []
-        self.resize = resize
-        self.train_count = train_count
+        # ds data
+        self.images, self.trains, self.masks = [], [], []
+        # ds settings
+        self.class_rule, self.base_scene, self.raw_trains, self.train_vis = class_rule, base_scene, raw_trains, train_vis
+        self.min_car, self.max_car = min_car, max_car
+        self.resize, self.train_count, self.label_noise = resize, ds_size, label_noise
+
+        # ds path
         ds_typ = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_car}-{max_car}'
-        self.base_scene = base_scene
         self.image_base_path = f'{ds_path}/{ds_typ}/images'
         self.all_scenes_path = f'{ds_path}/{ds_typ}/all_scenes'
 
+        # ds labels
         self.labels = ['direction']
         self.label_classes = ['west', 'east']
-        self.class_dim = len(self.label_classes)
-        self.output_dim = len(self.labels)
+        self.attributes = ['color', 'length', 'walls', 'roofs', 'wheel_count', 'load_obj1', 'load_obj2',
+                           'load_obj3'] * 4
+        color = ['yellow', 'green', 'grey', 'red', 'blue']
+        length = ['short', 'long']
+        walls = ["braced_wall", 'solid_wall']
+        roofs = ["roof_foundation", 'solid_roof', 'braced_roof', 'peaked_roof']
+        wheel_count = ['2_wheels', '3_wheels']
+        load_obj = ["box", "golden_vase", 'barrel', 'diamond', 'metal_pot', 'oval_vase']
+        self.attribute_classes = ['none'] + color + length + walls + roofs + wheel_count + load_obj
         # train with class specific labels
         if not os.path.isfile(self.all_scenes_path + '/all_scenes.json'):
             raise AssertionError(f'json scene file missing {self.all_scenes_path}. Not all images were generated')
@@ -49,10 +60,11 @@ class MichalskiTrainDataset(Dataset):
             raise AssertionError(f'Missing images in dataset. Expected size {self.train_count}.'
                                  f'Available images: {len(os.listdir(self.image_base_path))}')
 
+        # load data
         path = self.all_scenes_path + '/all_scenes.json'
         with open(path, 'r') as f:
             all_scenes = json.load(f)
-            for scene in all_scenes['scenes'][:train_count]:
+            for scene in all_scenes['scenes'][:ds_size]:
                 self.images.append(scene['image_filename'])
                 # self.depths.append(scene['depth_map_filename'])
                 train = scene['m_train']
@@ -60,7 +72,7 @@ class MichalskiTrainDataset(Dataset):
                 #     train.replace('michalski_trains.m_train.', 'm_train.'))
                 self.trains.append(jsonpickle.decode(train))
                 self.masks.append(scene['car_masks'])
-
+        # transform
         trans = [
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -75,7 +87,7 @@ class MichalskiTrainDataset(Dataset):
             transforms.Normalize(mean=[0.5, 0.5, 0.5],
                                  std=[0.5, 0.5, 0.5]),
         ])
-
+        # add noise to labels
         if label_noise > 0:
             print(f'applying noise of {label_noise} to dataset labels')
             for train in self.trains:
@@ -90,7 +102,6 @@ class MichalskiTrainDataset(Dataset):
                         raise ValueError(f'unexpected label value {lab}, expected value east or west')
 
     def __getitem__(self, item):
-
         image = self.get_pil_image(item)
         X = self.norm(image)
         y = self.get_direction(item)
@@ -107,6 +118,27 @@ class MichalskiTrainDataset(Dataset):
         label_binary = self.label_classes.index(lab)
         label = torch.tensor(label_binary).unsqueeze(dim=0)
         return label
+
+    def get_attributes(self, item):
+        att = self.attribute_classes
+        train = self.trains[item]
+        cars = train.get_cars()
+        labels = [0] * 32
+        # each train has (4 cars a 8 attributes) totalling to 32 labels
+        # each label can have 22 classes
+        for car in cars:
+            # index 0 = not existent
+            color = att.index(car.get_blender_car_color())
+            length = att.index(car.get_car_length())
+            wall = att.index(car.get_blender_wall())
+            roof = att.index(car.get_blender_roof())
+            wheels = att.index(car.get_car_wheels())
+            l_shape = att.index(car.get_blender_payload())
+            l_num = car.get_load_number()
+            l_shapes = [l_shape] * l_num + [0] * (3 - l_num)
+            car_number = car.get_car_number()
+            labels[8 * (car_number - 1):8 * car_number] = [color, length, wall, roof, wheels] + l_shapes
+        return torch.tensor(labels)
 
     def get_m_train(self, item):
         return self.trains[item]
@@ -130,58 +162,76 @@ class MichalskiTrainDataset(Dataset):
     def get_ds_labels(self):
         return self.labels
 
+    def get_ds_classes(self):
+        return self.label_classes
 
-def get_datasets(base_scene='base_scene', raw_trains='MichalskiTrains', train_vis='Trains', min_car=2, max_car=4,
-                 ds_size=12000, ds_path='output/image_generator', class_rule='theoryx', resize=False, noise=0):
+    def get_class_dim(self):
+        return len(self.label_classes)
+
+    def get_output_dim(self):
+        return len(self.labels)
+
+
+class MichalskiAttributeDataset(MichalskiDataset):
+    def __int__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __getitem__(self, item):
+        image = self.get_pil_image(item)
+        X = self.norm(image)
+        y = self.get_attributes(item)
+        return X, y
+
+    def get_ds_labels(self):
+        return self.attributes
+
+    def get_ds_classes(self):
+        return self.attribute_classes
+
+    def get_class_dim(self):
+        return len(self.attribute_classes)
+
+    def get_output_dim(self):
+        return len(self.attributes)
+
+
+def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_car=4,
+                 ds_size=12000, ds_path='output/image_generator', y_val='direction', resize=False, noise=0):
     """
     Returns the train and validation dataset for the given parameters
     Args:
         @param base_scene: string scene to be used for the dataset
         @param raw_trains: train description to be used for the dataset
         @param train_vis: train visualization to be used for the dataset
+        @param class_rule: class rule to be used for the dataset
         @param min_car: minimum number of cars in the scene
         @param max_car: maximum number of cars in the scene
         @param ds_size: dataset size
         @param ds_path: path to the dataset
-        @param class_rule: class rule to be used for the dataset
+        @param y_val: which value to use for the y value, either direction or attributes
         @param resize: whether to resize the images to 224x224
         @param noise: whether to apply noise to the labels
     @return: michalski train dataset
     """
-    path_ori = f'{ds_path}/{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_2-4'
-    if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
-        combine_json(base_scene, raw_trains, train_vis, class_rule, ds_size=ds_size)
-        raise Warning(f'Dataloader did not find JSON ground truth information.'
-                      f'Might be caused by interruptions during process of image generation.'
-                      f'Generating new JSON file at: {path_ori + "/all_scenes/all_scenes.json"}')
-    im_path = path_ori + '/images'
-    if not os.path.isdir(im_path):
-        raise AssertionError('dataset not found, please generate images first')
+    path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_car}-{max_car}'
+    check_data(ds_path, path_settings, ds_size)
 
-    files = os.listdir(im_path)
-    # total image count equals 10.000 adjust if not all images need to be generated
-    if len(files) < ds_size:
-        raise AssertionError(
-            f'not enough images in dataset: expected {ds_size}, present: {len(files)}'
-            f' please generate the missing images')
-    elif len(files) > ds_size:
-        raise Warning(
-            f' dataloader did not select all images of the dataset, number of selected images:  {ds_size},'
-            f' available images in dataset: {len(files)}')
-
-    # merge json files to one if it does not already exist
-    if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
-        raise AssertionError(
-            f'no JSON found')
     # image_count = None for standard image count
-    full_ds = MichalskiTrainDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
-                                    train_vis=train_vis, min_car=min_car, max_car=max_car,
-                                    label_noise=noise, train_count=ds_size, resize=resize, ds_path=ds_path)
+    if y_val == 'direction':
+        full_ds = MichalskiDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
+                                   train_vis=train_vis, min_car=min_car, max_car=max_car,
+                                   label_noise=noise, ds_size=ds_size, resize=resize, ds_path=ds_path)
+    elif y_val == 'attribute':
+        full_ds = MichalskiAttributeDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
+                                            train_vis=train_vis, min_car=min_car, max_car=max_car,
+                                            label_noise=noise, ds_size=ds_size, resize=resize, ds_path=ds_path)
+    else:
+        raise AssertionError(f'Unknown y value {y_val}')
     return full_ds
 
 
 def combine_json(path_settings, out_dir='output/image_generator', ds_size=10000):
-    path_ori = f'tmp/image_generator/{path_settings}'
+    path_ori = f'output/tmp/image_generator/{path_settings}'
     path_dest = f'{out_dir}/{path_settings}'
     im_path = path_ori + '/images'
     if os.path.isdir(im_path):
@@ -218,3 +268,31 @@ def merge_json_files(path):
     # args.output_scene_file.split('.json')[0]+'_classid_'+str(args.img_class_id)+'.json'
     with open(json_pth, 'w+') as f:
         json.dump(output, f, indent=2)
+
+
+def check_data(ds_path, path_settings, ds_size):
+    path_ori = f'{ds_path}/{path_settings}'
+    if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
+        combine_json(path_settings, out_dir=ds_path, ds_size=ds_size)
+        warnings.warn(f'Dataloader did not find JSON ground truth information.'
+                      f'Might be caused by interruptions during process of image generation.'
+                      f'Generating new JSON file at: {path_ori + "/all_scenes/all_scenes.json"}')
+    im_path = path_ori + '/images'
+    if not os.path.isdir(im_path):
+        raise AssertionError(f'dataset not found, please generate images first: ({im_path})')
+
+    files = os.listdir(im_path)
+    # total image count equals 10.000 adjust if not all images need to be generated
+    if len(files) < ds_size:
+        raise AssertionError(
+            f'not enough images in dataset: expected {ds_size}, present: {len(files)}'
+            f' please generate the missing images')
+    elif len(files) > ds_size:
+        raise Warning(
+            f' dataloader did not select all images of the dataset, number of selected images:  {ds_size},'
+            f' available images in dataset: {len(files)}')
+
+    # merge json files to one if it does not already exist
+    if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
+        raise AssertionError(
+            f'no JSON found')

@@ -92,7 +92,7 @@ load_shape(4,rectangle). load_shape(5,triangle). load_shape(6,utriangle).
 show(Train) :-
   direction(Train),
   show0(Train),
-  open('raw/tmp/MichalskiTrains.txt', append, OS),
+  open('output/tmp/raw/MichalskiTrains.txt', append, OS),
   format(OS, "~n" , []),
   close(OS),
   nl, !.
@@ -100,7 +100,7 @@ show(Train) :-
 show0([]).
 show0([C|Cs]) :-
   C=c(N,Shape,Length,Double,Roof,Wheels,l(Lshape,Lno)),
-  open('raw/tmp/MichalskiTrains.txt', append, OS),
+  open('output/tmp/raw/MichalskiTrains.txt', append, OS),
   format(OS, ' ~w ~w ~w ~w ~w ~w ~w ~w', [N,Shape,Length,Double,Roof,Wheels,Lshape,Lno]),
   writes(['Car ',N,': Shape = ',Shape,
   ', Length = ',Length,', Double = ',Double,nl, tab(8),
@@ -111,7 +111,7 @@ show0([C|Cs]) :-
   show0(Cs), !.
 
 direction(Train) :-
-  open('raw/tmp/MichalskiTrains.txt', append, OS),
+  open('output/tmp/raw/MichalskiTrains.txt', append, OS),
   (eastbound(Train) -> (format(OS, "~w" , [east]), write('Eastbound train:'), nl)
   ;otherwise -> (format(OS, "~w" , [west]), write('Westbound train:'), nl)),
   close(OS).

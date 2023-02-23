@@ -72,7 +72,7 @@ def restore_img(m_train, t_num, path_settings):
             blender_objects[obj.pass_index] = [obj]
     cars = m_train.m_cars
     obj_mask = {}
-    base_path = f'tmp/tmp_graph_output/{path_settings}/'
+    base_path = f'output/tmp/tmp_graph_output/{path_settings}/'
     for car in cars:
         car_number = car.get_car_number()
         current_car = "car_" + str(car_number)
@@ -164,7 +164,7 @@ def restore_depth_map(t_num, o_file, path_settings):
     'SimpleObjects'
     :param:  base_scene (string)    : Michalski train scene
     """
-    path = f'tmp/depth/{path_settings}/t_{t_num}_depth'
+    path = f'output/tmp/depth/{path_settings}/t_{t_num}_depth'
     # depth_map = cv2.imread(path + '/Image0001.exr',  cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
     # reads depth map
     depth_map = cv2.imread(path + '/Image0001.exr', cv2.IMREAD_UNCHANGED)[:, :, 0]
@@ -178,6 +178,6 @@ def restore_depth_map(t_num, o_file, path_settings):
     cv2.imwrite(o_file, depth_map)
     # depth_map_2 = cv2.imread(o_file)[:, :, 0]
     os.system('rm -r {}'.format(path))
-    # source = f'tmp/depth/t_{t_num}_depth/Image0001.exr'
+    # source = f'output/tmp/depth/t_{t_num}_depth/Image0001.exr'
     # shutil.move(source, o_file)
     # imageio.imwrite('float_img.exr', arr)

@@ -6,12 +6,13 @@ import pyswip
 from pyswip import newModule, Prolog
 
 
-def eval_rule(theory: str = None, ds_val: str = None, ds_train: str = None, dir='TrainGenerator/', print_stats=True, clean_up=True):
+def eval_rule(theory: str = None, ds_val: str = None, ds_train: str = None, dir='TrainGenerator/', print_stats=True,
+              clean_up=True):
     name = f'tmp_{random.randint(1, 1000)}'
     # test1 = newModule(name)
 
-    concept_tester_tmp = dir + f'tmp/concept_tester/{name}.pl'
-    os.makedirs(dir + f'tmp/concept_tester', exist_ok=True)
+    concept_tester_tmp = dir + f'output/tmp/concept_tester/{name}.pl'
+    os.makedirs(dir + f'output/tmp/concept_tester', exist_ok=True)
     try:
         os.remove(concept_tester_tmp)
     except OSError:

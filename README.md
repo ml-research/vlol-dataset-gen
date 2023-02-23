@@ -70,48 +70,49 @@ The default output location is `TrainGenerator/output/image_generator/`.
 
 The following settings are available, the corresponding input types and default settings are noted in parentheses:
 
-General settings:
-
+General:
 - `dataset_size` (int, 10,000) -> Size of the dataset we want to create.
-- `index_start` (int, 0) -> Start rendering images at index (index_start).
-- `index_end` (int, None) -> Stop rendering images at index (does not include rendering image index_end).
-  If None the train generator stops rendering at dataset_size.
 - `output_path` (str, 'output/image_generator') -> path to the output directory in which the generated datasets are
   saved.
+- `cuda` (int, 0) -> Which GPU to use for rendering. If -1, CPU is used.
 
-Classification & Visualization settings:
-
-- `classification_rule` (str, 'theoryx') -> The classification rule used for generating the labels of the dataset.
-  The following rules are available: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom'.
-  For more detailed information about the rules refer to the rule section.
-  Select custom rule to use your own personal rule. Therefore, define your own rule in \'example_rules/custom_rule.pl\'.
-- `description` (str, 'MichalskiTrains') -> The train descriptions we want to generate. Either 'MichalskiTrains' or '
+Background knowledge:
+- `bk` (str, 'MichalskiTrains') -> The train descriptions we want to generate. Either 'MichalskiTrains' or '
   RandomTrains'.
   The 'RandomTrains' descriptions are generated randomly.
   The 'MichalskiTrains' descriptions are generated according to distributional assumptions defined by
   Muggleton [[2]](#2).
+- `replace_bk` (bool, False) -> If the bk for the dataset is already generated shall it be replaced?
+  If false, it allows to use same bk for different visualizations.
+- `classification` (str, 'theoryx') -> The classification rule used for generating the labels of the dataset.
+  The following rules are available: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom'.
+  For more detailed information about the rules refer to the rule section.
+  Select custom rule to use your own personal rule. Therefore, define your own rule in \'example_rules/custom_rule.pl\'.
+- `max_train_length` (int, 4) -> The maximum number of cars a train can have.
+- `min_train_length` (int, 2) -> The minimum number of cars a train can have.
+
+Visualization:
 - `visualization` (str, 'Trains') -> The way we want to visualize the descriptions. Either as 'Trains' or '
   SimpleObjects'. For comparison see images above.
-- `background_scene` (str, 'base_scene') -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
+- `background` (str, 'base_scene') -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
   or 'fisheye_scene'.
-- `with_occlusion` (bool, False) -> Whether to include train angles which might lead to occlusion individual parts of
+- `occlusion` (bool, False) -> Whether to include train angles which might lead to occlusion individual parts of
   the train.
 
-Additional settings:
+Parallelization:
+- `index_start` (int, 0) -> Start rendering images at index (index_start).
+- `index_end` (int, None) -> Stop rendering images at index (does not include rendering image index_end).
+  If None the train generator stops rendering at dataset_size.
+- `parallel` (bool, True) -> Enables parallel generation of one dataset. Recommended to clear tmp folder before.
+  Images generated in tmp folder from previously uncompleted runs (of the same settings) are not deleted.
 
+rendering settings:
 - `save_blender` (bool, False) -> Whether the blender scene is saved.
   Only recommended for small image counts as the blend files can be quite large.
 - `high_res` (bool, False) -> Whether to render the images in high resolution (1920x1080) or standard resolution (
   480x270)
-- `gen_depth` (bool, False) -> Whether to save depth information of the individual scenes.
-- `replace_descriptions` (bool, False) -> If the train descriptions for the dataset are already generated shall they be
-  replaced?
-- `allow_parallel` (bool, True) -> Enables parallel generation of one dataset. Recommended to clear tmp folder before.
-  Images generated in tmp folder from previously uncompleted runs (of the same settings) are not deleted.
+- `depth` (bool, False) -> Whether to save depth information of the individual scenes.
 
-Enables parallel generation of one dataset. Recommended to clear tmp folder before. '
-'Images generated in tmp folder from previously uncompleted runs (of the same settings) '
-'are not deleted.
 
 The following shows example images of the four background scenes 'base_scene', 'desert_scene', 'sky_scene' and '
 fisheye_scene':

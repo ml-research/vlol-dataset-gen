@@ -30,17 +30,17 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
 
     start = time.time()
     path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_cars}-{max_cars}'
-    output_image = f'tmp/image_generator/{path_settings}/images/{t_num}_m_train.png'
-    output_blendfile = f'tmp/image_generator/{path_settings}/blendfiles/{t_num}_m_train.blend'
-    output_scene = f'tmp/image_generator/{path_settings}/scenes/{t_num}_m_train.json'
-    output_depth_map = f'tmp/image_generator/{path_settings}/depths/{t_num}_m_train.png'
+    output_image = f'output/tmp/image_generator/{path_settings}/images/{t_num}_m_train.png'
+    output_blendfile = f'output/tmp/image_generator/{path_settings}/blendfiles/{t_num}_m_train.blend'
+    output_scene = f'output/tmp/image_generator/{path_settings}/scenes/{t_num}_m_train.json'
+    output_depth_map = f'output/tmp/image_generator/{path_settings}/depths/{t_num}_m_train.png'
     if os.path.isfile(output_image) and os.path.isfile(output_scene) and (os.path.isfile(
             output_depth_map) or not gen_depth) and not replace_existing_img:
         return
-    os.makedirs(f'tmp/image_generator/{path_settings}/images', exist_ok=True)
-    os.makedirs(f'tmp/image_generator/{path_settings}/blendfiles', exist_ok=True)
-    os.makedirs(f'tmp/image_generator/{path_settings}/scenes', exist_ok=True)
-    os.makedirs(f'tmp/image_generator/{path_settings}/depths', exist_ok=True)
+    os.makedirs(f'output/tmp/image_generator/{path_settings}/images', exist_ok=True)
+    os.makedirs(f'output/tmp/image_generator/{path_settings}/blendfiles', exist_ok=True)
+    os.makedirs(f'output/tmp/image_generator/{path_settings}/scenes', exist_ok=True)
+    os.makedirs(f'output/tmp/image_generator/{path_settings}/depths', exist_ok=True)
 
     # collection = 'base_scene'
     # load_base_scene(filepath, collection)
@@ -113,7 +113,8 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
     loc_length = 0
     for car in train.m_cars:
         loc_length += car.get_car_length_scalar()
-
+    # move rotation point away from camera for space efficiency
+    init_cord = [0, -0.1, 0]
     if train_vis == 'SimpleObjects':
         displacement = .4 * train.get_blender_scale()[0]
         # add engine length and car displacements to the radius
@@ -121,10 +122,9 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
         # determine engine spawn position (which is located in the middle of the engine)
         offset = train.get_car_length('simple_engine') / 2  # - 0.675 * train.get_blender_scale()[0]
         engine_pos = - r + offset
-        # move rotation point away from camera
-        simple_init_cord = [0, -0.1, 0]
+
         # initialize train position
-        engine_pos = get_new_pos(simple_init_cord, engine_pos, alpha)
+        engine_pos = get_new_pos(init_cord, engine_pos, alpha)
 
         load_simple_engine(train_collection, engine_pos, alpha, train.get_blender_scale())
         # create and load trains into blender
@@ -136,10 +136,9 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
         offset = train.get_car_length('engine') - 0.675 * train.get_blender_scale()[0]
         engine_pos = - r + offset
         # load train at scale 1, z = -0.307
-        off_z = -0.307 * train.get_blender_scale()[0]
+        init_cord[2] = -0.307 * train.get_blender_scale()[0]
         # move rotation point away from camera
-        pos = [0, -0.1, off_z]
-        train_init_cord = get_new_pos(pos, engine_pos, alpha)
+        train_init_cord = get_new_pos(init_cord, engine_pos, alpha)
         # xd = engine_pos * math.cos(alpha) + offset[0]
         # yd = engine_pos * math.sin(alpha) + offset[1]
         # train_init_cord = [xd, yd, off_z]

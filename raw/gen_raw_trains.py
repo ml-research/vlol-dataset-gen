@@ -15,8 +15,8 @@ def gen_raw_michalski_trains(class_rule, out_path, num_entries=10000, with_occlu
         class_rule: str, classification rule used to derive the labels
     """
     rule_path = f'example_rules/{class_rule}_rule.pl'
-    os.makedirs('raw/tmp/', exist_ok=True)
-    generator_tmp = 'raw/tmp/generator_tmp.pl'
+    os.makedirs('output/tmp/raw/', exist_ok=True)
+    generator_tmp = 'output/tmp/raw/generator_tmp.pl'
     try:
         os.remove(generator_tmp)
     except OSError:
@@ -35,15 +35,15 @@ def gen_raw_michalski_trains(class_rule, out_path, num_entries=10000, with_occlu
         pass
     with open(out_path, 'w+') as all_trains:
         west_counter, east_counter = 0, 0
-        while west_counter < num_entries / 2 or east_counter < num_entries / 2:
+        while west_counter < int(math.ceil(num_entries / 2)) or east_counter < int(num_entries / 2):
             try:
-                os.remove(f'raw/tmp/MichalskiTrains.txt')
+                os.remove(f'output/tmp/raw/MichalskiTrains.txt')
             except OSError:
                 pass
             n_cars = random.randint(min_cars, max_cars)
             for _ in prolog.query(f"trains({n_cars})."):
                 continue
-            train = open('raw/tmp/MichalskiTrains.txt', 'r').read()
+            train = open('output/tmp/raw/MichalskiTrains.txt', 'r').read()
             t_angle = get_random_angle(with_occlusion)
             tmp = train.split(" ", 1)
             train = tmp[0] + f' {t_angle} ' + tmp[1]
@@ -53,7 +53,7 @@ def gen_raw_michalski_trains(class_rule, out_path, num_entries=10000, with_occlu
             elif 'west' in train and west_counter < int(math.ceil(num_entries / 2)):
                 all_trains.write(train)
                 west_counter += 1
-            os.remove('raw/tmp/MichalskiTrains.txt')
+            os.remove('output/tmp/raw/MichalskiTrains.txt')
         print(f'generated {west_counter} westbound trains and {east_counter} eastbound trains')
     os.remove(generator_tmp)
 
@@ -68,8 +68,8 @@ def gen_raw_random_trains(class_rule, out_path, num_entries=10000, with_occlusio
         max_cars: int maximum number of cars in a train
         min_cars: int minimum number of cars in a train
     """
-    classifier = 'raw/tmp/concept_tester_tmp.pl'
-    os.makedirs('raw/tmp/', exist_ok=True)
+    classifier = 'output/tmp/raw/concept_tester_tmp.pl'
+    os.makedirs('output/tmp/raw/', exist_ok=True)
     rule_path = f'example_rules/{class_rule}_rule.pl'
 
     try:
@@ -147,8 +147,11 @@ def gen_raw_trains(train_col, classification_rule, out_path, num_entries=10000, 
         num_entries: int number of michalski trains which are generated
         replace_existing: bool whether the existing copy shall be replaced by a new copy
         with_occlusion: boolean whether to include occlusion of the train payloads
+        max_cars: int maximum number of cars in a train
+        min_cars: int minimum number of cars in a train
     """
-    os.makedirs("raw/datasets/", exist_ok=True)
+    if min_cars > max_cars:
+        raise ValueError(f'min_train_length {min_cars} is larger than max_train_length {max_cars}')
     if replace_existing:
         if train_col == 'RandomTrains':
             gen_raw_random_trains(classification_rule, out_path, num_entries, with_occlusion, min_cars, max_cars)

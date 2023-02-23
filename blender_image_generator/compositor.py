@@ -22,7 +22,7 @@ def create_tree(train, t_num, gen_depth, path_settings):
     links = tree.links
     margin = 200
     pos_x, pos_y = 300, 0
-    base_path = f'tmp/tmp_graph_output/{path_settings}/'
+    base_path = f'output/tmp/tmp_graph_output/{path_settings}/'
 
     # clear default nodes
     for node in nodes:
@@ -99,7 +99,7 @@ def create_tree(train, t_num, gen_depth, path_settings):
 
     if gen_depth:
         depth_map_out = nodes.new("CompositorNodeOutputFile")
-        depth_map_out.base_path = f'tmp/depth/{path_settings}/t_{t_num}_depth'
+        depth_map_out.base_path = f'output/tmp/depth/{path_settings}/t_{t_num}_depth'
         depth_map_out.location = pos_x, 0
         depth_map_out.format.file_format = 'OPEN_EXR'
         links.new(
@@ -108,7 +108,7 @@ def create_tree(train, t_num, gen_depth, path_settings):
         )
 
         # car_ofile = nodes.new("CompositorNodeOutputFile")
-        # car_ofile.base_path = f'tmp/tmp_graph_output/t_{t_num}_car_{car_number}/Image0001.png'
+        # car_ofile.base_path = f'output/tmp/tmp_graph_output/t_{t_num}_car_{car_number}/Image0001.png'
         # car_ofile.location = 800, 285 + (car_number-1) * -800
         #
         # car_id_mask = nodes.new("CompositorNodeIDMask")
@@ -130,10 +130,10 @@ def create_tree(train, t_num, gen_depth, path_settings):
         #         car_mask.inputs['Image']
         #     )
 
-        # path = f'tmp/tmp_graph_output/t_{t_num}_car_{car_number}_wheels/Image0001.png'
-        # path = f'tmp/tmp_graph_output/t_{t_num}_car_{car_number}_roof/Image0001.png'
-        # path = f'tmp/tmp_graph_output/t_{t_num}_car_{car_number}_payload_{i}/Image0001.png'
-        # path = f'tmp/tmp_graph_output/t_{t_num}_car_{car_number}/Image0001.png'
+        # path = f'output/tmp/tmp_graph_output/t_{t_num}_car_{car_number}_wheels/Image0001.png'
+        # path = f'output/tmp/tmp_graph_output/t_{t_num}_car_{car_number}_roof/Image0001.png'
+        # path = f'output/tmp/tmp_graph_output/t_{t_num}_car_{car_number}_payload_{i}/Image0001.png'
+        # path = f'output/tmp/tmp_graph_output/t_{t_num}_car_{car_number}/Image0001.png'
 
     # generate segmentation image
     # math_node = nodes.new("CompositorNodeMath")
