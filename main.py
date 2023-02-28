@@ -37,7 +37,7 @@ def main():
 
     if args.command == 'image_generator':
         # generate images in range [start_ind:end_ind]
-        ds_raw_path = f'{out_path}/dataset_descriptions/{rule}/{bk}_car_length_{min_cars}-{max_cars}.txt'
+        ds_raw_path = f'{out_path}/dataset_descriptions/{rule}/{bk}_len_{min_cars}-{max_cars}.txt'
         if start_ind > ds_size or end_ind > ds_size:
             raise ValueError(f'start index {start_ind} or end index {end_ind} greater than dataset size {ds_size}')
         if min_cars > max_cars:
@@ -57,11 +57,11 @@ def main():
             raise ValueError(
                 f'defined dataset size: {ds_size}\n'
                 f'existing train descriptions: {num_lines}\n'
-                f'{num_lines} raw train descriptions were previously generated in raw/datasets/{bk}.txt \n '
+                f'{num_lines} raw train descriptions were previously generated in {ds_raw_path} \n '
                 f'add \'--replace_bk\' to command line arguments to the replace existing train descriptions and '
                 f'generate the correct number of michalski trains')
         #  scale the train to fit the scene (required space = number of cars + engine + free space)
-        scaler = 3/(max_cars + 2) if max_cars > 4 else 0.5
+        scaler = 3 / (max_cars + 2) if max_cars > 4 else 0.5
         # load trains
         trains = read_trains(ds_raw_path, toSimpleObjs=train_vis == 'SimpleObjects', scale=(scaler, scaler, scaler))
 
@@ -70,12 +70,14 @@ def main():
         rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_vis[0]}',
                     max_iterations=end_ind - start_ind)
         rtpt.start()
+        ds_name = f'{train_vis}_{rule}_{bk}_{base_scene}_len_{min_cars}-{max_cars}'
+
         for t_num, train in enumerate(trains, start=start_ind):
             rtpt.step()
             generate_image(rule, base_scene, bk, train_vis, t_num, train, save_blender, replace_existing_img,
-                           high_res=high_res, gen_depth=gen_depth, min_cars=min_cars, max_cars=max_cars)
-        path_settings = f'{train_vis}_{rule}_{bk}_{base_scene}_len_{min_cars}-{max_cars}'
-        combine_json(path_settings, out_dir=out_path, ds_size=ds_size)
+                           ds_name=ds_name, high_res=high_res, gen_depth=gen_depth, min_cars=min_cars,
+                           max_cars=max_cars)
+        combine_json(ds_name, out_dir=out_path, ds_size=ds_size)
 
     if args.command == 'ct':
         from raw.concept_tester import eval_rule

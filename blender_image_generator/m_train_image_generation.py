@@ -9,8 +9,8 @@ from util import *
 import time
 
 
-def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, save_blender=False,
-                   replace_existing_img=True,
+def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, ds_name=None,
+                   save_blender=False, replace_existing_img=True,
                    high_res=False, gen_depth=False, min_cars=2, max_cars=4):
     """ assemble a michalski train, render its corresponding image and generate ground truth information
     Args:
@@ -29,7 +29,7 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
     """
 
     start = time.time()
-    path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_cars}-{max_cars}'
+    path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_cars}-{max_cars}' if ds_name is None else ds_name
     output_image = f'output/tmp/image_generator/{path_settings}/images/{t_num}_m_train.png'
     output_blendfile = f'output/tmp/image_generator/{path_settings}/blendfiles/{t_num}_m_train.blend'
     output_scene = f'output/tmp/image_generator/{path_settings}/scenes/{t_num}_m_train.json'
