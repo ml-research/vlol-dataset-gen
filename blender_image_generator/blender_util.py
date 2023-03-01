@@ -39,6 +39,25 @@ def create_camera():
     bpy.context.scene.camera = cam
 
 
+def get_scale(max_cars, auto_zoom):
+    """
+        # get scale for train if auto zoom is enabled relative to the number of cars in the train
+        # else relative to max number of cars in the dataset
+    params:
+        max_cars (int): maximum number of cars in the scene
+        auto_zoom (bool): if True, the camera will zoom in and out depending on the number of cars in the scene
+    return:
+        scaler (float,float,float): train scale
+
+    """
+    if auto_zoom:
+        return None
+    else:
+        #  scale the train to fit the scene (required space = number of cars + engine + free space)
+        scaler = 3 / (max_cars + 2) if max_cars > 4 else 0.5
+        return scaler, scaler, scaler
+
+
 def clean_up():
     """
     clean up the scene

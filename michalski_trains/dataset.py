@@ -214,6 +214,7 @@ def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_c
     @return: michalski train dataset
     """
     path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_car}-{max_car}'
+    print(f'set up dataset with path settings: {path_settings}')
     check_data(ds_path, path_settings, ds_size)
 
     # image_count = None for standard image count

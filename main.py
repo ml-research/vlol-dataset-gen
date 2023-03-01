@@ -2,8 +2,9 @@ import warnings
 
 from rtpt import RTPT
 
+from blender_image_generator.blender_util import get_scale
 from blender_image_generator.m_train_image_generation import generate_image
-from michalski_trains.michalskitraindataset import combine_json
+from michalski_trains.dataset import combine_json
 from raw.gen_raw_trains import gen_raw_trains, read_trains
 from util import *
 import argparse
@@ -16,6 +17,7 @@ def main():
     # settings general
     ds_size, out_path, device = args.dataset_size, args.output_path, torch.device(
         f"cuda:{args.cuda}" if torch.cuda.is_available() else "cpu")
+    tag = args.tag + '_' if args.tag != "" else args.tag
 
     # bk settings
     bk, replace_bk = args.bk, args.replace_bk
@@ -26,6 +28,7 @@ def main():
     train_vis = args.visualization
     base_scene = args.background
     occ = args.occlusion
+    auto_zoom = args.auto_zoom
 
     # render settings
     save_blender, high_res, gen_depth = args.save_blender, args.high_res, args.depth
@@ -37,7 +40,7 @@ def main():
 
     if args.command == 'image_generator':
         # generate images in range [start_ind:end_ind]
-        ds_raw_path = f'{out_path}/dataset_descriptions/{rule}/{bk}_len_{min_cars}-{max_cars}.txt'
+        ds_raw_path = f'{out_path}/dataset_descriptions/{rule}/{tag}{bk}_len_{min_cars}-{max_cars}.txt'
         if start_ind > ds_size or end_ind > ds_size:
             raise ValueError(f'start index {start_ind} or end index {end_ind} greater than dataset size {ds_size}')
         if min_cars > max_cars:
@@ -60,23 +63,25 @@ def main():
                 f'{num_lines} raw train descriptions were previously generated in {ds_raw_path} \n '
                 f'add \'--replace_bk\' to command line arguments to the replace existing train descriptions and '
                 f'generate the correct number of michalski trains')
-        #  scale the train to fit the scene (required space = number of cars + engine + free space)
-        scaler = 3 / (max_cars + 2) if max_cars > 4 else 0.5
+
+        # get scale for train if auto zoom is enabled relative to the number of cars in the train
+        # else relative to max number of cars in the dataset
+        scale = get_scale(max_cars, auto_zoom)
         # load trains
-        trains = read_trains(ds_raw_path, toSimpleObjs=train_vis == 'SimpleObjects', scale=(scaler, scaler, scaler))
+        trains = read_trains(ds_raw_path, toSimpleObjs=train_vis == 'SimpleObjects', scale=scale)
 
         # render trains
         trains = trains[start_ind:end_ind]
         rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_vis[0]}',
                     max_iterations=end_ind - start_ind)
         rtpt.start()
-        ds_name = f'{train_vis}_{rule}_{bk}_{base_scene}_len_{min_cars}-{max_cars}'
+        ds_name = tag + f'{train_vis}_{rule}_{bk}_{base_scene}_len_{min_cars}-{max_cars}'
 
         for t_num, train in enumerate(trains, start=start_ind):
             rtpt.step()
-            generate_image(rule, base_scene, bk, train_vis, t_num, train, save_blender, replace_existing_img,
-                           ds_name=ds_name, high_res=high_res, gen_depth=gen_depth, min_cars=min_cars,
-                           max_cars=max_cars)
+            generate_image(rule, base_scene, bk, train_vis, t_num, train, save_blender=save_blender,
+                           replace_existing_img=replace_existing_img, ds_name=ds_name, high_res=high_res,
+                           gen_depth=gen_depth, min_cars=min_cars, max_cars=max_cars)
         combine_json(ds_name, out_dir=out_path, ds_size=ds_size)
 
     if args.command == 'ct':
@@ -91,6 +96,7 @@ def parse():
     parser.add_argument('--dataset_size', type=int, default=10000, help='Size of the dataset we want to create')
     parser.add_argument('--output_path', type=str, default="output/image_generator",
                         help='path to the output directory')
+    parser.add_argument('--tag', type=str, default="", help='add name tag to the output directory')
     parser.add_argument('--cuda', type=int, default=0, help='Which cuda device to use')
 
     # Background knowledge settings
@@ -114,7 +120,10 @@ def parse():
                         help='Scene in which the trains are set: base_scene, desert_scene, sky_scene or fisheye_scene')
     parser.add_argument('--occlusion', type=bool, default=False,
                         help='Whether to include train angles which might lead to occlusion of the individual '
-                             'train attributes')
+                             'train attributes.')
+    parser.add_argument('--auto_zoom', type=bool, default=False,
+                        help='Whether to automatically zoom in or out depending on the individual train lengths '
+                             ' or fix the zoom of the camera to the max length of the train.')
 
     # Parallelization settings
     parser.add_argument('--index_start', type=int, default=0, help='start rendering images at index')
