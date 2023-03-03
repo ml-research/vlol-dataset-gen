@@ -13,13 +13,34 @@ certainly easy to find a classification hypothesis satisfying a given set of Mic
 e.g. learning the trains by heart. However, due to the great number of train properties, it
 is a major challenge to find the most general decision hypothesis.
 
-This study takes the Michalski train problem one step further by introducing a three-dimensional
-Michalski train generator. An image generator that allows to establish versatile datasets for deep image understanding,
-relational and analogical (grounded) visual reasoning.
+This study takes the clevr dataset even a step further by introducing the Michalski train problem in the form of a complex rule-based learning task into it.
+In doing so, we aim to provide a novel dataset for the domain of relational and analogical (grounded) visual reasoning.
+For this we provide an image generator that allows a simple and efficient large-scale generation of visual datasets.
+Furthermore, we allow a highly flexible customisation of the dataset that allows us to take effect/shape on the complexities of visual perception and relational reasoning.
+We can incorporate any arbitrary prolog rule and test for different kind of reasoning abilities (recognition, counting, spatial, numerical, logical, abstract).
+
+[//]: # (This study takes the Michalski train problem one step further by introducing it in form of a complex rule-based learning task into a clevr like datasets.)
+
 This research aims to contribute an ILP dataset which allows to incorporate the complex rule-based logic of the
 Michalski train problem and establish a modern three-dimensional dataset creating a problem of inductive inference.
 The resulting datasets allow for diagnostic insights into an AI model’s decision-making process as well as its
 capabilities of rule-based learning.
+
+[//]: # ()
+[//]: # (% 1. Allows simple, efficient and large-scale generation of datasets.)
+
+[//]: # (% 2. Customise the complexities of the visual and relational challenges.)
+
+[//]: # (% 3. We can Incorporate any arbitrary prolog rule and test for different kind of reasoning abilities. &#40;recognition, counting, spatial, numerical, logical, abstract&#41;)
+
+[//]: # (% 4. Scale amount of information &#40;and combinatorial relations&#41; within each scene)
+
+[//]: # (%     - Select min and max train length according to requirements, images are scaled automatically)
+
+[//]: # (% 5. Choose between different object visualizations and backgrounds)
+
+[//]: # (% 6. Establish datasets with rich scene information &#40;depth, object masks, etc.&#41;)
+
 
 <div align="center">
   <img src="example_images/michalski_original.png" width="600"  alt="">
