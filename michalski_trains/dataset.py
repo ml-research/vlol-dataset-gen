@@ -16,7 +16,7 @@ from michalski_trains.m_train import *
 
 class MichalskiDataset(Dataset):
     def __init__(self, class_rule, base_scene, raw_trains, train_vis, min_car=2, max_car=4,
-                 ds_size=10000, resize=False, label_noise=0, ds_path='output/image_generator'):
+                 ds_size=10000, resize=False, label_noise=0, image_noise=0, ds_path='output/image_generator'):
         """ MichalskiTrainDataset
             @param class_rule (string): classification rule
             @param base_scene (string): background scene
@@ -81,6 +81,10 @@ class MichalskiDataset(Dataset):
         if resize:
             print('resize true')
             trans.append(transforms.Resize((224, 224), interpolation=transforms.InterpolationMode.BICUBIC))
+        if image_noise > 0:
+            print('adding noise to images')
+            trans.append(AddBinaryNoise(image_noise))
+
         self.norm = transforms.Compose(trans)
         self.normalize_mask = transforms.Compose([
             # transforms.ToTensor(),
@@ -196,7 +200,8 @@ class MichalskiAttributeDataset(MichalskiDataset):
 
 
 def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_car=4,
-                 ds_size=12000, ds_path='output/image_generator', y_val='direction', resize=False, noise=0):
+                 ds_size=12000, ds_path='output/image_generator', y_val='direction', resize=False, label_noise=0,
+                 image_noise=0):
     """
     Returns the train and validation dataset for the given parameters
     Args:
@@ -221,11 +226,13 @@ def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_c
     if y_val == 'direction':
         full_ds = MichalskiDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                    train_vis=train_vis, min_car=min_car, max_car=max_car,
-                                   label_noise=noise, ds_size=ds_size, resize=resize, ds_path=ds_path)
+                                   label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
+                                   image_noise=image_noise)
     elif y_val == 'attribute':
         full_ds = MichalskiAttributeDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                             train_vis=train_vis, min_car=min_car, max_car=max_car,
-                                            label_noise=noise, ds_size=ds_size, resize=resize, ds_path=ds_path)
+                                            label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
+                                            image_noise=image_noise)
     else:
         raise AssertionError(f'Unknown y value {y_val}')
     return full_ds
@@ -297,3 +304,28 @@ def check_data(ds_path, path_settings, ds_size):
     if not os.path.isfile(path_ori + '/all_scenes/all_scenes.json'):
         raise AssertionError(
             f'no JSON found')
+
+
+class AddBinaryNoise(object):
+    def __init__(self, p=0.1):
+        self.p = p
+
+    def __call__(self, tensor):
+        t = torch.ones_like(tensor)
+        t[torch.rand_like(tensor) < self.p] = 0
+        return t * tensor
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(percentage={0})'.format(self.p)
+
+
+class AddGaussianNoise(object):
+    def __init__(self, mean=0., std=1.):
+        self.std = std
+        self.mean = mean
+
+    def __call__(self, tensor):
+        return tensor + torch.randn(tensor.size()) * self.std + self.mean
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
