@@ -2,12 +2,13 @@ import os
 import random
 from importlib import reload
 
+import numpy as np
 import pyswip
 from pyswip import newModule, Prolog
 
 
 def eval_rule(theory: str = None, ds_val: str = None, ds_train: str = None, dir='TrainGenerator/', print_stats=True,
-              clean_up=True):
+              clean_up=True, noise=0):
     name = f'tmp_{random.randint(1, 1000)}'
     # test1 = newModule(name)
 
@@ -46,6 +47,9 @@ def eval_rule(theory: str = None, ds_val: str = None, ds_train: str = None, dir=
                         ind = c * 8
                         train += ', ' if c > 0 else ''
                         train += f'c({l[ind + 2]}, {l[ind + 3]}, {l[ind + 4]}, {l[ind + 5]}, {l[ind + 6]}, {l[ind + 7]}, l({l[ind + 8]}, {l[ind + 9]}))'
+                    if noise > 0:
+                        ns = random.random()
+                        train = creat_random_train() if ns < noise else train
                     q = list(prolog.query(f"eastbound([{train}])."))
                     p = 'east' if bool(q) else 'west'
 
@@ -92,3 +96,26 @@ def eval_rule(theory: str = None, ds_val: str = None, ds_train: str = None, dir=
     if clean_up:
         os.remove(concept_tester_tmp)
     return TP, FN, TN, FP, TP_train, FN_train, TN_train, FP_train
+
+
+def creat_random_train():
+    '''
+    creates a random train
+    :return:
+    train: string
+    '''
+    cars = np.random.randint(2, 5)
+    train = ''
+    for i in range(cars):
+        train += ', ' if i > 0 else ''
+        shape = ['ellipse', 'hexagon', 'rectangle', 'u_shaped', 'bucket'][np.random.randint(5)]
+        length = ['short', 'long'][np.random.randint(2)]
+        walls = ["not_double", 'double'][np.random.randint(2)]
+        roofs = ["none", 'flat', 'jagged', 'peaked', 'arc'][
+            np.random.randint(5)]
+        wheel_count = ['2', '3'][np.random.randint(2)]
+        l_shape = ["circle", "diamond", 'hexagon', 'rectangle', 'triangle', 'utriangle'][
+            np.random.randint(6)]
+        l_num = np.random.randint(4)
+        train += f'c({i + 1}, {shape}, {length}, {walls}, {roofs}, {wheel_count}, l({l_shape}, {l_num}))'
+    return train
