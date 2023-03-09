@@ -10,6 +10,7 @@ import torch
 from torch.utils.data import Dataset
 from PIL import Image
 from torchvision import transforms
+from pycocotools import mask as maskUtils
 
 from michalski_trains.m_train import *
 
@@ -126,27 +127,6 @@ class MichalskiDataset(Dataset):
         label = torch.tensor(label_binary).unsqueeze(dim=0)
         return label
 
-    def get_attributes(self, item):
-        att = self.attribute_classes
-        train = self.trains[item]
-        cars = train.get_cars()
-        labels = [0] * 32
-        # each train has (4 cars a 8 attributes) totalling to 32 labels
-        # each label can have 22 classes
-        for car in cars:
-            # index 0 = not existent
-            color = att.index(car.get_blender_car_color())
-            length = att.index(car.get_car_length())
-            wall = att.index(car.get_blender_wall())
-            roof = att.index(car.get_blender_roof())
-            wheels = att.index(car.get_car_wheels())
-            l_shape = att.index(car.get_blender_payload())
-            l_num = car.get_load_number()
-            l_shapes = [l_shape] * l_num + [0] * (3 - l_num)
-            car_number = car.get_car_number()
-            labels[8 * (car_number - 1):8 * car_number] = [color, length, wall, roof, wheels] + l_shapes
-        return torch.tensor(labels)
-
     def get_m_train(self, item):
         return self.trains[item]
 
@@ -180,55 +160,181 @@ class MichalskiDataset(Dataset):
 
 
 class MichalskiAttributeDataset(MichalskiDataset):
-    def __int__(self, *args, **kwargs):
+    ''' Dataset for the Michalski train dataset with attributes as labels.
+        parameters:
+        fixed_output_car_size: if set to None, the output tensor will have the size of the number of cars * attributes.
+         Else the output tensor y will have the size of fixed_output_car_size * number of attributes
+    '''
+    def __int__(self, fixed_output_car_size=4, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fixed_output_car_size = fixed_output_car_size
 
     def __getitem__(self, item):
         image = self.get_pil_image(item)
         X = self.norm(image)
+        y = self.get_attributes(item) if self.fixed_output_car_size is None else self.get_attributes_fixed_size(item)
+        return X, y
+
+    def get_attributes(self, item):
+        ''' Returns a tensor of labels for all attributes of each car in the train
+        :param item: index of the train
+        :return: tensor of labels
+        '''
+        att = self.attribute_classes
+        train = self.trains[item]
+        cars = train.get_cars()
+        labels = []
+        # each train has (n cars a 8 attributes) totalling to n*8 labels
+        # each label can have 22 classes
+        for car in cars:
+            # index 0 = not existent
+            color = att.index(car.get_blender_car_color())
+            length = att.index(car.get_car_length())
+            wall = att.index(car.get_blender_wall())
+            roof = att.index(car.get_blender_roof())
+            wheels = att.index(car.get_car_wheels())
+            l_shape = att.index(car.get_blender_payload())
+            l_num = car.get_load_number()
+            l_shapes = [l_shape] * l_num + [0] * (3 - l_num)
+            car_number = car.get_car_number()
+            labels += [color, length, wall, roof, wheels] + l_shapes
+        return torch.tensor(labels, dtype=torch.int64)
+
+    def get_attributes_fixed_size(self, item):
+        ''' Returns a tensor of labels for all attributes of each car in the train
+        :param item: index of the train
+        :return: tensor of labels
+        '''
+        att = self.attribute_classes
+        train = self.trains[item]
+        cars = train.get_cars()
+        labels = []
+        # each train has (fixed_output_car_size cars a 8 attributes) totalling to fixed_output_car_size*8 labels
+        # each label can have 22 classes
+        for car in cars:
+            # index 0 = not existent
+            color = att.index(car.get_blender_car_color())
+            length = att.index(car.get_car_length())
+            wall = att.index(car.get_blender_wall())
+            roof = att.index(car.get_blender_roof())
+            wheels = att.index(car.get_car_wheels())
+            l_shape = att.index(car.get_blender_payload())
+            l_num = car.get_load_number()
+            l_shapes = [l_shape] * l_num + [0] * (3 - l_num)
+            car_number = car.get_car_number()
+            labels += [color, length, wall, roof, wheels] + l_shapes
+        if len(labels) > self.fixed_output_car_size * 8:
+            raise ValueError(f'Number of labels is greater than the fixed output car size.')
+        labels = labels + [0] * (self.fixed_output_car_size * 8 - len(labels))
+        return torch.tensor(labels, dtype=torch.int64)
+
+    def get_ds_labels(self):
+        return self.attributes
+
+    def get_ds_classes(self):
+        return self.attribute_classes
+
+    def get_class_dim(self):
+        return len(self.attribute_classes)
+
+    def get_output_dim(self):
+        return len(self.attributes)
+
+
+class MichalskiMaskDataset(MichalskiAttributeDataset):
+    def __int__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __getitem__(self, item):
+        target = dict()
+        image = self.get_pil_image(item)
+        X = self.norm(image)
+        target['boxes'] = self.get_bboxes(item)
+        target['labels'] = self.get_attributes(item)
+        target['image_id'] = torch.tensor([item], dtype=torch.int64)
+        target['area'] = (target['boxes'][:, 3] - target['boxes'][:, 1]) * (target['boxes'][:, 2] - target['boxes'][:, 0])
+        target['iscrowd'] = torch.zeros_like(target['area'], dtype=torch.uint8)
+        # target['masks'] = self.normalize_mask(self.get_mask(item))
+        return X, target
+
+    def get_masks(self, item):
+        ''' returns a list of masks of the train.
+        params:
+            item: index of the train
+        returns:
+            tensor of masks
+        '''
+        masks = torch.empty(0, 270, 480, dtype=torch.uint8)
+        mask = self.get_mask(item)
+        attr_id = -1
         y = self.get_attributes(item)
-        return X, y
+        for car_id, car in mask.items():
+            whole_car_mask = car['mask']
+            whole_car_bbox = maskUtils.toBbox(whole_car_mask)
+            del car['mask'], car['b_box'], car['world_cord']
+            for att_name in ['color', 'length', 'wall', 'roof', 'wheels', 'payload_0', 'payload_1', 'payload_2']:
+                attr_id += 1
+                if att_name in car:
+                    att = car[att_name]
+                    label = att['label']
+                    if label != 'none':
+                        if att_name == 'length' or att_name == 'color':
+                            rle = whole_car_mask
+                        else:
+                            rle = att['mask']
+                        class_id = self.attribute_classes.index(label)
+                        masks = torch.vstack([masks, torch.from_numpy(maskUtils.decode(rle))])
+                        # if att_name == 'payload_1' or att_name == 'payload_2' or att_name == 'payload_0':
+                        #     if masks[attr_id, :, :].max() != y[attr_id]:
+                        #         raise AssertionError(
+                        #             f'class {label} with id {y[attr_id]}, rle id is {torch.from_numpy(maskUtils.decode(rle) * class_id).max()}')
+                        # #     print(f'class {label} with id {y[attr_id]}, rle id is {torch.from_numpy(maskUtils.decode(rle) * class_id).max()}')
+                    del car[att_name]
+                else:
+                    # if object is not in image add a zero mask
+                    masks = torch.vstack([masks, torch.zeros(270, 480, dtype=torch.uint8)])
+                    if y[attr_id] != 0:
+                        raise AssertionError(att_name + ' not in car')
+        return masks
 
-    def get_ds_labels(self):
-        return self.attributes
-
-    def get_ds_classes(self):
-        return self.attribute_classes
-
-    def get_class_dim(self):
-        return len(self.attribute_classes)
-
-    def get_output_dim(self):
-        return len(self.attributes)
-
-
-class MichalskiMaskDataset(MichalskiDataset):
-    def __int__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def __getitem__(self, item):
-        image = self.get_pil_image(item)
-        X = self.norm(image)
-        y = self.normalize_mask(self.get_mask(item))
-        mask_labels = self.get_attributes(item)
-        return X, y
-
-    def get_ds_labels(self):
-        return self.attributes
-
-    def get_ds_classes(self):
-        return self.attribute_classes
-
-    def get_class_dim(self):
-        return len(self.attribute_classes)
-
-    def get_output_dim(self):
-        return len(self.attributes)
+    def get_bboxes(self, item):
+        ''' return tensor of bboxes of the train
+        params:
+            item: index of the train
+        returns:
+            binary tensor of bboxes
+        '''
+        bboxes = torch.empty(0, 4)
+        mask = self.get_mask(item)
+        attr_id = -1
+        y = self.get_attributes(item)
+        for car_id, car in mask.items():
+            whole_car_mask = car['mask']
+            whole_car_bbox = maskUtils.toBbox(whole_car_mask)
+            del car['mask'], car['b_box'], car['world_cord']
+            for att_name in ['color', 'length', 'wall', 'roof', 'wheels', 'payload_0', 'payload_1', 'payload_2']:
+                attr_id += 1
+                if att_name in car:
+                    att = car[att_name]
+                    label = att['label']
+                    if label != 'none':
+                        if att_name == 'length' or att_name == 'color':
+                            box = whole_car_bbox
+                        else:
+                            box = maskUtils.toBbox(att['mask'])
+                        bboxes = torch.vstack([bboxes, torch.tensor(box)])
+                    del car[att_name]
+                else:
+                    # if object is not in image, add a zero bbox
+                    bboxes = torch.vstack([bboxes, torch.zeros(1,4)])
+                    if y[attr_id] != 0:
+                        raise AssertionError(att_name + ' not in car')
+        return bboxes
 
 
 def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_car=4,
                  ds_size=12000, ds_path='output/image_generator', y_val='direction', resize=False, label_noise=0,
-                 image_noise=0, preprocessing=None):
+                 image_noise=0, preprocessing=None, fixed_output_car_size=4):
     """
     Returns the train and validation dataset for the given parameters
     Args:
@@ -258,10 +364,11 @@ def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_c
                                    label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
                                    image_noise=image_noise, preprocessing=preprocessing)
     elif y_val == 'attribute':
-        full_ds = MichalskiAttributeDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
+        full_ds = MichalskiAttributeDataset(fixed_output_car_size=fixed_output_car_size, class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                             train_vis=train_vis, min_car=min_car, max_car=max_car,
                                             label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
-                                            image_noise=image_noise, preprocessing=preprocessing)
+                                            image_noise=image_noise, preprocessing=preprocessing,
+                                            )
     elif y_val == 'mask':
         full_ds = MichalskiMaskDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                        train_vis=train_vis, min_car=min_car, max_car=max_car,
