@@ -165,9 +165,10 @@ class MichalskiAttributeDataset(MichalskiDataset):
         fixed_output_car_size: if set to None, the output tensor will have the size of the number of cars * attributes.
          Else the output tensor y will have the size of fixed_output_car_size * number of attributes
     '''
-    def __int__(self, fixed_output_car_size=4, *args, **kwargs):
+
+    def __int__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fixed_output_car_size = fixed_output_car_size
+        self.fixed_output_car_size = 4
 
     def __getitem__(self, item):
         image = self.get_pil_image(item)
@@ -252,7 +253,8 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         target['boxes'] = self.get_bboxes(item)
         target['labels'] = self.get_attributes(item)
         target['image_id'] = torch.tensor([item], dtype=torch.int64)
-        target['area'] = (target['boxes'][:, 3] - target['boxes'][:, 1]) * (target['boxes'][:, 2] - target['boxes'][:, 0])
+        target['area'] = (target['boxes'][:, 3] - target['boxes'][:, 1]) * (
+                    target['boxes'][:, 2] - target['boxes'][:, 0])
         target['iscrowd'] = torch.zeros_like(target['area'], dtype=torch.uint8)
         # target['masks'] = self.normalize_mask(self.get_mask(item))
         return X, target
@@ -326,7 +328,7 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                     del car[att_name]
                 else:
                     # if object is not in image, add a zero bbox
-                    bboxes = torch.vstack([bboxes, torch.zeros(1,4)])
+                    bboxes = torch.vstack([bboxes, torch.zeros(1, 4)])
                     if y[attr_id] != 0:
                         raise AssertionError(att_name + ' not in car')
         return bboxes
@@ -363,8 +365,9 @@ def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_c
                                    train_vis=train_vis, min_car=min_car, max_car=max_car,
                                    label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
                                    image_noise=image_noise, preprocessing=preprocessing)
-    elif y_val == 'attribute':
-        full_ds = MichalskiAttributeDataset(fixed_output_car_size=fixed_output_car_size, class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
+    elif y_val == 'attributes':
+        full_ds = MichalskiAttributeDataset(class_rule=class_rule,
+                                            base_scene=base_scene, raw_trains=raw_trains,
                                             train_vis=train_vis, min_car=min_car, max_car=max_car,
                                             label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
                                             image_noise=image_noise, preprocessing=preprocessing,
