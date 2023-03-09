@@ -16,7 +16,8 @@ from michalski_trains.m_train import *
 
 class MichalskiDataset(Dataset):
     def __init__(self, class_rule, base_scene, raw_trains, train_vis, min_car=2, max_car=4,
-                 ds_size=10000, resize=False, label_noise=0, image_noise=0, ds_path='output/image_generator'):
+                 ds_size=10000, resize=False, label_noise=0, image_noise=0, ds_path='output/image_generator',
+                 preprocessing=None):
         """ MichalskiTrainDataset
             @param class_rule (string): classification rule
             @param base_scene (string): background scene
@@ -26,6 +27,7 @@ class MichalskiDataset(Dataset):
             @param resize: bool if true images are resized to 224x224
             @param label_noise: float between 0 and 1. If > 0, labels are flipped with the given probability
             @param ds_path: path to the dataset
+            @param preprocessing: preprocessing function to apply to the images
             @return X_val: image data
             @return y_val: label data
             """
@@ -73,11 +75,12 @@ class MichalskiDataset(Dataset):
                 self.trains.append(jsonpickle.decode(train))
                 self.masks.append(scene['car_masks'])
         # transform
+
         trans = [
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225]),
-        ]
+        ] if preprocessing is None else [preprocessing]
         if resize:
             print('resize true')
             trans.append(transforms.Resize((224, 224), interpolation=transforms.InterpolationMode.BICUBIC))
@@ -199,9 +202,33 @@ class MichalskiAttributeDataset(MichalskiDataset):
         return len(self.attributes)
 
 
+class MichalskiMaskDataset(MichalskiDataset):
+    def __int__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __getitem__(self, item):
+        image = self.get_pil_image(item)
+        X = self.norm(image)
+        y = self.normalize_mask(self.get_mask(item))
+        mask_labels = self.get_attributes(item)
+        return X, y
+
+    def get_ds_labels(self):
+        return self.attributes
+
+    def get_ds_classes(self):
+        return self.attribute_classes
+
+    def get_class_dim(self):
+        return len(self.attribute_classes)
+
+    def get_output_dim(self):
+        return len(self.attributes)
+
+
 def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_car=4,
                  ds_size=12000, ds_path='output/image_generator', y_val='direction', resize=False, label_noise=0,
-                 image_noise=0):
+                 image_noise=0, preprocessing=None):
     """
     Returns the train and validation dataset for the given parameters
     Args:
@@ -215,7 +242,9 @@ def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_c
         @param ds_path: path to the dataset
         @param y_val: which value to use for the y value, either direction or attributes
         @param resize: whether to resize the images to 224x224
-        @param noise: whether to apply noise to the labels
+        @param label_noise: noise to be applied to the labels
+        @param image_noise: noise to be applied to the images
+        @param preprocessing: additional preprocessing to be applied to the images
     @return: michalski train dataset
     """
     path_settings = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_car}-{max_car}'
@@ -227,12 +256,17 @@ def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_c
         full_ds = MichalskiDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                    train_vis=train_vis, min_car=min_car, max_car=max_car,
                                    label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
-                                   image_noise=image_noise)
+                                   image_noise=image_noise, preprocessing=preprocessing)
     elif y_val == 'attribute':
         full_ds = MichalskiAttributeDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                             train_vis=train_vis, min_car=min_car, max_car=max_car,
                                             label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
-                                            image_noise=image_noise)
+                                            image_noise=image_noise, preprocessing=preprocessing)
+    elif y_val == 'mask':
+        full_ds = MichalskiMaskDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
+                                       train_vis=train_vis, min_car=min_car, max_car=max_car,
+                                       label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
+                                       image_noise=image_noise, preprocessing=preprocessing)
     else:
         raise AssertionError(f'Unknown y value {y_val}')
     return full_ds
