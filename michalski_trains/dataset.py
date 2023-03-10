@@ -6,6 +6,7 @@ import os
 import random
 import shutil
 import jsonpickle
+import numpy as np
 import torch
 from torch.utils.data import Dataset
 from PIL import Image
@@ -38,7 +39,6 @@ class MichalskiDataset(Dataset):
         self.class_rule, self.base_scene, self.raw_trains, self.train_vis = class_rule, base_scene, raw_trains, train_vis
         self.min_car, self.max_car = min_car, max_car
         self.resize, self.train_count, self.label_noise = resize, ds_size, label_noise
-
         # ds path
         ds_typ = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_car}-{max_car}'
         self.image_base_path = f'{ds_path}/{ds_typ}/images'
@@ -77,11 +77,11 @@ class MichalskiDataset(Dataset):
                 self.masks.append(scene['car_masks'])
         # transform
 
-        trans = [
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225]),
-        ] if preprocessing is None else [preprocessing]
+        trans = [transforms.ToTensor(),
+                 transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                      std=[0.229, 0.224, 0.225]), ]
+        if preprocessing is not None:
+            trans.append(preprocessing)
         if resize:
             print('resize true')
             trans.append(transforms.Resize((224, 224), interpolation=transforms.InterpolationMode.BICUBIC))
@@ -166,14 +166,15 @@ class MichalskiAttributeDataset(MichalskiDataset):
          Else the output tensor y will have the size of fixed_output_car_size * number of attributes
     '''
 
-    def __int__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fixed_output_car_size = 4
+    def __int__(self, fixed_car_size=4, **kwargs):
+        self.fixed_car_size = fixed_car_size
+        super().__init__(**kwargs)
 
     def __getitem__(self, item):
         image = self.get_pil_image(item)
         X = self.norm(image)
-        y = self.get_attributes(item) if self.fixed_output_car_size is None else self.get_attributes_fixed_size(item)
+        # y = self.get_attributes(item) if self.fixed_output_car_size is None else self.get_attributes_fixed_size(item)
+        y = self.get_attributes_fixed_size(item)
         return X, y
 
     def get_attributes(self, item):
@@ -206,6 +207,9 @@ class MichalskiAttributeDataset(MichalskiDataset):
         :param item: index of the train
         :return: tensor of labels
         '''
+        # fixed_car_size = self.fixed_car_size
+        fixed_car_size = 4
+        # self.fixed_output_car_size = 4
         att = self.attribute_classes
         train = self.trains[item]
         cars = train.get_cars()
@@ -224,9 +228,9 @@ class MichalskiAttributeDataset(MichalskiDataset):
             l_shapes = [l_shape] * l_num + [0] * (3 - l_num)
             car_number = car.get_car_number()
             labels += [color, length, wall, roof, wheels] + l_shapes
-        if len(labels) > self.fixed_output_car_size * 8:
+        if len(labels) > fixed_car_size * 8:
             raise ValueError(f'Number of labels is greater than the fixed output car size.')
-        labels = labels + [0] * (self.fixed_output_car_size * 8 - len(labels))
+        labels = labels + [0] * (fixed_car_size * 8 - len(labels))
         return torch.tensor(labels, dtype=torch.int64)
 
     def get_ds_labels(self):
@@ -243,19 +247,24 @@ class MichalskiAttributeDataset(MichalskiDataset):
 
 
 class MichalskiMaskDataset(MichalskiAttributeDataset):
-    def __int__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    # def __int__(self, *args, **kwargs):
+    # super().__init__(*args, **kwargs)
 
     def __getitem__(self, item):
-        target = dict()
+        target = {}
         image = self.get_pil_image(item)
         X = self.norm(image)
-        target['boxes'] = self.get_bboxes(item)
-        target['labels'] = self.get_attributes(item)
+        boxes = self.get_bboxes(item)
+        labels = self.get_attributes(item)
+
+
+        target['boxes'] = boxes[boxes != 0].view(-1,4)
+        target['labels'] = labels[labels != 0]
         target['image_id'] = torch.tensor([item], dtype=torch.int64)
-        target['area'] = (target['boxes'][:, 3] - target['boxes'][:, 1]) * (
-                    target['boxes'][:, 2] - target['boxes'][:, 0])
+        target['area'] = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         target['iscrowd'] = torch.zeros_like(target['area'], dtype=torch.uint8)
+        # not sure how crowd is to be defined in this dataset
+        # target['iscrowd'] = torch.zeros((boxes.shape[0],), dtype=torch.int64)
         # target['masks'] = self.normalize_mask(self.get_mask(item))
         return X, target
 
@@ -299,12 +308,13 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                         raise AssertionError(att_name + ' not in car')
         return masks
 
-    def get_bboxes(self, item):
+    def get_bboxes(self, item, format='[x0,y0,x1,y1]'):
         ''' return tensor of bboxes of the train
         params:
             item: index of the train
+            format: format of the bboxes either [x0,y0,w,h] or [x0,y0,x1,y1]
         returns:
-            binary tensor of bboxes
+            FloatTensor of bboxes [x0,y0,w,h] or [x0,y0,x1,y1]
         '''
         bboxes = torch.empty(0, 4)
         mask = self.get_mask(item)
@@ -324,7 +334,10 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                             box = whole_car_bbox
                         else:
                             box = maskUtils.toBbox(att['mask'])
-                        bboxes = torch.vstack([bboxes, torch.tensor(box)])
+                        box_formated = (box + np.concatenate(([0, 0], box[:2]))) if format == '[x0,y0,x1,y1]' else box
+                        bboxes = torch.vstack([bboxes, torch.tensor(box_formated)])
+                    else:
+                        bboxes = torch.vstack([bboxes, torch.zeros(1, 4)])
                     del car[att_name]
                 else:
                     # if object is not in image, add a zero bbox
@@ -366,12 +379,10 @@ def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_c
                                    label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
                                    image_noise=image_noise, preprocessing=preprocessing)
     elif y_val == 'attributes':
-        full_ds = MichalskiAttributeDataset(class_rule=class_rule,
-                                            base_scene=base_scene, raw_trains=raw_trains,
+        full_ds = MichalskiAttributeDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                             train_vis=train_vis, min_car=min_car, max_car=max_car,
                                             label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
-                                            image_noise=image_noise, preprocessing=preprocessing,
-                                            )
+                                            image_noise=image_noise, preprocessing=preprocessing)
     elif y_val == 'mask':
         full_ds = MichalskiMaskDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                        train_vis=train_vis, min_car=min_car, max_car=max_car,
