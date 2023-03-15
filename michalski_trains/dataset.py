@@ -256,16 +256,16 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         X = self.norm(image)
         boxes = self.get_bboxes(item)
         labels = self.get_attributes(item)
+        masks = self.get_masks(item)
 
-
-        target['boxes'] = boxes[boxes != 0].view(-1,4)
+        target['boxes'] = boxes[boxes != 0].view(-1, 4)
         target['labels'] = labels[labels != 0]
         target['image_id'] = torch.tensor([item], dtype=torch.int64)
         target['area'] = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         target['iscrowd'] = torch.zeros_like(target['area'], dtype=torch.uint8)
         # not sure how crowd is to be defined in this dataset
         # target['iscrowd'] = torch.zeros((boxes.shape[0],), dtype=torch.int64)
-        # target['masks'] = self.normalize_mask(self.get_mask(item))
+        target['masks'] = masks
         return X, target
 
     def get_masks(self, item):
@@ -281,8 +281,6 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         y = self.get_attributes(item)
         for car_id, car in mask.items():
             whole_car_mask = car['mask']
-            whole_car_bbox = maskUtils.toBbox(whole_car_mask)
-            del car['mask'], car['b_box'], car['world_cord']
             for att_name in ['color', 'length', 'wall', 'roof', 'wheels', 'payload_0', 'payload_1', 'payload_2']:
                 attr_id += 1
                 if att_name in car:
@@ -293,19 +291,22 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                             rle = whole_car_mask
                         else:
                             rle = att['mask']
-                        class_id = self.attribute_classes.index(label)
-                        masks = torch.vstack([masks, torch.from_numpy(maskUtils.decode(rle))])
-                        # if att_name == 'payload_1' or att_name == 'payload_2' or att_name == 'payload_0':
-                        #     if masks[attr_id, :, :].max() != y[attr_id]:
-                        #         raise AssertionError(
-                        #             f'class {label} with id {y[attr_id]}, rle id is {torch.from_numpy(maskUtils.decode(rle) * class_id).max()}')
-                        # #     print(f'class {label} with id {y[attr_id]}, rle id is {torch.from_numpy(maskUtils.decode(rle) * class_id).max()}')
-                    del car[att_name]
+                        masks = torch.vstack([masks, torch.from_numpy(maskUtils.decode(rle)).unsqueeze(0)])
+                        if y[attr_id] == 0:
+                            raise AssertionError(
+                                att_name + f' mask and label inconsistency in car {car_id} of train {item}')
+                    else:
+                        # if object is not in image add a zero mask
+                        masks = torch.vstack([masks, torch.zeros(1, 270, 480, dtype=torch.uint8)])
+                        if y[attr_id] != 0:
+                            raise AssertionError(
+                                att_name + f' mask and label inconsistency in car {car_id} of train {item}')
                 else:
                     # if object is not in image add a zero mask
-                    masks = torch.vstack([masks, torch.zeros(270, 480, dtype=torch.uint8)])
+                    masks = torch.vstack([masks, torch.zeros(1, 270, 480, dtype=torch.uint8)])
                     if y[attr_id] != 0:
-                        raise AssertionError(att_name + ' not in car')
+                        raise AssertionError(
+                            att_name + f' mask and label inconsistency in car {car_id} of train {item}')
         return masks
 
     def get_bboxes(self, item, format='[x0,y0,x1,y1]'):
@@ -323,7 +324,6 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         for car_id, car in mask.items():
             whole_car_mask = car['mask']
             whole_car_bbox = maskUtils.toBbox(whole_car_mask)
-            del car['mask'], car['b_box'], car['world_cord']
             for att_name in ['color', 'length', 'wall', 'roof', 'wheels', 'payload_0', 'payload_1', 'payload_2']:
                 attr_id += 1
                 if att_name in car:
@@ -336,14 +336,20 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                             box = maskUtils.toBbox(att['mask'])
                         box_formated = (box + np.concatenate(([0, 0], box[:2]))) if format == '[x0,y0,x1,y1]' else box
                         bboxes = torch.vstack([bboxes, torch.tensor(box_formated)])
+                        if y[attr_id] == 0:
+                            raise AssertionError(
+                                att_name + f' mask and label inconsistency in car {car_id} of train {item}')
                     else:
                         bboxes = torch.vstack([bboxes, torch.zeros(1, 4)])
-                    del car[att_name]
+                        if y[attr_id] != 0:
+                            raise AssertionError(
+                                att_name + f' mask and label inconsistency in car {car_id} of train {item}')
                 else:
                     # if object is not in image, add a zero bbox
                     bboxes = torch.vstack([bboxes, torch.zeros(1, 4)])
                     if y[attr_id] != 0:
-                        raise AssertionError(att_name + ' not in car')
+                        raise AssertionError(
+                            att_name + f' mask and label inconsistency in car {car_id} of train {item}')
         return bboxes
 
 
@@ -484,3 +490,13 @@ class AddGaussianNoise(object):
 
     def __repr__(self):
         return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
+
+
+def michalski_categories():
+    color = ['yellow', 'green', 'grey', 'red', 'blue']
+    length = ['short', 'long']
+    walls = ["braced_wall", 'solid_wall']
+    roofs = ["roof_foundation", 'solid_roof', 'braced_roof', 'peaked_roof']
+    wheel_count = ['2_wheels', '3_wheels']
+    load_obj = ["box", "golden_vase", 'barrel', 'diamond', 'metal_pot', 'oval_vase']
+    return ['none'] + color + length + walls + roofs + wheel_count + load_obj
