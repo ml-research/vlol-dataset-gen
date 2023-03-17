@@ -562,3 +562,4 @@ def michalski_categories():
 def rcnn_michalski_categories():
     cat = michalski_categories()
     cat += [f'car_{i}' for i in range(1, 11)]
+    return cat
