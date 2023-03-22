@@ -176,7 +176,6 @@ class MichalskiAttributeDataset(MichalskiDataset):
     def __int__(self, fixed_car_size=4, **kwargs):
         self.fixed_car_size = fixed_car_size
         super().__init__(**kwargs)
-
     def __getitem__(self, item):
         image = self.get_pil_image(item)
         X = self.norm(image)
