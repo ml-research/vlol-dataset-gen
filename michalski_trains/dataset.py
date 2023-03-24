@@ -79,9 +79,7 @@ class MichalskiDataset(Dataset):
 
         self.image_size = self.get_image_size(0)
 
-        trans = [transforms.ToTensor(),
-                 transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                      std=[0.229, 0.224, 0.225]), ]
+        trans = [transforms.ToTensor()]
         if preprocessing is not None:
             trans.append(preprocessing)
         if resize:
@@ -90,6 +88,8 @@ class MichalskiDataset(Dataset):
         if image_noise > 0:
             print('adding noise to images')
             trans.append(AddBinaryNoise(image_noise))
+
+        trans.append(transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]))
 
         self.norm = transforms.Compose(trans)
         self.normalize_mask = transforms.Compose([
@@ -123,7 +123,6 @@ class MichalskiDataset(Dataset):
     def get_image_size(self, item):
         im = self.get_pil_image(item)
         return im.size
-
 
     def get_direction(self, item):
         lab = self.trains[item].get_label()
@@ -176,6 +175,7 @@ class MichalskiAttributeDataset(MichalskiDataset):
     def __int__(self, fixed_car_size=4, **kwargs):
         self.fixed_car_size = fixed_car_size
         super().__init__(**kwargs)
+
     def __getitem__(self, item):
         image = self.get_pil_image(item)
         X = self.norm(image)
@@ -557,6 +557,11 @@ def michalski_categories():
     wheel_count = ['2_wheels', '3_wheels']
     load_obj = ["box", "golden_vase", 'barrel', 'diamond', 'metal_pot', 'oval_vase']
     return ['none'] + color + length + walls + roofs + wheel_count + load_obj
+
+def michalski_labels():
+    return ['color', 'length', 'walls', 'roofs', 'wheel_count', 'load_obj1', 'load_obj2', 'load_obj3']
+
+
 
 def rcnn_michalski_categories():
     cat = michalski_categories()
