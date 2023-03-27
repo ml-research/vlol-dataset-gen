@@ -5,7 +5,7 @@ from blender_image_generator.blender_util import get_new_pos, replace_material
 from blender_image_generator.load_assets import add_position
 
 
-def create_simple_scene(train, raw_trainslection, train_init_cord, alpha):
+def create_simple_scene(train, train_collection, train_init_cord, alpha):
     displacement = .4 * train.get_blender_scale()[0]
     train_tail_coord = get_new_pos(train_init_cord, train.get_car_length('simple_engine')/2, alpha)
 
@@ -13,7 +13,7 @@ def create_simple_scene(train, raw_trainslection, train_init_cord, alpha):
         distance = car.get_car_length_scalar()
         train_tail_coord = get_new_pos(train_tail_coord, distance/2 + displacement, alpha)
 
-        car_collection = create_platform(car, train_tail_coord, raw_trainslection, alpha)
+        car_collection = create_platform(car, train_tail_coord, train_collection, alpha)
 
         load_objects(car_collection, train_tail_coord, car, alpha)
         train_tail_coord = get_new_pos(train_tail_coord, distance/2, alpha)
@@ -21,19 +21,19 @@ def create_simple_scene(train, raw_trainslection, train_init_cord, alpha):
         # load_side_obj(car_collection, train_tail_coord, car, alpha)
 
 
-def create_platform(car, train_tail_coord, raw_trainslection, alpha):
+def create_platform(car, train_tail_coord, train_collection, alpha):
     """
     load a train car to the scene
     :param:  car (object)                   : car which is added to the scene
     :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
-    :param:  raw_trainslection (object)      : blender collection in which the car is added
+    :param:  train_collection (object)      : blender collection in which the car is added
     :param:  alpha (int)                    : angle of rotation
     """
     collection_name = 'car' + str(car.n)
 
     link = False
     my_collection = bpy.data.collections.new(collection_name)
-    raw_trainslection.children.link(my_collection)
+    train_collection.children.link(my_collection)
 
     # platform height is represented by car length
     platform_length = car.get_car_length()
@@ -101,7 +101,7 @@ def load_objects(car_collection, train_tail, car, alpha):
     load the objects and place them on the platform the scene
     :param:  car (object)                   : car which is added to the scene
     :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
-    :param:  raw_trainslection (object)      : blender collection in which the car is added
+    :param:  train_collection (object)      : blender collection in which the car is added
     :param:  alpha (int)                    : angle of rotation
     """
     obj_shape_dict = {
@@ -253,12 +253,12 @@ def load_simple_asset(filepath, material, alpha, location, collection, link, pas
     return objs
 
 
-def load_simple_engine(raw_trainslection, train_init_cord, alpha, scale=(0.5, 0.5, 0.5)):
+def load_simple_engine(train_collection, train_init_cord, alpha, scale=(0.5, 0.5, 0.5)):
     filepath = 'data/shapes/simple_objects/train/trainv1.blend'
     collection = 'train'
     # append, set to true to keep the link to the original file
     link = False
     init_obj_scale = (1.6 * scale[0], .8 * scale[0], .8 * scale[0])
     my_collection = bpy.data.collections.new(collection)
-    raw_trainslection.children.link(my_collection)
+    train_collection.children.link(my_collection)
     load_simple_asset(filepath, None, alpha, train_init_cord, my_collection, link, init_obj_scale=init_obj_scale)

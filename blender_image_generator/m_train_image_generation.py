@@ -104,9 +104,9 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
 
     # create blender collection for the train which is to be created
     collection = 'train'
-    raw_trainslection = bpy.data.collections.new(collection)
-    bpy.context.scene.collection.children.link(raw_trainslection)
-    layer_collection = bpy.context.view_layer.layer_collection.children[raw_trainslection.name]
+    train_collection = bpy.data.collections.new(collection)
+    bpy.context.scene.collection.children.link(train_collection)
+    layer_collection = bpy.context.view_layer.layer_collection.children[train_collection.name]
     layer_collection.exclude = False
 
     # determine train length and the starting point as a radius distance r for the engine
@@ -126,9 +126,9 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
         # initialize train position
         engine_pos = get_new_pos(init_cord, engine_pos, alpha)
 
-        load_simple_engine(raw_trainslection, engine_pos, alpha, train.get_blender_scale())
+        load_simple_engine(train_collection, engine_pos, alpha, train.get_blender_scale())
         # create and load trains into blender
-        create_simple_scene(train, raw_trainslection, engine_pos, alpha)
+        create_simple_scene(train, train_collection, engine_pos, alpha)
     else:
         # add engine length to radius
         r = (loc_length + train.get_car_length('engine')) / 2
@@ -146,12 +146,12 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
         # load engine
         # use mat='black_metal' for black engine metal
         mat = None
-        load_engine(raw_trainslection, train_init_cord, alpha, mat, scale=train.get_blender_scale())
+        load_engine(train_collection, train_init_cord, alpha, mat, scale=train.get_blender_scale())
         # load rails at z = 0
         rail_cord = [0, -0.1, 0]
-        load_rails(raw_trainslection, rail_cord, alpha, base_scene, scale=train.get_blender_scale())
+        load_rails(train_collection, rail_cord, alpha, base_scene, scale=train.get_blender_scale())
         # create and load trains into blender
-        create_train(train, raw_trainslection, train_init_cord, alpha)
+        create_train(train, train_collection, train_init_cord, alpha)
 
     load_obj_time = time.time()
     # print('time needed pre set up: ' + str(load_obj_time - start))

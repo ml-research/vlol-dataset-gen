@@ -55,10 +55,10 @@ def load_base_scene(filepath, collection):
                 bpy.context.scene.camera = obj
 
 
-def load_engine(raw_trainslection, location, alpha, metal_mat=None, scale=(0.5, 0.5, 0.5)):
+def load_engine(train_collection, location, alpha, metal_mat=None, scale=(0.5, 0.5, 0.5)):
     """
     load the train engine to the scene
-    :param:  raw_trainslection (object)      : collection in which the train is added
+    :param:  train_collection (object)      : collection in which the train is added
     :param:  location (array of int)        : location (x,y,z position) where the engine is added within the scene
     :param:  alpha (int)                    : angle of the train rotation
     :param:  metal_mat (string)             : whether to paint the metal of the engin black if 'black_metal'
@@ -69,15 +69,15 @@ def load_engine(raw_trainslection, location, alpha, metal_mat=None, scale=(0.5, 
     # append, set to true to keep the link to the original file
     link = False
     my_collection = bpy.data.collections.new(collection)
-    raw_trainslection.children.link(my_collection)
+    train_collection.children.link(my_collection)
     load_asset(filepath, alpha, location, my_collection, link, metal_color=metal_mat, init_obj_scale=scale)
 
 
-def load_rails(raw_trainslection, location, alpha, base_scene, scale=(0.5, 0.5, 0.5)):
+def load_rails(train_collection, location, alpha, base_scene, scale=(0.5, 0.5, 0.5)):
     """
     load the rails to the scene, Load rails into the camera's field of view only and only load and at most to the
      boundary of the subsoil
-    :param:  raw_trainslection (object)      : collection in which the rails are added
+    :param:  train_collection (object)      : collection in which the rails are added
     :param:  location (array of int)        : location (x,y,z position) where the rails are starting
     :param:  alpha (int)                    : angle of the train rotation
     :param:  base_scene (string)            : whether to paint the metal of the engin black if 'black_metal'
@@ -93,7 +93,7 @@ def load_rails(raw_trainslection, location, alpha, base_scene, scale=(0.5, 0.5, 
     link = False
     alpha_to_cam = alpha % math.pi
     my_collection = bpy.data.collections.new(collection)
-    raw_trainslection.children.link(my_collection)
+    train_collection.children.link(my_collection)
     load_asset(filepath, alpha, location, my_collection, link, init_obj_scale=scale)
     b_box = (1, 1, 1, 1)
     while cur_loc[0] ** 2 + cur_loc[1] ** 2 < radius ** 2 and (b_box != (0, 0, 0, 0) or base_scene == 'fisheye_scene'):
@@ -108,12 +108,12 @@ def load_rails(raw_trainslection, location, alpha, base_scene, scale=(0.5, 0.5, 
         b_box = get_b_box(bpy.context, rail)
 
 
-def load_car(car, train_tail, raw_trainslection, alpha):
+def load_car(car, train_tail, train_collection, alpha):
     """
     load a train car to the scene
     :param:  car (object)                   : car which is added to the scene
     :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
-    :param:  raw_trainslection (object)      : blender collection in which the car is added
+    :param:  train_collection (object)      : blender collection in which the car is added
     :param:  alpha (int)                    : angle of rotation
     """
     filepath_car = f'data/shapes/train/car/{car.length}_car.blend'
@@ -122,7 +122,7 @@ def load_car(car, train_tail, raw_trainslection, alpha):
 
     link = False
     my_collection = bpy.data.collections.new(collection_name)
-    raw_trainslection.children.link(my_collection)
+    train_collection.children.link(my_collection)
 
     obj = load_asset(filepath_car, alpha, train_tail, my_collection, link, material=car.get_blender_car_color(),
                      pass_index=car.get_index('car'), init_obj_scale=car.get_blender_scale())
@@ -139,7 +139,7 @@ def load_roof(car, car_collection, train_tail, alpha):
     if car has a roof load it to the scene
     :param:  car (object)                   : car which is added to the scene
     :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
-    :param:  raw_trainslection (object)      : blender collection in which the car is added
+    :param:  train_collection (object)      : blender collection in which the car is added
     :param:  alpha (int)                    : angle of rotation
     """
     roof_type = car.get_blender_roof()
@@ -163,7 +163,7 @@ def load_wall(car, car_collection, train_tail, alpha, wall_type):
     load the wall of the car to the scene
     :param:  car (object)                   : car which is added to the scene
     :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
-    :param:  raw_trainslection (object)      : blender collection in which the car is added
+    :param:  train_collection (object)      : blender collection in which the car is added
     :param:  alpha (int)                    : angle of rotation
     :param:  wall_type (string)             : wall type which is loaded
     """
@@ -180,7 +180,7 @@ def load_payload(car_collection, train_tail, car, alpha):
     load the payload of the car to the scene
     :param:  car (object)                   : car which is added to the scene
     :param:  train_tail (array of int)      : the rearmost location (x,y,z position) of the previous car
-    :param:  raw_trainslection (object)      : blender collection in which the car is added
+    :param:  train_collection (object)      : blender collection in which the car is added
     :param:  alpha (int)                    : angle of rotation
     """
     payload_num = car.get_load_number()
@@ -219,12 +219,12 @@ def load_payload(car_collection, train_tail, car, alpha):
                     bpy.context.view_layer.update()
 
 
-def create_train(train, raw_trainslection, train_init_cord, alpha):
+def create_train(train, train_collection, train_init_cord, alpha):
     """
     create and load the train into the blender scene and the given collection
     :param:  train (object)                 : train which is added to the scene
     :param:  train_init_cord (array of int) : initial location (x,y,z position) of the train
-    :param:  raw_trainslection (object)      : blender collection in which the train is added
+    :param:  train_collection (object)      : blender collection in which the train is added
     :param:  alpha (int)                    : angle of rotation of the train
     """
     # train is points in x direction -> thus cars need to be added in -x direction
@@ -233,7 +233,7 @@ def create_train(train, raw_trainslection, train_init_cord, alpha):
     scale = train.get_blender_scale()
 
     for car in train.m_cars:
-        car_collection = load_car(car, train_tail_coord, raw_trainslection, alpha)
+        car_collection = load_car(car, train_tail_coord, train_collection, alpha)
         wall_type = car.get_blender_wall()
         load_wall(car, car_collection, train_tail_coord, alpha, wall_type)
         load_roof(car, car_collection, train_tail_coord, alpha)
