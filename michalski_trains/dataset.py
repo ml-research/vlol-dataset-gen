@@ -275,6 +275,10 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         return X, target
 
     def get_mask_labels(self, item):
+        ''' Returns a tensor of labels for all attributes of each car in the train
+        :param item: index of the train
+        :return: tensor of labels
+        '''
         att = self.attribute_classes
         train = self.trains[item]
         cars = train.get_cars()
