@@ -261,11 +261,12 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         image = self.get_pil_image(item)
         X = self.norm(image)
         boxes = self.get_bboxes(item)
-        labels = self.get_mask_labels(item)
+        labels, label_ids = self.get_mask_labels(item)
         masks = self.get_masks(item)
 
         target['boxes'] = boxes
         target['labels'] = labels
+        target['labels_ids'] = label_ids
         target['image_id'] = torch.tensor([item], dtype=torch.int64)
         target['area'] = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         target['iscrowd'] = torch.zeros_like(target['area'], dtype=torch.uint8)
@@ -275,6 +276,36 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         return X, target
 
     def get_mask_labels(self, item):
+        ''' Returns a tensor of labels for all attributes of each car in the train
+        :param item: index of the train
+        :return: tensor of labels
+        '''
+        att = self.attribute_classes
+        train = self.trains[item]
+        cars = train.get_cars()
+        labels = []
+        label_ids = []
+        # each train has (n cars a 9 attributes) totalling to n*9 labels
+        # each label can have 22 classes + n for total number of cars
+        for car in cars:
+            # index 0 = not existent
+            color = att.index(car.get_blender_car_color())
+            length = att.index(car.get_car_length())
+            wall = att.index(car.get_blender_wall())
+            roof = att.index(car.get_blender_roof())
+            wheels = att.index(car.get_car_wheels())
+            l_shape = att.index(car.get_blender_payload())
+            l_num = car.get_load_number()
+            l_shapes = [l_shape] * l_num + [0] * (3 - l_num)
+            car_number_label = car.get_car_number() + len(att) - 1
+            labels += [car_number_label, color, length, wall, roof, wheels] + l_shapes
+            label_ids += [0, 1, 2, 3, 4, 5, 6, 6, 6]
+        # remove the 0 labels (not existent)
+        labels = torch.tensor(labels, dtype=torch.int64)
+        label_ids = torch.tensor(label_ids, dtype=torch.int64)
+        return labels[labels != 0], label_ids[labels != 0]
+
+    def get_mask_label_ids(self, item):
         ''' Returns a tensor of labels for all attributes of each car in the train
         :param item: index of the train
         :return: tensor of labels
@@ -355,7 +386,6 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         # masks = masks[masks != 0].view(-1, h, w)
         return masks
 
-
     def get_rle(self, item):
         ''' returns a list of masks of the train. Each mask is a tensor of shape (270, 480).
         It returns 9 masks for each car in the train. the corresponding labels are:
@@ -409,6 +439,7 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                             att_name + f' mask and label inconsistency in car {car_id} of train {item}')
         # masks = masks[masks != 0].view(-1, h, w)
         return masks
+
     def get_bboxes(self, item, format='[x0,y0,x1,y1]'):
         ''' returns a list of bounding boxes of the train. Each bounding box is a tensor of shape (270, 480).
         It returns 9 bounding boxes for each car in the train. the corresponding labels are:
@@ -616,12 +647,16 @@ def michalski_categories():
     load_obj = ["box", "golden_vase", 'barrel', 'diamond', 'metal_pot', 'oval_vase']
     return ['none'] + color + length + walls + roofs + wheel_count + load_obj
 
+
 def michalski_labels():
     return ['color', 'length', 'walls', 'roofs', 'wheel_count', 'load_obj1', 'load_obj2', 'load_obj3']
-
 
 
 def rcnn_michalski_categories():
     cat = michalski_categories()
     cat += [f'car_{i}' for i in range(1, 21)]
     return cat
+
+
+def rcnn_michalski_labels():
+    return ['car_number', 'color', 'length', 'walls', 'roofs', 'wheel_count', 'load_obj']
