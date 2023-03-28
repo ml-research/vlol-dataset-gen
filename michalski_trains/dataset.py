@@ -355,6 +355,60 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         # masks = masks[masks != 0].view(-1, h, w)
         return masks
 
+
+    def get_rle(self, item):
+        ''' returns a list of masks of the train. Each mask is a tensor of shape (270, 480).
+        It returns 9 masks for each car in the train. the corresponding labels are:
+        0: whole car
+        1: color
+        2: length
+        3: wall
+        4: roof
+        5: wheels
+        6: payload_0
+        7: payload_1
+        8: payload_2
+        params:
+            item: index of the train
+        returns:
+            mask: rle of the masks
+        '''
+        w, h = self.image_size
+        masks = []
+        mask = self.get_mask(item)
+        attr_id = -1
+        y = self.get_attributes(item)
+        for car_id, car in mask.items():
+            whole_car_mask = car['mask']
+            masks.append(whole_car_mask)
+            for att_name in ['color', 'length', 'wall', 'roof', 'wheels', 'payload_0', 'payload_1', 'payload_2']:
+                attr_id += 1
+                if att_name in car:
+                    att = car[att_name]
+                    label = att['label']
+                    if label != 'none':
+                        if att_name == 'length' or att_name == 'color':
+                            rle = whole_car_mask
+                        else:
+                            rle = att['mask']
+                        masks.append(rle)
+                        if y[attr_id] == 0:
+                            raise AssertionError(
+                                att_name + f' mask and label inconsistency in car {car_id} of train {item}')
+                    else:
+                        # if object is not in image add a zero mask
+                        # masks = torch.vstack([masks, torch.zeros(1, 270, 480, dtype=torch.uint8)])
+                        if y[attr_id] != 0:
+                            raise AssertionError(
+                                att_name + f' mask and label inconsistency in car {car_id} of train {item}')
+                else:
+                    # if object is not in image add a zero mask
+                    # masks = torch.vstack([masks, torch.zeros(1, 270, 480, dtype=torch.uint8)])
+                    if y[attr_id] != 0:
+                        raise AssertionError(
+                            att_name + f' mask and label inconsistency in car {car_id} of train {item}')
+        # masks = masks[masks != 0].view(-1, h, w)
+        return masks
     def get_bboxes(self, item, format='[x0,y0,x1,y1]'):
         ''' returns a list of bounding boxes of the train. Each bounding box is a tensor of shape (270, 480).
         It returns 9 bounding boxes for each car in the train. the corresponding labels are:
@@ -569,5 +623,5 @@ def michalski_labels():
 
 def rcnn_michalski_categories():
     cat = michalski_categories()
-    cat += [f'car_{i}' for i in range(1, 11)]
+    cat += [f'car_{i}' for i in range(1, 21)]
     return cat

@@ -137,11 +137,11 @@ def gen_raw_random_trains(class_rule, out_path, num_entries=10000, with_occlusio
     os.remove(classifier)
 
 
-def gen_raw_trains(train_col, classification_rule, out_path, num_entries=10000, replace_existing=True,
+def gen_raw_trains(raw_trains, classification_rule, out_path, num_entries=10000, replace_existing=True,
                    with_occlusion=False, min_cars=2, max_cars=4):
     """ Generate random or Michalski train descriptions
     Args:
-        train_col: string type of train which is generated available options: 'RandomTrains' and 'MichalskiTrains'
+        raw_trains: string type of train which is generated available options: 'RandomTrains' and 'MichalskiTrains'
         out_path: string path to save the generated train descriptions
         classification_rule: str, path to classification rule used to derive the labels
         num_entries: int number of michalski trains which are generated
@@ -153,9 +153,9 @@ def gen_raw_trains(train_col, classification_rule, out_path, num_entries=10000, 
     if min_cars > max_cars:
         raise ValueError(f'min_train_length {min_cars} is larger than max_train_length {max_cars}')
     if replace_existing:
-        if train_col == 'RandomTrains':
+        if raw_trains == 'RandomTrains':
             gen_raw_random_trains(classification_rule, out_path, num_entries, with_occlusion, min_cars, max_cars)
-        elif train_col == 'MichalskiTrains':
+        elif raw_trains == 'MichalskiTrains':
             gen_raw_michalski_trains(classification_rule, out_path, num_entries, with_occlusion, min_cars, max_cars)
 
 
