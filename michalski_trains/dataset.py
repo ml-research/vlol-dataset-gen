@@ -300,8 +300,8 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
             car_number_label = car.get_car_number() + len(att) - 1
             labels += [car_number_label, color, length, wall, roof, wheels] + l_shapes
             # label_ids += [0, 1, 2, 3, 4, 5, 6, 6, 6]
-            # label_ids += [0, 2, 1, 1, 1, 1, 1, 1, 1]
-            label_ids += [0, 1, 1, 1, 1, 1, 1, 1, 1]
+            label_ids += [0, 2, 1, 1, 1, 1, 1, 1, 1]
+            # label_ids += [0, 1, 1, 1, 1, 1, 1, 1, 1]
         # remove the 0 labels (not existent)
         labels = torch.tensor(labels, dtype=torch.int64)
         label_ids = torch.tensor(label_ids, dtype=torch.int64)
