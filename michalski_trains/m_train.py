@@ -147,20 +147,21 @@ class MichalskiCar(object):
 
 
 class BlenderCar(MichalskiCar):
-    def __init__(self, *args, **kwargs):
-        '''
-        Blender car object that inherits from MichalskiCar and contains the blender attributes and values
-        @param n: car number
-        @param shape: car shape
-        @param length: car length
-        @param double: car wall
-        @param roof: car roof
-        @param wheels: car wheels
-        @param l_shape: payload shape
-        @param l_num: payload number
-        '''
-        super.__init__(*args, **kwargs)
-        self.scale = kwargs.get("scale")
+    '''
+    Blender car object that inherits from MichalskiCar and contains the blender attributes and values
+    @param n: car number
+    @param shape: car shape
+    @param length: car length
+    @param double: car wall
+    @param roof: car roof
+    @param wheels: car wheels
+    @param l_shape: payload shape
+    @param l_num: payload number
+    '''
+
+    def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num, *args, **kwargs):
+        super().__init__(n, shape, length, double, roof, wheels, l_shape, l_num)
+        self.scale = [1] * 3 if kwargs.get("scale") is None else kwargs.get("scale")
         self.car_length_scalar = {
             # short train length (2,9 - 0,909) = 1,991 along x axis
             "long": 3.54121375 * self.scale[0],
@@ -232,7 +233,8 @@ class BlenderCar(MichalskiCar):
             "triangle": "golden_vase",
             "circle": 'barrel',
             "hexagon": 'metal_pot',
-            "utriangle": 'oval_vase'
+            "utriangle": 'oval_vase',
+            "none": 'none'
         }
         return load_to_b_obj[self.l_shape]
 
@@ -347,38 +349,37 @@ class SimpleCar(BlenderCar):
         }
         return load_to_b_obj[self.l_shape]
 
-
-def blender_cat():
-    color = ['yellow', 'green', 'grey', 'red', 'blue']
-    length = ['short', 'long']
-    walls = ["braced_wall", 'solid_wall']
-    roofs = ["roof_foundation", 'solid_roof', 'braced_roof', 'peaked_roof']
-    wheel_count = ['2_wheels', '3_wheels']
-    load_obj = ["box", "golden_vase", 'barrel', 'diamond', 'metal_pot', 'oval_vase']
-    return ['none'] + color + length + walls + roofs + wheel_count + load_obj
-
-
-def blender_labels():
-    return ['color', 'length', 'walls', 'roofs', 'wheel_count', 'load_obj1', 'load_obj2', 'load_obj3']
-
-
-def michalski_cat():
-    shape = ['rectangle', 'bucket', 'ellipse', 'hexagon', 'u_shaped']
-    length = ['short', 'long']
-    walls = ["double", 'not_double']
-    roofs = ["none", 'arc', 'flat', 'jagged', 'peaked']
-    wheel_count = ['2_wheels', '3_wheels']
-    load_obj = ["rectangle", "triangle", 'circle', 'diamond', 'hexagon', 'utriangle']
-    return ['none'] + shape + length + walls + roofs + wheel_count + load_obj
-
-
-def encode(li, cat):
-    return [cat.index(l) for l in li]
-
-
-def decode(li, cat):
-    return [cat[l] for l in li]
-
-
-def michalski_labels():
-    return ['shape', 'length', 'walls', 'roofs', 'wheel_count', 'load_obj1', 'load_obj2', 'load_obj3']
+# def blender_cat():
+#     color = ['yellow', 'green', 'grey', 'red', 'blue']
+#     length = ['short', 'long']
+#     walls = ["braced_wall", 'solid_wall']
+#     roofs = ["roof_foundation", 'solid_roof', 'braced_roof', 'peaked_roof']
+#     wheel_count = ['2_wheels', '3_wheels']
+#     load_obj = ["box", "golden_vase", 'barrel', 'diamond', 'metal_pot', 'oval_vase']
+#     return ['none'] + color + length + walls + roofs + wheel_count + load_obj
+#
+#
+# def blender_labels():
+#     return ['color', 'length', 'walls', 'roofs', 'wheel_count', 'load_obj1', 'load_obj2', 'load_obj3']
+#
+#
+# def michalski_cat():
+#     shape = ['rectangle', 'bucket', 'ellipse', 'hexagon', 'u_shaped']
+#     length = ['short', 'long']
+#     walls = ["double", 'not_double']
+#     roofs = ["none", 'arc', 'flat', 'jagged', 'peaked']
+#     wheel_count = ['2_wheels', '3_wheels']
+#     load_obj = ["rectangle", "triangle", 'circle', 'diamond', 'hexagon', 'utriangle']
+#     return ['none'] + shape + length + walls + roofs + wheel_count + load_obj
+#
+#
+# def encode(li, cat):
+#     return [cat.index(l) for l in li]
+#
+#
+# def decode(li, cat):
+#     return [cat[l] for l in li]
+#
+#
+# def michalski_labels():
+#     return ['shape', 'length', 'walls', 'roofs', 'wheel_count', 'load_obj1', 'load_obj2', 'load_obj3']

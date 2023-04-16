@@ -640,7 +640,7 @@ class AddGaussianNoise(object):
         return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
 
 
-def michalski_categories():
+def blender_categories():
     color = ['yellow', 'green', 'grey', 'red', 'blue']
     length = ['short', 'long']
     walls = ["braced_wall", 'solid_wall']
@@ -650,12 +650,22 @@ def michalski_categories():
     return ['none'] + color + length + walls + roofs + wheel_count + load_obj
 
 
+def original_categories():
+    shape = ['rectangle', 'bucket', 'ellipse', 'hexagon', 'u_shaped']
+    length = ['short', 'long']
+    walls = ["double", 'not_double']
+    roofs = ['arc', 'flat', 'jagged', 'peaked']
+    wheel_count = ['2', '3']
+    load_obj = ["rectangle", "triangle", 'circle', 'diamond', 'hexagon', 'utriangle']
+    return ['none'] + shape + length + walls + roofs + wheel_count + load_obj
+
+
 def michalski_labels():
     return ['color', 'length', 'walls', 'roofs', 'wheel_count', 'load_obj1', 'load_obj2', 'load_obj3']
 
 
-def rcnn_michalski_categories():
-    cat = michalski_categories()
+def rcnn_blender_categories():
+    cat = blender_categories()
     cat += [f'car_{i}' for i in range(1, 21)]
     return cat
 
