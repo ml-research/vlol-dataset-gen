@@ -31,7 +31,7 @@ RUN ln -s /usr/local/bin/python3.10 /usr/bin/python & ln -s /usr/local/bin/pip3.
 # set up blender as a python module
 RUN mkdir /home/blender-git
 WORKDIR /home/blender-git
-RUN git clone -b blender-v3.3-release --single-branch https://git.blender.org/blender.git
+RUN git clone -b blender-v3.3-release --single-branch https://github.com/blender/blender.git
 
 RUN mkdir /home/blender-git/lib
 WORKDIR /home/blender-git/lib
