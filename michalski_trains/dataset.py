@@ -365,7 +365,7 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                     att = car[att_name]
                     label = att['label']
                     if label != 'none':
-                        if att_name == 'length' or att_name == 'color':
+                        if att_name == 'length' or att_name == 'color' or (att_name == 'roof' and self.train_vis == 'SimpleObjects'):
                             rle = whole_car_mask
                         else:
                             rle = att['mask']
@@ -467,6 +467,7 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         for car_id, car in mask.items():
             whole_car_mask = car['mask']
             whole_car_bbox = maskUtils.toBbox(whole_car_mask)
+            # whole_car_bbox = car['b_box']
             box_formated = (whole_car_bbox + np.concatenate(
                 ([0, 0], whole_car_bbox[:2]))) if format == '[x0,y0,x1,y1]' else whole_car_bbox
             bboxes = torch.vstack([bboxes, torch.tensor(box_formated)])
@@ -476,10 +477,15 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                     att = car[att_name]
                     label = att['label']
                     if label != 'none':
-                        if att_name == 'length' or att_name == 'color':
+                        if att_name == 'length' or att_name == 'color' or (att_name == 'roof' and self.train_vis == 'SimpleObjects'):
                             box = whole_car_bbox
                         else:
-                            box = maskUtils.toBbox(att['mask'])
+                            try:
+                                # box = att['b_box']
+                                box = maskUtils.toBbox(att['mask'])
+                            except:
+                                print(att)
+                                raise ValueError('b_box not found')
                         box_formated = (box + np.concatenate(([0, 0], box[:2]))) if format == '[x0,y0,x1,y1]' else box
                         bboxes = torch.vstack([bboxes, torch.tensor(box_formated)])
                         if y[attr_id] == 0:
