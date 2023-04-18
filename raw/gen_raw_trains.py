@@ -211,7 +211,7 @@ def get_random_angle(with_occlusion, angle=None):
     if angle is not None:
         train_dir = angle
     else:
-        allowed_deg = [-60, 60] if with_occlusion else [-70, 70]
+        allowed_deg = [-70, 70] if with_occlusion else [-60, 60]
         train_dir = random.randint(allowed_deg[0], allowed_deg[1]) + 180 * random.randint(0, 1)
     return train_dir
 

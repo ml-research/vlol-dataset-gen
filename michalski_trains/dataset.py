@@ -12,7 +12,6 @@ from torch.utils.data import Dataset
 from PIL import Image
 from torchvision import transforms
 from pycocotools import mask as maskUtils
-
 from michalski_trains.m_train import *
 
 
@@ -273,6 +272,9 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         # not sure how crowd is to be defined in this dataset
         # target['iscrowd'] = torch.zeros((boxes.shape[0],), dtype=torch.int64)
         target['masks'] = masks
+        if boxes.size()[0] != labels.size()[0] or boxes.size()[0] != masks.size()[0]:
+            raise ValueError(
+                f'gt size missmatch, boxes: {boxes.size()}, labels: {labels.size()}, masks: {masks.size()}')
         return X, target
 
     def get_mask_labels(self, item):
@@ -301,7 +303,6 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
             labels += [car_number_label, color, length, wall, roof, wheels] + l_shapes
             # label_ids += [0, 1, 2, 3, 4, 5, 6, 6, 6]
             label_ids += [0, 2, 1, 1, 1, 1, 1, 1, 1]
-            # label_ids += [0, 1, 1, 1, 1, 1, 1, 1, 1]
         # remove the 0 labels (not existent)
         labels = torch.tensor(labels, dtype=torch.int64)
         label_ids = torch.tensor(label_ids, dtype=torch.int64)
@@ -365,7 +366,8 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                     att = car[att_name]
                     label = att['label']
                     if label != 'none':
-                        if att_name == 'length' or att_name == 'color' or (att_name == 'roof' and self.train_vis == 'SimpleObjects'):
+                        if att_name == 'length' or att_name == 'color' or (
+                                att_name == 'roof' and self.train_vis == 'SimpleObjects'):
                             rle = whole_car_mask
                         else:
                             rle = att['mask']
@@ -477,33 +479,36 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                     att = car[att_name]
                     label = att['label']
                     if label != 'none':
-                        if att_name == 'length' or att_name == 'color' or (att_name == 'roof' and self.train_vis == 'SimpleObjects'):
+                        if att_name == 'length' or att_name == 'color' or (
+                                att_name == 'roof' and self.train_vis == 'SimpleObjects'):
                             box = whole_car_bbox
                         else:
                             try:
                                 # box = att['b_box']
                                 box = maskUtils.toBbox(att['mask'])
                             except:
-                                print(att)
-                                raise ValueError('b_box not found')
+                                raise ValueError(f'b_box for {att} not found')
                         box_formated = (box + np.concatenate(([0, 0], box[:2]))) if format == '[x0,y0,x1,y1]' else box
                         bboxes = torch.vstack([bboxes, torch.tensor(box_formated)])
                         if y[attr_id] == 0:
                             raise AssertionError(
                                 att_name + f' mask and label inconsistency in car {car_id} of train {item}')
+                        if box_formated.tolist() == [0, 0, 0, 0]:
+                            raise AssertionError(f'empy bbox for attribute {att_name} with value {label} in car {car_id}'
+                                                 f' of train {item} with image at {self.get_image_path(item)}')
                     else:
-                        bboxes = torch.vstack([bboxes, torch.zeros(1, 4)])
+                        # bboxes = torch.vstack([bboxes, torch.zeros(1, 4)])
                         if y[attr_id] != 0:
                             raise AssertionError(
                                 att_name + f' mask and label inconsistency in car {car_id} of train {item}')
                 else:
                     # if object is not in image, add a zero bbox
-                    bboxes = torch.vstack([bboxes, torch.zeros(1, 4)])
+                    # bboxes = torch.vstack([bboxes, torch.zeros(1, 4)])
                     if y[attr_id] != 0:
                         raise AssertionError(
                             att_name + f' mask and label inconsistency in car {car_id} of train {item}')
         # remove zero bboxes (not present in the image)
-        bboxes = bboxes[bboxes != 0].view(-1, 4)
+        # bboxes = bboxes[bboxes != 0].view(-1, 4)
         return bboxes
 
 

@@ -159,9 +159,9 @@ class BlenderCar(MichalskiCar):
     @param l_num: payload number
     '''
 
-    def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num, *args, **kwargs):
+    def __init__(self, n, shape, length, double, roof, wheels, l_shape, l_num, scale=None):
         super().__init__(n, shape, length, double, roof, wheels, l_shape, l_num)
-        self.scale = [1] * 3 if kwargs.get("scale") is None else kwargs.get("scale")
+        self.scale = [.5, .5, .5] if scale is None else scale
         self.car_length_scalar = {
             # short train length (2,9 - 0,909) = 1,991 along x axis
             "long": 3.54121375 * self.scale[0],
