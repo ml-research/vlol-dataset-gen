@@ -94,7 +94,7 @@ def load_rails(train_collection, location, alpha, base_scene, scale=(0.5, 0.5, 0
     alpha_to_cam = alpha % math.pi
     my_collection = bpy.data.collections.new(collection)
     train_collection.children.link(my_collection)
-    load_asset(filepath, alpha, location, my_collection, link, init_obj_scale=scale)
+    load_asset(filepath, alpha, location, my_collection, link, init_obj_scale=scale, pass_index=30001)
     b_box = (1, 1, 1, 1)
     while cur_loc[0] ** 2 + cur_loc[1] ** 2 < radius ** 2 and (b_box != (0, 0, 0, 0) or base_scene == 'fisheye_scene'):
         cur_loc = get_new_pos(cur_loc, rail_length, alpha_to_cam + math.pi)
