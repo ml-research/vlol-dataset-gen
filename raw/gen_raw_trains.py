@@ -89,6 +89,7 @@ def gen_raw_random_trains(class_rule, out_path, num_entries=10000, with_occlusio
         os.remove(out_path)
     except OSError:
         pass
+    os.makedirs(out_path.rsplit('/', 1)[0], exist_ok=True)
     with open(out_path, 'w+') as text_file:
         while west_counter < num_entries / 2 or east_counter < num_entries / 2:
             t_angle = get_random_angle(with_occlusion)

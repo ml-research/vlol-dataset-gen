@@ -8,11 +8,8 @@ def create_tree(train, t_num, gen_depth, path_settings):
     params:
         train (MichalskiTrain): trains for which the tree is created
         t_num (int): train id
-        :param:  raw_trains (string): typ of train descriptions 'RandomTrains' or 'MichalskiTrains'
-        :param:  train_vis (string): visualization of the train description either 'MichalskiTrains' or
-        'SimpleObjects'
-        base_scene (string): scene in which the train is placed
         gen_depth (boolean): whether to create the pixel wise depth information
+        path_settings (string): the configuration setting of the train
     """
     # switch on nodes and get reference
     bpy.context.scene.use_nodes = True
@@ -28,10 +25,10 @@ def create_tree(train, t_num, gen_depth, path_settings):
     for node in nodes:
         nodes.remove(node)
 
+    # create render layer node
     render_layer = nodes.new(type='CompositorNodeRLayers')
     bpy.context.scene.view_layers["RenderLayer"].use_pass_object_index = True
     render_layer.location = 0, 0
-
 
     image_output = nodes.new("CompositorNodeComposite")
     # image_output.location = pos_x, pos_y + margin
@@ -41,6 +38,43 @@ def create_tree(train, t_num, gen_depth, path_settings):
     )
     pos_y -= 200
 
+    # create mask and output nodes for the locomotive with pass index 30000
+    loco_id_mask = nodes.new("CompositorNodeIDMask")
+    loco_id_mask.location = pos_x, pos_y + 2 * margin
+    loco_id_mask.index = 30000
+    link_init = loco_id_mask.outputs[0]
+    links.new(
+        render_layer.outputs['IndexOB'],
+        loco_id_mask.inputs[0]
+    )
+
+    loco_output = nodes.new("CompositorNodeOutputFile")
+    loco_output.location = pos_x + margin, pos_y + 2 * margin
+    loco_output.base_path = base_path + f't_{t_num}_loco'
+    links.new(
+        link_init,
+        loco_output.inputs[0]
+    )
+
+    # create rail and output nodes for the locomotive with pass index 30001
+    rail_id_mask = nodes.new("CompositorNodeIDMask")
+    rail_id_mask.location = pos_x, pos_y + margin
+    rail_id_mask.index = 30001
+    link_init = rail_id_mask.outputs[0]
+    links.new(
+        render_layer.outputs['IndexOB'],
+        rail_id_mask.inputs[0]
+    )
+
+    rail_output = nodes.new("CompositorNodeOutputFile")
+    rail_output.location = pos_x + margin, pos_y + margin
+    rail_output.base_path = base_path + f't_{t_num}_rail'
+    links.new(
+        link_init,
+        rail_output.inputs[0]
+    )
+
+    # create mask and output nodes for the cars by combining the masks of the corresponding objects
     for car in train.get_cars():
         car_number = car.get_car_number()
         objs = ["wall", 'roof', 'wheels'] + [f"payload{i}" for i in range(car.get_load_number())]

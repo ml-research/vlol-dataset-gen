@@ -72,7 +72,26 @@ def restore_img(m_train, t_num, path_settings):
             blender_objects[obj.pass_index] = [obj]
     cars = m_train.m_cars
     obj_mask = {}
+
+    # get mask and bounding box of the rail
     base_path = f'output/tmp/tmp_graph_output/{path_settings}/'
+    path = base_path + f't_{t_num}_rail'
+    rail_obj = blender_objects[30001]
+    b_box = get_b_box(bpy.context, rail_obj)
+    obj_mask["rail"] = {}
+    obj_mask["rail"]["b_box"] = b_box
+    obj_mask["rail"]["mask"] = encodeMask(cv2.imread(path + '/Image0001.png')[:, :, 0])
+    os.system('rm -r {}'.format(path))
+
+    # get mask and bounding box of the locomotive
+    path = base_path + f't_{t_num}_loco'
+    loco_obj = blender_objects[30000]
+    b_box = get_b_box(bpy.context, loco_obj)
+    obj_mask["loco"] = {}
+    obj_mask["loco"]["b_box"] = b_box
+    obj_mask["loco"]["mask"] = encodeMask(cv2.imread(path + '/Image0001.png')[:, :, 0])
+    os.system('rm -r {}'.format(path))
+
     for car in cars:
         car_number = car.get_car_number()
         current_car = "car_" + str(car_number)
