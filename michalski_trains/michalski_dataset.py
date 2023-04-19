@@ -7,8 +7,6 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
-
-from michalski_trains.dataset import AddBinaryNoise
 from michalski_trains.m_train import *
 
 
@@ -36,9 +34,9 @@ class MichalskiDataset(Dataset):
         self.min_car, self.max_car = min_car, max_car
         self.resize, self.train_count, self.label_noise = resize, ds_size, label_noise
         # ds path
-        ds_typ = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_car}-{max_car}'
-        self.image_base_path = f'{ds_path}/{ds_typ}/images'
-        self.all_scenes_path = f'{ds_path}/{ds_typ}/all_scenes'
+        self.ds_typ = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_car}-{max_car}'
+        self.image_base_path = f'{ds_path}/{self.ds_typ}/images'
+        self.all_scenes_path = f'{ds_path}/{self.ds_typ}/all_scenes'
 
         # ds labels
         self.labels = ['direction']
@@ -124,7 +122,7 @@ class MichalskiDataset(Dataset):
         lab = self.trains[item].get_label()
         if lab == 'none':
             # return torch.tensor(0).unsqueeze(dim=0)
-            raise AssertionError(f'There is no direction label for a RandomTrains. Use MichalskiTrain DS.')
+            raise AssertionError(f'There is no direction label for the selected DS {self.ds_typ}')
         label_binary = self.label_classes.index(lab)
         label = torch.tensor(label_binary).unsqueeze(dim=0)
         return label
@@ -163,3 +161,28 @@ class MichalskiDataset(Dataset):
 
     def get_output_dim(self):
         return len(self.labels)
+
+
+class AddBinaryNoise(object):
+    def __init__(self, p=0.1):
+        self.p = p
+
+    def __call__(self, tensor):
+        t = torch.ones_like(tensor)
+        t[torch.rand_like(tensor) < self.p] = 0
+        return t * tensor
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(percentage={0})'.format(self.p)
+
+
+class AddGaussianNoise(object):
+    def __init__(self, mean=0., std=1.):
+        self.std = std
+        self.mean = mean
+
+    def __call__(self, tensor):
+        return tensor + torch.randn(tensor.size()) * self.std + self.mean
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)

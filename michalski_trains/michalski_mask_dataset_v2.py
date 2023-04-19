@@ -8,6 +8,7 @@ from michalski_trains.michalski_attribute_dataset import MichalskiAttributeDatas
 class MichalskiMaskDatasetV2(MichalskiAttributeDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.attribute_classes = self.blender_categories()
 
     def __getitem__(self, item):
         target = {}
@@ -50,7 +51,7 @@ class MichalskiMaskDatasetV2(MichalskiAttributeDataset):
         att = self.attribute_classes
         train = self.trains[item]
         cars = train.get_cars()
-        labels = [23]
+        labels = [24]
         # each train has (n cars a 9 attributes) totalling to n*9 labels + 1 for the locomotive
         # each label can have 22 classes (assignable attributes) + 1 car label + 1 for the locomotive
         for car in cars:
@@ -63,7 +64,7 @@ class MichalskiMaskDatasetV2(MichalskiAttributeDataset):
             l_shape = att.index(car.get_blender_payload())
             l_num = car.get_load_number()
             l_shapes = [l_shape] * l_num + [0] * (3 - l_num)
-            car_label = 24
+            car_label = 23
             labels += [car_label, color, length, wall, roof, wheels] + l_shapes
         # remove the 0 labels (not existent)
         labels = torch.tensor(labels, dtype=torch.int64)
@@ -97,6 +98,8 @@ class MichalskiMaskDatasetV2(MichalskiAttributeDataset):
         masks = torch.vstack([masks, torch.from_numpy(maskUtils.decode(loco_mask)).unsqueeze(0)])
 
         for car_id, car in mask.items():
+            if 'car' not in car_id:
+                continue
             whole_car_mask = car['mask']
             masks = torch.vstack([masks, torch.from_numpy(maskUtils.decode(whole_car_mask)).unsqueeze(0)])
             for att_name in ['color', 'length', 'wall', 'roof', 'wheels', 'payload_0', 'payload_1', 'payload_2']:
@@ -157,6 +160,8 @@ class MichalskiMaskDatasetV2(MichalskiAttributeDataset):
         bboxes = torch.vstack([bboxes, torch.tensor(loco_bbox)])
 
         for car_id, car in mask.items():
+            if 'car' not in car_id:
+                continue
             whole_car_mask = car['mask']
             whole_car_bbox = maskUtils.toBbox(whole_car_mask)
             # whole_car_bbox = car['b_box']

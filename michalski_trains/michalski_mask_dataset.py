@@ -112,6 +112,8 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         attr_id = -1
         y = self.get_attributes(item)
         for car_id, car in mask.items():
+            if 'car' not in car_id:
+                continue
             whole_car_mask = car['mask']
             masks = torch.vstack([masks, torch.from_numpy(maskUtils.decode(whole_car_mask)).unsqueeze(0)])
             for att_name in ['color', 'length', 'wall', 'roof', 'wheels', 'payload_0', 'payload_1', 'payload_2']:
@@ -167,6 +169,8 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         attr_id = -1
         y = self.get_attributes(item)
         for car_id, car in mask.items():
+            if 'car' not in car_id:
+                continue
             whole_car_mask = car['mask']
             masks.append(whole_car_mask)
             for att_name in ['color', 'length', 'wall', 'roof', 'wheels', 'payload_0', 'payload_1', 'payload_2']:
@@ -221,6 +225,8 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
         attr_id = -1
         y = self.get_attributes(item)
         for car_id, car in mask.items():
+            if 'car' not in car_id:
+                continue
             whole_car_mask = car['mask']
             whole_car_bbox = maskUtils.toBbox(whole_car_mask)
             # whole_car_bbox = car['b_box']

@@ -1,5 +1,6 @@
 import warnings
 
+import torch
 from rtpt import RTPT
 
 from blender_image_generator.blender_util import get_scale
@@ -75,6 +76,8 @@ def main():
         rtpt = RTPT(name_initials='LH', experiment_name=f'gen_{base_scene[:3]}_{train_vis[0]}',
                     max_iterations=end_ind - start_ind)
         rtpt.start()
+        # dummy tensor so rtpt shows gpu allocation
+        t = torch.Tensor([0]).to(device)
         ds_name = tag + f'{train_vis}_{rule}_{bk}_{base_scene}_len_{min_cars}-{max_cars}'
 
         for t_num, train in enumerate(trains, start=start_ind):

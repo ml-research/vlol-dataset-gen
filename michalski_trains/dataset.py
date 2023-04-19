@@ -132,30 +132,6 @@ def check_data(ds_path, path_settings, ds_size):
             f'no JSON found')
 
 
-class AddBinaryNoise(object):
-    def __init__(self, p=0.1):
-        self.p = p
-
-    def __call__(self, tensor):
-        t = torch.ones_like(tensor)
-        t[torch.rand_like(tensor) < self.p] = 0
-        return t * tensor
-
-    def __repr__(self):
-        return self.__class__.__name__ + '(percentage={0})'.format(self.p)
-
-
-class AddGaussianNoise(object):
-    def __init__(self, mean=0., std=1.):
-        self.std = std
-        self.mean = mean
-
-    def __call__(self, tensor):
-        return tensor + torch.randn(tensor.size()) * self.std + self.mean
-
-    def __repr__(self):
-        return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
-
 
 def blender_categories():
     color = ['yellow', 'green', 'grey', 'red', 'blue']
@@ -183,7 +159,8 @@ def michalski_labels():
 
 def rcnn_blender_categories():
     cat = blender_categories()
-    cat += [f'car_{i}' for i in range(1, 21)]
+    # cat += [f'car_{i}' for i in range(1, 21)]
+    cat += ['car', 'locomotive']
     return cat
 
 
