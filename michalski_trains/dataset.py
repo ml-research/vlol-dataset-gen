@@ -142,6 +142,10 @@ class MichalskiDataset(Dataset):
         im_path = self.get_image_path(item)
         return Image.open(im_path).convert('RGB')
 
+    def get_image(self, item):
+        im = self.get_pil_image(item)
+        return self.norm(im)
+
     def get_image_path(self, item):
         return self.image_base_path + '/' + self.images[item]
 
@@ -487,7 +491,7 @@ class MichalskiMaskDataset(MichalskiAttributeDataset):
                                 # box = att['b_box']
                                 box = maskUtils.toBbox(att['mask'])
                             except:
-                                raise ValueError(f'b_box for {att} not found')
+                                raise ValueError(f'b_box for {att} not found, for car {car_id} in train {item} in image at {self.get_image_path(item)}')
                         box_formated = (box + np.concatenate(([0, 0], box[:2]))) if format == '[x0,y0,x1,y1]' else box
                         bboxes = torch.vstack([bboxes, torch.tensor(box_formated)])
                         if y[attr_id] == 0:

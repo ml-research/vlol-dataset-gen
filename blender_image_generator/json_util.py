@@ -72,16 +72,18 @@ def restore_img(m_train, t_num, path_settings):
             blender_objects[obj.pass_index] = [obj]
     cars = m_train.m_cars
     obj_mask = {}
+    base_path = f'output/tmp/tmp_graph_output/{path_settings}/'
 
     # get mask and bounding box of the rail
-    base_path = f'output/tmp/tmp_graph_output/{path_settings}/'
-    path = base_path + f't_{t_num}_rail'
-    rail_obj = blender_objects[30001]
-    b_box = get_b_box(bpy.context, rail_obj)
-    obj_mask["rail"] = {}
-    obj_mask["rail"]["b_box"] = b_box
-    obj_mask["rail"]["mask"] = encodeMask(cv2.imread(path + '/Image0001.png')[:, :, 0])
-    os.system('rm -r {}'.format(path))
+    # rails only exist in the Trains representation but not in the SimpleObject representation
+    if 'SimpleObjects' not in path_settings:
+        path = base_path + f't_{t_num}_rail'
+        rail_obj = blender_objects[30001]
+        b_box = get_b_box(bpy.context, rail_obj)
+        obj_mask["rail"] = {}
+        obj_mask["rail"]["b_box"] = b_box
+        obj_mask["rail"]["mask"] = encodeMask(cv2.imread(path + '/Image0001.png')[:, :, 0])
+        os.system('rm -r {}'.format(path))
 
     # get mask and bounding box of the locomotive
     path = base_path + f't_{t_num}_loco'

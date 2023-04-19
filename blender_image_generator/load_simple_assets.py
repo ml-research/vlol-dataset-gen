@@ -7,16 +7,16 @@ from blender_image_generator.load_assets import add_position
 
 def create_simple_scene(train, train_collection, train_init_cord, alpha):
     displacement = .4 * train.get_blender_scale()[0]
-    train_tail_coord = get_new_pos(train_init_cord, train.get_car_length('simple_engine')/2, alpha)
+    train_tail_coord = get_new_pos(train_init_cord, train.get_car_length('simple_engine') / 2, alpha)
 
     for car in train.m_cars:
         distance = car.get_car_length_scalar()
-        train_tail_coord = get_new_pos(train_tail_coord, distance/2 + displacement, alpha)
+        train_tail_coord = get_new_pos(train_tail_coord, distance / 2 + displacement, alpha)
 
         car_collection = create_platform(car, train_tail_coord, train_collection, alpha)
 
         load_objects(car_collection, train_tail_coord, car, alpha)
-        train_tail_coord = get_new_pos(train_tail_coord, distance/2, alpha)
+        train_tail_coord = get_new_pos(train_tail_coord, distance / 2, alpha)
 
         # load_side_obj(car_collection, train_tail_coord, car, alpha)
 
@@ -261,4 +261,5 @@ def load_simple_engine(train_collection, train_init_cord, alpha, scale=(0.5, 0.5
     init_obj_scale = (1.6 * scale[0], .8 * scale[0], .8 * scale[0])
     my_collection = bpy.data.collections.new(collection)
     train_collection.children.link(my_collection)
-    load_simple_asset(filepath, None, alpha, train_init_cord, my_collection, link, init_obj_scale=init_obj_scale)
+    load_simple_asset(filepath, None, alpha, train_init_cord, my_collection, link, init_obj_scale=init_obj_scale,
+                      pass_index=30000)
