@@ -51,7 +51,7 @@ class MichalskiMaskDatasetV2(MichalskiAttributeDataset):
         att = self.attribute_classes
         train = self.trains[item]
         cars = train.get_cars()
-        labels = [24]
+        labels = [att.index('locomotive')]
         # each train has (n cars a 9 attributes) totalling to n*9 labels + 1 for the locomotive
         # each label can have 22 classes (assignable attributes) + 1 car label + 1 for the locomotive
         for car in cars:
@@ -64,7 +64,7 @@ class MichalskiMaskDatasetV2(MichalskiAttributeDataset):
             l_shape = att.index(car.get_blender_payload())
             l_num = car.get_load_number()
             l_shapes = [l_shape] * l_num + [0] * (3 - l_num)
-            car_label = 23
+            car_label = att.index('car')
             labels += [car_label, color, length, wall, roof, wheels] + l_shapes
         # remove the 0 labels (not existent)
         labels = torch.tensor(labels, dtype=torch.int64)
