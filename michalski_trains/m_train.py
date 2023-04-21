@@ -94,6 +94,12 @@ class MichalskiTrain(object):
                 index += 1
             car.set_index(indicies)
 
+    def to_txt(self):
+        txt = f'{self.direction} {self.angle}'
+        for car in self.m_cars:
+            txt += ' ' + car.to_txt()
+        return txt
+
 
 class MichalskiCar(object):
     '''
@@ -144,6 +150,9 @@ class MichalskiCar(object):
 
     def get_load_shape(self):
         return self.l_shape
+
+    def to_txt(self):
+        return str(self.n) + " " + self.shape + " " + self.length + " " + self.double + " " + self.roof + " " + str(self.wheels) + " " + self.l_shape + " " + str(self.l_num)
 
 
 class BlenderCar(MichalskiCar):
