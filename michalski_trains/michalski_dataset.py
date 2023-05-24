@@ -12,7 +12,7 @@ from michalski_trains.m_train import *
 
 class MichalskiDataset(Dataset):
     def __init__(self, class_rule, base_scene, raw_trains, train_vis, min_car=2, max_car=4,
-                 ds_size=10000, resize=False, label_noise=0, image_noise=0, ds_path='output/image_generator',
+                 ds_size=10000, resize=False, ds_path='output/image_generator',
                  preprocessing=None):
         """ MichalskiTrainDataset
             @param class_rule (string): classification rule
@@ -28,11 +28,11 @@ class MichalskiDataset(Dataset):
             @return y_val: label data
             """
         # ds data
-        self.images, self.trains, self.masks = [], [], []
+        self.images, self.y, self.trains, self.masks = [], [], [], []
         # ds settings
         self.class_rule, self.base_scene, self.raw_trains, self.train_vis = class_rule, base_scene, raw_trains, train_vis
         self.min_car, self.max_car = min_car, max_car
-        self.resize, self.train_count, self.label_noise = resize, ds_size, label_noise
+        self.resize, self.train_count, = resize, ds_size
         # ds path
         self.ds_typ = f'{train_vis}_{class_rule}_{raw_trains}_{base_scene}_len_{min_car}-{max_car}'
         self.image_base_path = f'{ds_path}/{self.ds_typ}/images'
@@ -67,7 +67,10 @@ class MichalskiDataset(Dataset):
                 train = scene['m_train']
                 # self.trains.append(
                 #     train.replace('michalski_trains.m_train.', 'm_train.'))
-                self.trains.append(jsonpickle.decode(train))
+                train = jsonpickle.decode(train)
+                lab = int(train.get_label() == 'east')
+                self.y.append(lab)
+                self.trains.append(train)
                 self.masks.append(scene['car_masks'])
         # transform
 
@@ -79,9 +82,6 @@ class MichalskiDataset(Dataset):
         if resize:
             print('resize true')
             trans.append(transforms.Resize((224, 224), interpolation=transforms.InterpolationMode.BICUBIC))
-        if image_noise > 0:
-            print('adding noise to images')
-            trans.append(AddBinaryNoise(image_noise))
 
         trans.append(transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]))
 
@@ -91,19 +91,6 @@ class MichalskiDataset(Dataset):
             transforms.Normalize(mean=[0.5, 0.5, 0.5],
                                  std=[0.5, 0.5, 0.5]),
         ])
-        # add noise to labels
-        if label_noise > 0:
-            print(f'applying noise of {label_noise} to dataset labels')
-            for train in self.trains:
-                n = random.random()
-                if n < label_noise:
-                    lab = train.get_label()
-                    if lab == 'east':
-                        train.set_label('west')
-                    elif lab == 'west':
-                        train.set_label('east')
-                    else:
-                        raise ValueError(f'unexpected label value {lab}, expected value east or west')
 
     def __getitem__(self, item):
         image = self.get_pil_image(item)
@@ -112,20 +99,42 @@ class MichalskiDataset(Dataset):
         return X, y
 
     def __len__(self):
-        return self.train_count
+        return len(self.y)
 
     def get_image_size(self, item):
         im = self.get_pil_image(item)
         return im.size
 
     def get_direction(self, item):
-        lab = self.trains[item].get_label()
-        if lab == 'none':
-            # return torch.tensor(0).unsqueeze(dim=0)
-            raise AssertionError(f'There is no direction label for the selected DS {self.ds_typ}')
-        label_binary = self.label_classes.index(lab)
+        # lab = self.trains[item].get_label()
+        # if lab == 'none':
+        #     # return torch.tensor(0).unsqueeze(dim=0)
+        #     raise AssertionError(f'There is no direction label for the selected DS {self.ds_typ}')
+        # label_binary = self.label_classes.index(lab)
+        label_binary = self.y[item]
         label = torch.tensor(label_binary).unsqueeze(dim=0)
         return label
+
+    def apply_label_noise(self, label_noise):
+        if label_noise > 0:
+            print(f'applying noise of {label_noise} to dataset labels')
+            for idx in range(self.__len__()):
+                n = random.random()
+                if n < label_noise:
+                    train = self.get_m_train(idx)
+                    self.y[idx] = 1 - self.y[idx]
+                    lab = train.get_label()
+                    if lab == 'east':
+                        train.set_label('west')
+                    elif lab == 'west':
+                        train.set_label('east')
+                    else:
+                        raise ValueError(f'unexpected label value {lab}, expected value east or west')
+
+    def apply_image_noise(self, image_noise):
+        if image_noise > 0:
+            print('adding noise to images')
+            self.norm.transforms.insert(-2, AddBinaryNoise(image_noise))
 
     def get_m_train(self, item):
         return self.trains[item]

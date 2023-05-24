@@ -14,8 +14,8 @@ from michalski_trains.michalski_mask_dataset_v2 import MichalskiMaskDatasetV2
 
 
 def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_car=4,
-                 ds_size=12000, ds_path='output/image_generator', y_val='direction', resize=False, label_noise=0,
-                 image_noise=0, preprocessing=None, fixed_output_car_size=4):
+                 ds_size=12000, ds_path='output/image_generator', y_val='direction', resize=False,
+                 preprocessing=None, fixed_output_car_size=4):
     """
     Returns the train and validation dataset for the given parameters
     Args:
@@ -42,23 +42,23 @@ def get_datasets(base_scene, raw_trains, train_vis, class_rule, min_car=2, max_c
     if y_val == 'direction':
         full_ds = MichalskiDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                    train_vis=train_vis, min_car=min_car, max_car=max_car,
-                                   label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
-                                   image_noise=image_noise, preprocessing=preprocessing)
+                                   ds_size=ds_size, resize=resize, ds_path=ds_path,
+                                   preprocessing=preprocessing)
     elif y_val == 'attributes':
         full_ds = MichalskiAttributeDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                             train_vis=train_vis, min_car=min_car, max_car=max_car,
-                                            label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
-                                            image_noise=image_noise, preprocessing=preprocessing)
+                                            ds_size=ds_size, resize=resize, ds_path=ds_path,
+                                            preprocessing=preprocessing)
     elif y_val == 'mask':
         full_ds = MichalskiMaskDataset(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                        train_vis=train_vis, min_car=min_car, max_car=max_car,
-                                       label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
-                                       image_noise=image_noise, preprocessing=preprocessing)
+                                       ds_size=ds_size, resize=resize, ds_path=ds_path,
+                                       preprocessing=preprocessing)
     elif y_val == 'maskv2':
         full_ds = MichalskiMaskDatasetV2(class_rule=class_rule, base_scene=base_scene, raw_trains=raw_trains,
                                          train_vis=train_vis, min_car=min_car, max_car=max_car,
-                                         label_noise=label_noise, ds_size=ds_size, resize=resize, ds_path=ds_path,
-                                         image_noise=image_noise, preprocessing=preprocessing)
+                                         ds_size=ds_size, resize=resize, ds_path=ds_path,
+                                         preprocessing=preprocessing)
     else:
         raise AssertionError(f'Unknown y value {y_val}')
     return full_ds
