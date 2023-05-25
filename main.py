@@ -18,7 +18,7 @@ def main():
     # settings general
     ds_size, out_path, device = args.dataset_size, args.output_path, torch.device(
         f"cuda:{args.cuda}" if torch.cuda.is_available() else "cpu")
-    tag = args.tag + '_' if args.tag != "" else args.tag
+    tag = args.tag + '/' if args.tag != "" else args.tag
 
     # bk settings
     bk, replace_bk = args.bk, args.replace_bk
