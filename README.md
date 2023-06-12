@@ -1,32 +1,38 @@
-# The Three Dimensional Michalski Train Generator
+# V-LoL<img src="example_images/train.png" width="45"> Generator
 
-Repository for the three-dimensional Michalski train generator introduced in `...` .
+here is a smily face: :smiley:
 
-The Michalski train problem [[1]](#1) proposed by Ryszard S. Michalski in 1980 represents
-one of the most prominent challenges in the domain of relational learning. The problem
-constitutes a set of trains, which are composed of a wide variety of properties and labeled
-into the two categories `Eastbound` and `Westbound` trains. It is up to the viewer
-to generate a classification hypothesis governing what trains are eastbound
-and what are westbound. The conjectured hypothesis should accomplish both
-assigning the correct labels while retaining a degree of generality. It is
-certainly easy to find a classification hypothesis satisfying a given set of Michalski trains,
-e.g. learning the trains by heart. However, due to the great number of train properties, it
-is a major challenge to find the most general decision hypothesis.
+Repository for the V-LoL<img src="example_images/train.png" width="20"> generator introduced in `...` .
 
-This study takes the clevr dataset even a step further by introducing the Michalski train problem in the form of a complex rule-based learning task into it.
-In doing so, we aim to provide a novel dataset for the domain of relational and analogical (grounded) visual reasoning.
-For this we provide an image generator that allows a simple and efficient large-scale generation of visual datasets.
-Furthermore, we allow a highly flexible customisation of the dataset that allows us to take effect/shape on the complexities of visual perception and relational reasoning.
-We can incorporate any arbitrary prolog rule and test for different kind of reasoning abilities (recognition, counting, spatial, numerical, logical, abstract).
+Despite the successes of recent developments in visual AI, different shortcomings still exist;
+from missing exact logical reasoning, to abstract generalization abilities, to understanding complex and noisy scenes.
+Unfortunately, existing benchmarks, were not designed to capture more than a few of these aspects.
+Whereas deep learning datasets focus on visually complex data but simple visual reasoning tasks,
+inductive logic datasets involve complex logical learning tasks, however, lack the visual component.
+To address this, we propose the visual logical learning dataset, V-LoL,
+that seamlessly combines visual and logical challenges.
+Notably, we introduce the first instantiation of V-LoL, V-LoL<img src="example_images/train.png" width="20">,
+-- a visual rendition of a classic benchmark in symbolic AI, the Michalski train problem.
+By incorporating intricate visual scenes and flexible logical reasoning tasks within a versatile framework,
+V-LoL<img src="example_images/train.png" width="20"> provides a platform for investigating a wide range of visual logical learning challenges.
 
-[//]: # (This study takes the Michalski train problem one step further by introducing it in form of a complex rule-based learning task into a clevr like datasets.)
+<div align="center">
+  <img src="example_images/main_figure.png" width="600"  alt="">
+</div>
 
-This research aims to contribute an ILP dataset which allows to incorporate the complex rule-based logic of the
-Michalski train problem and establish a modern three-dimensional dataset creating a problem of inductive inference.
-The resulting datasets allow for diagnostic insights into an AI model’s decision-making process as well as its
-capabilities of rule-based learning.
+
+With V-LoL we provide a diagnostic dataset that allows to test a variety of visual logical learning challenges.
+(I) The generation process of V-LoL<img src="example_images/train.png" width="20"> consists of sampling symbolic train representations
+(\ie train cars and their attributes) from a pre-defined distribution. Via a logical class rule the class affiliation
+of each train sample is determined and finally the 3D visual representations are rendered with different visual complexity. 
+(II) The logic rules can easily be exchanged allowing for great versatility in data generation for specific learning challenges, 
+\eg inherent counting abilities of a model. 
+(III) One can test the behaviour of trained models via tailored test-time interventions, e.g. interventions on the order of car pay loads. 
+(IV) By increasing the number of cars in the test set one can test for abstract generalization abilities of a model, also 
+(V) via small dataset sizes.
 
 [//]: # ()
+
 [//]: # (% 1. Allows simple, efficient and large-scale generation of datasets.)
 
 [//]: # (% 2. Customise the complexities of the visual and relational challenges.)
@@ -42,20 +48,17 @@ capabilities of rule-based learning.
 [//]: # (% 6. Establish datasets with rich scene information &#40;depth, object masks, etc.&#41;)
 
 
-<div align="center">
-  <img src="example_images/michalski_original.png" width="600"  alt="">
-</div>
-<div align="center">
-  <img src="example_images/michalski_3D.png" width="400"  alt="">
-  <img src="example_images/simple_scene.png" width="400"  alt="">
-</div>
 
-In the top image you can see the original Michalski trains, in the bottom images you can see example images from our
-novel 3D Michalski train generator.
 
-You can use the code of this repository to generate Michalski train descriptions, render their corresponding images and
-create a three-dimensional Michalski train dataset. Below we provide detailed descriptions and explanations of the
-necessary steps to create the datasets.
+
+
+
+
+You can use the code of this repository to generate new V-LoL<img src="example_images/train.png" width="20"> datasets. 
+The procedure can be described via two high-level generation steps:
+First, we use the specified classification rule to deduce a symbolic representations of trains composition (symbolic train).
+In the second step, the symbolic train is transformed and rendered into a complex visual scene. 
+Below we provide detailed explanations on how to create new datasets.
 
 ## Instructions for setting up the docker container
 
@@ -63,19 +66,19 @@ A docker container can be used to set up the required environment.
 Additionally, CUDA 11.3+, docker and nvidia-container-toolkit must be installed to allow the
 usage of the docker container and enable image rendering.
 
-For easier handling we recommend to create a screen: `screen -S train_generator`
+For easier handling we recommend to create a screen: `screen -S vlol`
 
 Then:
 
 ```bash
 cd TrainGenerator
-docker build -t blender_train_generator .
-docker run --gpus device=0 -v $(pwd):/home/workdir blender_train_generator python3 main.py
+docker build -t vlol .
+docker run --gpus device=0 -v $(pwd):/home/workdir vlol python3 main.py
 ```
 
 ## Overview
 
-This is a very brief instruction on how the three-dimensional Michalski train dataset is generated.
+This is a very brief instruction on the V-LoL<img src="example_images/train.png" width="20"> generation process.
 At first, we generate train descriptions for the whole dataset resorting to a slightly adapted version of Muggleton's
 train generator [[2]](#2).
 We have extended the code to assign labels to the generated train descriptions according to a specified decision rule.
@@ -85,15 +88,20 @@ individual rules see section below.
 Subsequently, we render images for the individual train descriptions, generate their ground-truth information creating a
 dataset.
 The train generator provides a wide range of settings allowing to adapt to the given requirements.
-The default output location is `TrainGenerator/output/image_generator/`.
+The default output location is `TrainGenerator/output/image_generator/`. In the following images you can see example images
+from our V-LoL<img src="example_images/train.png" width="20"> generator.
+
+<div align="center">
+  <img src="example_images/michalski_3D.png" width="400"  alt="">
+  <img src="example_images/simple_scene.png" width="400"  alt="">
+</div>
 
 ## Script parameters
 
 The following settings are available, the corresponding input types and default settings are noted in parentheses:
 
 General:
-
-- `dataset_size` (int, 10,000) -> Size of the dataset we want to create.
+- `dataset_size` (int, 10,000) -> Size of the dataset you want to create.
 - `output_path` (str, 'output/image_generator') -> path to the output directory in which the generated datasets are
   saved.
 - `cuda` (int, 0) -> Which GPU to use for rendering. If -1, CPU is used.
@@ -104,15 +112,14 @@ Background knowledge:
   The following rules are available: 'theoryx', 'easy', 'color', 'numerical', 'multi', 'complex', 'custom'.
   For more detailed information about the rules refer to the rule section.
   Select custom rule to use your own personal rule. Therefore, define your own rule in \'example_rules/custom_rule.pl\'.
-- `bk` (str, 'MichalskiTrains') -> The train descriptions we want to generate. Either 'MichalskiTrains' or '
+- `distribution` (str, 'MichalskiTrains') -> The train descriptions we want to generate. Either 'MichalskiTrains' or '
   RandomTrains'.
-  The 'RandomTrains' descriptions are generated randomly.
-  The 'MichalskiTrains' descriptions are generated according to distributional assumptions defined by
-  Muggleton [[2]](#2).
-- `replace_bk` (bool, False) -> If the bk for the dataset is already generated shall it be replaced?
-  If false, it allows to use same bk for different visualizations.
+  The 'RandomTrains' are sampled from a uniform distribution of the attributes.
+  The 'MichalskiTrains' are sampled according to distributional assumptions defined by Muggleton [[2]](#2).
 - `max_train_length` (int, 4) -> The maximum number of cars a train can have.
 - `min_train_length` (int, 2) -> The minimum number of cars a train can have.
+- `replace_bk` (bool, False) -> If the bk for the dataset is already generated shall it be replaced?
+  If false, it allows to use same bk for multiple runs.
 
 Visualization:
 
@@ -120,8 +127,8 @@ Visualization:
   SimpleObjects'. For comparison see images above.
 - `background` (str, 'base_scene') -> Scene in which the trains are set: 'base_scene', 'desert_scene', 'sky_scene'
   or 'fisheye_scene'.
-- `occlusion` (bool, False) -> Whether to include train angles which might lead to occlusion individual parts of
-  the train.
+- `occlusion` (bool, False) -> Whether to include rotation angles of the train which might lead to occlusion of 
+  individual parts of the train.
 
 Parallelization:
 
@@ -270,17 +277,17 @@ You can use these values defined below for the predicates defined above:
 |            | u_shaped  |     		     |    		    |  peaked  |     		      |  hexagon   |
 |    			     |    		     |     		     |   			    |    		    |             | utriangle  |
 
-#### Michalski-3D
+#### Symbolic V-LoL<img src="example_images/train.png" width="20"> representation
 
-| Car Position | Car Colour | Car Length | Car Wall | Car Roof | Axles | Payload 1 & Payload 2 & Payload 3 |
-|:------------:|:----------:|:----------:|:--------:|:--------:|:-----:|:---------------------------------:|
-|      1       |   Yellow   |   Short    |   Full   |   None   |   2   |             Blue Box              |
-|      2       |   Green    |    Long    | Railing  |  Frame   |   3   |            Golden Vase            |
-|      3       |    Grey    |     	      |    		    |   Flat   |       |              Barrel               |
-|      4       |    Red     |     		     |   			    |   Bars   |       |              Diamond              |
-|              |    Blue    |     		     |    		    |  Peaked  |  		   |             Metal Pot             |
-|     			      |     		     |     		     |   			    |    		    |       |             Cval Vase             |
-|      		      |     		     |     		     |   			    |    		    |       |               None                |
+| Car Position | Car Colour | Car Length | Car Wall | Car Roof | Car Axles | Load Number | Load Shape  |
+|:------------:|:----------:|:----------:|:--------:|:--------:|:---------:|:-----------:|:-----------:|
+|      1       |   Yellow   |   Short    |   Full   |   None   |     2     |      0      |  Blue Box   |
+|      2       |   Green    |    Long    | Railing  |  Frame   |     3     |      1      | Golden Vase |
+|      3       |    Grey    |     	      |    		    |   Flat   |           |      2      |   Barrel    |
+|      4       |    Red     |     		     |   			    |   Bars   |           |      3      |   Diamond   |
+|              |    Blue    |     		     |    		    |  Peaked  |    		     |             |  Metal Pot  |
+|     			      |     		     |     		     |   			    |    		    |           |             |  Oval Vase  |
+|      		      |     		     |     		     |   			    |    		    |           |             |    None     |
 
 Overview of our three-dimensional train representation.
 The following image illustrates the above described predicates.
@@ -289,17 +296,17 @@ The following image illustrates the above described predicates.
   <img src="example_images/descriptor_overview/overview.png" height="350px"  alt="">
 </div>
 
-#### Three-dimensional simple representation
+#### Symbolic V-LoL<img src="example_images/square.png" width="11"> representation
 
-| Car Position | Car Color | Car length | Black Top |    Car Shape    | Black Bottom | Load 1 & Load 2 & Load 3 |
-|:------------:|:---------:|:----------:|:---------:|:---------------:|:------------:|:------------------------:|
-|      1       |  Yellow   |   Short    |   True    |      Cube       |     True     |          Sphere          |
-|      2       |   Green   |    Long    |   False   |    Cylinder     |    False     |         Pyramid          |
-|      3       |   Grey    |     	      |    		     |   Hemisphere    |              |           Cube           |
-|      4       |    Red    |     		     |    			    |     Frustum     |              |         Cylinder         |
-|              |   Blue    |     		     |    		     | hexagonal Prism |      		      |           Cone           |
-|     			      |    		     |     		     |    			    |       		        |              |          Torus           |
-|      		      |    		     |     		     |    			    |       		        |              |           None           |
+| Car Position | Car Colour | Car Length | Black Top |    Car Shape    | Black Bottom | Load Number | Load Shape |
+|:------------:|:----------:|:----------:|:---------:|:---------------:|:------------:|:-----------:|:----------:|
+|      1       |   Yellow   |   Short    |   True    |      Cube       |     True     |      0      |   Sphere   |
+|      2       |   Green    |    Long    |   False   |    Cylinder     |    False     |      1      |  Pyramid   |
+|      3       |    Grey    |     	      |    		     |   Hemisphere    |              |      2      |    Cube    |
+|      4       |    Red     |     		     |    			    |     Frustum     |              |      3      |  Cylinder  |
+|              |    Blue    |     		     |    		     | hexagonal Prism |      		      |             |    Cone    |
+|     			      |     		     |     		     |    			    |       		        |              |             |   Torus    |
+|      		      |     		     |     		     |    			    |       		        |              |             |    None    |
 
 The Train generator also allows for a simpler visualization relying on less complex objects.
 The following image illustrates the above described predicates.
@@ -420,6 +427,22 @@ The corresponding ground truth information is located in the 'scenes' folder.
 The depth information of the individual images is located in the 'depths' folder (if depth_gen is opted).
 The blender scene which is used to render the individual images is located in the 'blendfiles' folder (if save_blend is
 opted).
+
+# The Michalski Train Problem
+<div align="center">
+  <img src="example_images/michalski_original.png" width="600"  alt="">
+</div>
+The Michalski train problem [[1]](#1) proposed by Ryszard S. Michalski in 1980 represents
+one of the most prominent challenges in the domain of relational learning. The problem
+constitutes a set of trains, which are composed of a wide variety of properties and labeled
+into the two categories `Eastbound` and `Westbound` trains. It is up to the viewer
+to generate a classification hypothesis governing what trains are eastbound
+and what are westbound. The conjectured hypothesis should accomplish both
+assigning the correct labels while retaining a degree of generality. It is
+certainly easy to find a classification hypothesis satisfying a given set of Michalski trains,
+e.g. learning the trains by heart. However, due to the great number of train properties, it
+is a major challenge to find the most general decision hypothesis.
+
 
 ## References
 
