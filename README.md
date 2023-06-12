@@ -62,7 +62,7 @@ Background knowledge:
   Select custom rule to use your own personal rule. Therefore, define your own rule in \'example_rules/custom_rule.pl\'.
 - `distribution` (str, 'MichalskiTrains') -> The distribution we want to sample from. Either 'MichalskiTrains' or '
   RandomTrains'. The 'RandomTrains' are sampled from a uniform distribution of the attributes.
-  The 'MichalskiTrains' c [[2]](#2).
+  'MichalskiTrains' are sampled according to distributional assumptions defined by Muggleton [[2]](#2).
 - `max_train_length` (int, 4) -> The maximum number of cars a train can have.
 - `min_train_length` (int, 2) -> The minimum number of cars a train can have.
 - `replace_symbolics` (bool, False) -> If the symbolic trains for the dataset are already generated shall they be replaced?
