@@ -147,7 +147,7 @@ The other classification are denoted as follows:
   number of loads, or there is a short and a long car with the same colour where the position number of the short car is
   smaller as the wheel count of the long car, or the train has three differently coloured cars.
 
-## Symbolic Train Representation
+## Symbolic train representation
 
 The definition of the original Michalski trains heavily relies on their two-dimensional delineation and does not
 meet the requirements of a vivid three-dimensional visualization.
