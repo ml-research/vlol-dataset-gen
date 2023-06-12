@@ -20,8 +20,8 @@ def main():
         f"cuda:{args.cuda}" if torch.cuda.is_available() else "cpu")
     tag = args.tag + '/' if args.tag != "" else args.tag
 
-    # bk settings
-    bk, replace_bk = args.bk, args.replace_bk
+    # distribution settings
+    distribution, replace_symbolics = args.distribution, args.replace_symbolics
     rule = args.classification
     min_cars, max_cars = args.min_train_length, args.max_train_length
 
@@ -35,25 +35,25 @@ def main():
     save_blender, high_res, gen_depth = args.save_blender, args.high_res, args.depth
 
     # parallel settings
-    replace_existing_img = not args.parallel
+    replace_existing_img = not args.continue_run
     start_ind = args.index_start
     end_ind = args.index_end if args.index_end is not None else ds_size
 
     if args.command == 'image_generator':
         # generate images in range [start_ind:end_ind]
-        ds_raw_path = f'{out_path}/dataset_descriptions/{rule}/{tag}{bk}_len_{min_cars}-{max_cars}.txt'
+        ds_raw_path = f'{out_path}/dataset_descriptions/{rule}/{tag}{distribution}_len_{min_cars}-{max_cars}.txt'
         if start_ind > ds_size or end_ind > ds_size:
             raise ValueError(f'start index {start_ind} or end index {end_ind} greater than dataset size {ds_size}')
         if min_cars > max_cars:
             warnings.warn(f'max cars {max_cars} is smaller than min cars {min_cars}, setting max cars to {min_cars}')
             max_cars = min_cars
-        print(f'generating {train_vis} images using {bk} descriptions with {min_cars} to {max_cars} cars, '
+        print(f'generating {train_vis} images using {distribution} descriptions with {min_cars} to {max_cars} cars, '
               f'the labels are derived frome the {rule} classification rule, '
               f'the images are set in the {base_scene} background')
 
         # generate raw trains if they do not exist or shall be replaced
-        if not os.path.isfile(ds_raw_path) or replace_bk:
-            gen_raw_trains(bk, rule, min_cars=min_cars, max_cars=max_cars,
+        if not os.path.isfile(ds_raw_path) or replace_symbolics:
+            gen_raw_trains(distribution, rule, min_cars=min_cars, max_cars=max_cars,
                            with_occlusion=occ, num_entries=ds_size, out_path=ds_raw_path)
 
         num_lines = sum(1 for _ in open(ds_raw_path))
@@ -62,7 +62,7 @@ def main():
                 f'defined dataset size: {ds_size}\n'
                 f'existing train descriptions: {num_lines}\n'
                 f'{num_lines} raw train descriptions were previously generated in {ds_raw_path} \n '
-                f'add \'--replace_bk\' to command line arguments to the replace existing train descriptions and '
+                f'add \'--replace_symbolics\' to command line arguments to the replace existing train descriptions and '
                 f'generate the correct number of michalski trains')
 
         # get scale for train if auto zoom is enabled relative to the number of cars in the train
@@ -78,11 +78,11 @@ def main():
         rtpt.start()
         # dummy tensor so rtpt shows gpu allocation
         t = torch.Tensor([0]).to(device)
-        ds_name = tag + f'{train_vis}_{rule}_{bk}_{base_scene}_len_{min_cars}-{max_cars}'
+        ds_name = tag + f'{train_vis}_{rule}_{distribution}_{base_scene}_len_{min_cars}-{max_cars}'
 
         for t_num, train in enumerate(trains, start=start_ind):
             rtpt.step()
-            generate_image(rule, base_scene, bk, train_vis, t_num, train, save_blender=save_blender,
+            generate_image(rule, base_scene, distribution, train_vis, t_num, train, save_blender=save_blender,
                            replace_existing_img=replace_existing_img, ds_name=ds_name, high_res=high_res,
                            gen_depth=gen_depth, min_cars=min_cars, max_cars=max_cars)
         combine_json(ds_name, out_dir=out_path, ds_size=ds_size)
@@ -103,17 +103,18 @@ def parse():
     parser.add_argument('--cuda', type=int, default=0, help='Which cuda device to use')
 
     # Background knowledge settings
-    parser.add_argument('--bk', type=str, default='MichalskiTrains',
-                        help='whether to generate bk based on \'MichalskiTrains\', \'RandomTrains\'')
+    parser.add_argument('--distribution', type=str, default='MichalskiTrains',
+                        help='The distribution we want to sample from. Either \'MichalskiTrains\' or \'RandomTrains\'.'
+                             'MichalskiTrains are sampled according to distributional assumptions defined by Muggleton.'
+                             'RandomTrains are sampled uniformly at random.')
     parser.add_argument('--classification', type=str, default='theoryx',
                         help='the classification rule used for generating the labels of the dataset, possible options: '
                              '\'theoryx\', \'easy\', \'color\', \'numerical\', \'multi\', \'complex\', \'custom\'')
     parser.add_argument('--max_train_length', type=int, default=4, help='max number of cars a train can have')
     parser.add_argument('--min_train_length', type=int, default=2, help='min number of cars a train can have')
-    parser.add_argument('--replace_bk', type=bool, default=False,
-                        help='Allows multiple usages of the same bk if no bk settings are changed. '
-                             'By default train descriptions are not replaced. '
-                             'If new train descriptions need to be rendered set to True')
+    parser.add_argument('--replace_symbolics', type=bool, default=False,
+                        help='If the symbolic trains for the dataset are already generated shall they be replaced?'
+                             ' If false, it allows to use same trains for multiple generation runs.')
 
     # Visualization settings
     parser.add_argument('--visualization', type=str, default='Trains', help='whether to transform the generated train '
@@ -131,10 +132,10 @@ def parse():
     # Parallelization settings
     parser.add_argument('--index_start', type=int, default=0, help='start rendering images at index')
     parser.add_argument('--index_end', type=int, default=None, help='stop rendering images at index')
-    parser.add_argument('--parallel', type=bool, default=True,
-                        help='Enables parallel generation of one dataset. Recommended to clear tmp folder before. '
-                             'Images generated in tmp folder from previously uncompleted runs (of the same settings) '
-                             'are not deleted.')
+    parser.add_argument('--continue_run', type=bool, default=True,
+                        help='Enables parallel generation of one dataset. Uncompleted/aborted runs will be continued. '
+                             'If set to False we start a new run and the images generated in tmp folder from previously'
+                             ' uncompleted runs (of the same settings) will be deleted.')
 
     # rendering settings
     parser.add_argument('--save_blender', type=bool, default=False,
