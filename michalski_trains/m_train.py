@@ -152,7 +152,8 @@ class MichalskiCar(object):
         return self.l_shape
 
     def to_txt(self):
-        return str(self.n) + " " + self.shape + " " + self.length + " " + self.double + " " + self.roof + " " + str(self.wheels) + " " + self.l_shape + " " + str(self.l_num)
+        return str(self.n) + " " + self.shape + " " + self.length + " " + self.double + " " + self.roof + " " + str(
+            self.wheels) + " " + self.l_shape + " " + str(self.l_num)
 
 
 class BlenderCar(MichalskiCar):
@@ -179,13 +180,7 @@ class BlenderCar(MichalskiCar):
             # engine length (2,9 - 0.067029) = 2,832971 along x axis
             "engine": 3.75 * self.scale[0]
         }[self.length]
-        # self.payload_scale = {
-        #     "golden_vase": (0.015, 0.015, 0.05),
-        #     "barrel": (0.4, 0.4, 0.4),
-        #     "diamond": (40, 40, 40),
-        #     "metal_pot": (1.2, 1.2, 1.2),
-        #     "oval_vase": (2.5, 2.5, 2.5),
-        # }
+
         self.payload_scale = {
             "golden_vase": (0.03, 0.03, 0.1),
             "barrel": (0.8, 0.8, 0.8),
@@ -222,13 +217,6 @@ class BlenderCar(MichalskiCar):
         return roof_to_b_obj[self.roof]
 
     def get_blender_wall(self):
-        # roof_to_wall = {
-        #     "none": None,
-        #     "arc": "striped",
-        #     "flat": 'full',
-        #     "jagged": 'cage',
-        #     "peaked": 'minimal'
-        # }
         roof_to_wall = {
             "double": "braced_wall",
             "not_double": 'solid_wall',
@@ -278,7 +266,6 @@ class BlenderCar(MichalskiCar):
         return self.car_length_scalar
 
     # set and get blender world coords for individual car objects
-
     def set_blender_world_cord(self, obj_name, cord):
         self.blender_cords[obj_name] = cord
 
@@ -357,6 +344,67 @@ class SimpleCar(BlenderCar):
             "utriangle": 'torus'
         }
         return load_to_b_obj[self.l_shape]
+
+
+def blender_to_michalski(blender_car_number: int, blender_color: str, blender_length: str, blender_wall: str,
+                         blender_roof: str, blender_wheels: int, blender_payload_number: int,
+                         blender_payload_shape: str):
+    '''
+    @param blender_car_number: (int) blender car number
+    @param blender_color: (str) blender color, either yellow, green, grey, red, blue
+    @param blender_length: (str) blender length, either long, short
+    @param blender_wall: (str) blender wall, either brace_wall, solid_wall
+    @param blender_roof: (str) blender roof, either roof_foundation, solid_roof, braced_roof, peaked_roof
+    @param blender_wheels: (int) blender wheels, either 2, 4
+    @param blender_payload_number: (int) blender payload number, either 0, 1, 2, 3
+    @param blender_payload_shape: (str) blender payload shape, either diamond, box, golden_vase, barrel, metal_pot, oval_vase, none
+    @return:
+        n: car number (int)
+        shape: car shape (str), either rectangle, bucket, ellipse, hexagon, u_shaped
+        length: car length (str), either long, short
+        double: car wall (str), either double, not_double
+        roof: car roof (str), either none, arc, flat, jagged, peaked
+        wheels: car wheels (int), either 2, 3
+        l_shape: payload shape (str), either diamond, rectangle, triangle, circle, hexagon, utriangle, none
+        l_num: payload number (int), either 0, 1, 2, 3
+    '''
+    n = blender_car_number
+    shape = {
+        'yellow': 'rectangle',
+        'green': 'bucket',
+        'grey': 'ellipse',
+        'red': 'hexagon',
+        'blue': 'u_shaped',
+    }[blender_color]
+    length = {
+        'long': 'long',
+        'short': 'short',
+    }[blender_length]
+    double = {
+        'braced_wall': 'double',
+        'solid_wall': 'not_double',
+    }[blender_wall]
+    roof = {
+        'roof_foundation': 'none',
+        'solid_roof': 'flat',
+        'braced_roof': 'arc',
+        'peaked_roof': 'peaked',
+    }[blender_roof]
+    wheels = {
+        2: 2,
+        3: 3,
+    }[blender_wheels]
+    l_shape = {
+        'diamond': 'diamond',
+        'box': 'rectangle',
+        'golden_vase': 'triangle',
+        'barrel': 'circle',
+        'metal_pot': 'hexagon',
+        'oval_vase': 'utriangle',
+        'none': 'none',
+    }[blender_payload_shape]
+    l_num = blender_payload_number
+    return n, shape, length, double, roof, wheels, l_shape, l_num
 
 # def blender_cat():
 #     color = ['yellow', 'green', 'grey', 'red', 'blue']
