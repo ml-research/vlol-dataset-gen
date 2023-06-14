@@ -51,7 +51,6 @@ class MichalskiTrain(object):
         train_length = len(l) // 8
         for c in range(train_length):
             ind = c * 8
-            # a = (l[ind+i] for i in range(8))
             car = BlenderCar(l[ind + 2], l[ind + 3], l[ind + 4], l[ind + 5], l[ind + 6], l[ind + 7], l[ind + 8],
                              l[ind + 9].strip('\n'))
             if visualization == 'block':
@@ -63,6 +62,10 @@ class MichalskiTrain(object):
         if visualization == 'block':
             train.update_pass_indices()
         return train
+
+    @classmethod
+    def fromJSON(self, obj):
+        return jsonpickle.decode(obj)
 
     def toJSON(self):
         return jsonpickle.encode(self)
@@ -125,6 +128,7 @@ class MichalskiTrain(object):
             txt += ' ' + car.to_txt()
         return txt
 
+
 @dataclass
 class MichalskiCar(object):
     '''
@@ -179,6 +183,7 @@ class MichalskiCar(object):
     def to_txt(self):
         return str(self.n) + " " + self.shape + " " + self.length + " " + self.double + " " + self.roof + " " + str(
             self.wheels) + " " + self.l_shape + " " + str(self.l_num)
+
 
 @dataclass
 class BlenderCar(MichalskiCar):
@@ -296,6 +301,7 @@ class BlenderCar(MichalskiCar):
 
     def get_blender_world_cord(self, obj_name):
         return self.blender_cords[obj_name]
+
 
 @dataclass
 class SimpleCar(BlenderCar):

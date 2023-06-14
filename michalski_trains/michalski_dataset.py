@@ -1,5 +1,4 @@
 import json
-import json
 import os
 import random
 
@@ -67,7 +66,7 @@ class MichalskiDataset(Dataset):
                 # self.depths.append(scene['depth_map_filename'])
                 if 'train' in scene:
                     # new json data format
-                    train = scene['']
+                    train = scene['train']
                     train = MichalskiTrain.from_text(train, train_vis)
                 else:
                     # old json data format
