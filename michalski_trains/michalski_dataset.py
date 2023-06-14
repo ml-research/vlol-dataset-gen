@@ -7,6 +7,7 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
+
 from michalski_trains.m_train import *
 
 
@@ -64,16 +65,22 @@ class MichalskiDataset(Dataset):
             for scene in all_scenes['scenes'][:ds_size]:
                 self.images.append(scene['image_filename'])
                 # self.depths.append(scene['depth_map_filename'])
-                train = scene['m_train']
-                # self.trains.append(
-                #     train.replace('michalski_trains.m_train.', 'm_train.'))
-                train = jsonpickle.decode(train)
+                if 'train' in scene:
+                    # new json data format
+                    train = scene['']
+                    train = MichalskiTrain.from_text(train, train_vis)
+                else:
+                    # old json data format
+                    train = scene['m_train']
+                    train = jsonpickle.decode(train)
+                    # self.trains.append(train.replace('michalski_trains.m_train.', 'm_train.'))
+                    # text = train.to_txt()
+                    # t1 = MichalskiTrain.from_text(text, train_vis)
                 lab = int(train.get_label() == 'east')
                 self.y.append(lab)
                 self.trains.append(train)
                 self.masks.append(scene['car_masks'])
         # transform
-
         self.image_size = self.get_image_size(0)
 
         trans = [transforms.ToTensor()]

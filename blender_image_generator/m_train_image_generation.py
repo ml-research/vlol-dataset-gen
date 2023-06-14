@@ -98,7 +98,8 @@ def generate_image(class_rule, base_scene, raw_trains, train_vis, t_num, train, 
         'blender_filename': os.path.basename(output_blendfile),
         'depth_map_filename': os.path.basename(output_depth_map),
         'angle': train_dir,
-        'm_train': train.toJSON(),
+        # 'm_train': train.toJSON(),
+        'train': train.to_txt(),
         'car_masks': {},
     }
 
