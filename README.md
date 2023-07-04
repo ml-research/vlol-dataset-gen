@@ -38,7 +38,7 @@ For easier handling we recommend to create a screen: `screen -S vlol`
 Then:
 
 ```bash
-cd TrainGenerator
+cd vlol-dataset-gen
 docker build -t vlol .
 docker run --gpus device=0 -v $(pwd):/home/workdir vlol python3 main.py
 ```
